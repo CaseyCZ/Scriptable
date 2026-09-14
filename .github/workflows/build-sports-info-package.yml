@@ -20,38 +20,60 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: Master
+
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
           node --check /tmp/SportsInfo.mjs
-      - name: Build .scriptable package
+
+      - name: Build package and sync release metadata
         run: |
           python .github/scripts/build_sports_info_package.py
-      - name: Validate package
+
+      - name: Validate one-source-of-truth release
         run: |
           python - <<'PY'
           import json,re
           from pathlib import Path
+
           app=Path('apps/Sports-Info')
           src=(app/'Sports Info.js').read_text(encoding='utf-8')
           pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          app_readme=(app/'README.md').read_text(encoding='utf-8')
+          root_readme=Path('README.md').read_text(encoding='utf-8')
+          site=Path('index.html').read_text(encoding='utf-8')
+
+          vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
+
           assert pkg['name']=='Sports Info'
-          assert pkg['script']==src
+          assert pkg['script']==src, '.scriptable does not contain exact Sports Info.js'
           assert 'const APP_NAME = "Sports Info";' in src
-          assert re.search(r'const APP_VERSION\s*=\s*"[^"]+"',src)
+          assert f'**Sports Info v{version} — Production**' in app_readme, 'app README version mismatch'
+          assert f'| 🏆 **Sports Info** | ✅ v{version} |' in root_readme, 'root README version mismatch'
+          assert f"{{name:'Sports Info',version:'{version}'" in site, 'website version mismatch'
+          assert "install:'./apps/Sports-Info/Sports%20Info.scriptable'" in site, 'website install path mismatch'
+          assert 'https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Info/Sports%20Info.js' in src, 'updater is not pinned to Master'
+
           for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
               assert marker in src, marker
           assert len(src)>30000
-          print('Sports Info package OK')
+          print(f'Sports Info v{version}: package + website + READMEs are synchronized')
           PY
-      - name: Commit generated package
+
+      - name: Commit synchronized release files
         run: |
           git config user.name "CaseyCZ automation"
           git config user.email "actions@users.noreply.github.com"
-          git add 'apps/Sports-Info/Sports Info.scriptable'
+          git add \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
           if git diff --cached --quiet; then
-            echo "Generated package unchanged"
+            echo "Sports Info release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync Sports Info package"
+          git commit -m "Sync Sports Info release surfaces"
           git push origin HEAD:Master
