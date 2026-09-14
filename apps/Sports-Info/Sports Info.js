@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.12
+// Sports Info v2.5.13
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.12";
+const APP_VERSION = "2.5.13";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -286,11 +286,11 @@ async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.lay
 function title(parent,v,p){const r=parent.addStack();r.layoutHorizontally();txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
 const TABLE_PROFILES={
-  football:[["team","TÝM",110],["played","Z",18],["wins","V",18],["draws","R",18],["losses","P",18],["score","SK",40],["diff","RS",26],["points","B",28]],
-  hockey:[["team","TÝM",110],["played","Z",18],["wins","V",18],["otWins","VP",22],["otLosses","PP",22],["losses","P",18],["score","SK",40],["points","B",28]],
-  basketball:[["team","TÝM",126],["played","Z",20],["wins","V",20],["losses","P",20],["pct","%",42],["score","SK",48]],
-  floorball:[["team","TÝM",136],["played","Z",18],["wins","V",18],["draws","R",18],["losses","P",18],["score","SK",40],["points","B",28]],
-  baseball:[["team","TÝM",130],["played","Z",20],["wins","W",20],["losses","L",20],["pct","PCT",46],["gb","GB",40]]
+  football:[["team","TÝM"],["played","Z"],["wins","V"],["draws","R"],["losses","P"],["score","SK"],["diff","RS"],["points","B"]],
+  hockey:[["team","TÝM"],["played","Z"],["wins","V"],["otWins","VP"],["otLosses","PP"],["losses","P"],["score","SK"],["points","B"]],
+  basketball:[["team","TÝM"],["played","Z"],["wins","V"],["losses","P"],["pct","%"],["score","SK"]],
+  floorball:[["team","TÝM"],["played","Z"],["wins","V"],["draws","R"],["losses","P"],["score","SK"],["points","B"]],
+  baseball:[["team","TÝM"],["played","Z"],["wins","W"],["losses","L"],["pct","PCT"],["gb","GB"]]
 };
 function standingTeamLabel(x){const full=x.name||x.short||"";if(full.length<=20)return full;return x.short&&x.short!==full?x.short:full}
 function standingValue(x,key){
@@ -305,6 +305,26 @@ function standingValue(x,key){
   if(key==="pct"){let v=val("pct");if(v){let n=Number(v);if(Number.isFinite(n)){if(n>1)n=n/100;return n.toFixed(3)}return v}const w=Number(val("wins")||val("won")),g=Number(val("played"));return Number.isFinite(w)&&Number.isFinite(g)&&g>0?(w/g).toFixed(3):"–"}
   return val(key)||"–"
 }
+function tableTextWidth(value,size=10,bold=false){
+  const text=String(value??"–"),factor=bold?.61:.58;
+  return Math.ceil(text.length*size*factor)+8
+}
+function dynamicTableLayout(rows,cols,showLogos){
+  const TOTAL=300,team=cols[0],stats=cols.slice(1);
+  const statCols=stats.map(([key,label])=>{
+    const widest=[label,...rows.map(r=>standingValue(r,key))].reduce((a,v)=>Math.max(a,tableTextWidth(v,10,key==="points")),0);
+    const min=label.length>=3?32:label.length===2?25:22;
+    const max=key==="score"?54:key==="pct"?50:key==="gb"?44:40;
+    return [key,label,clamp(widest,min,max)]
+  });
+  const statsWidth=statCols.reduce((a,c)=>a+c[2],0);
+  const logoSpace=showLogos?17:0;
+  const wantedTeam=Math.max(86,...rows.map(r=>logoSpace+tableTextWidth(standingValue(r,"team"),11,false)));
+  const maxTeam=Math.max(86,TOTAL-statsWidth);
+  const teamWidth=Math.min(wantedTeam,maxTeam);
+  return {teamCol:[team[0],team[1],teamWidth],statCols,statsWidth,total:teamWidth+statsWidth}
+}
+
 async function table(parent,s,d,p){
   let all=d.table||[];if(!all.length)return;
   const hasFav=!!(s.teamId||s.teamName),favIndex=hasFav?all.findIndex(x=>teamMatches(x,s)):-1;
@@ -313,27 +333,23 @@ async function table(parent,s,d,p){
   let capacity=d.current?14:17;if(shownUpcoming>1)capacity-=shownUpcoming-1;if(shownLast)capacity-=shownLast+1;if(s.showForm&&(s.teamId||s.teamName)&&d.form.length)capacity-=1;
   const maxRows=Math.min(all.length,clamp(capacity,6,17));
   let rows;if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);
-  const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football,teamCol=cols[0],statCols=cols.slice(1),statsWidth=statCols.reduce((a,c)=>a+c[2],0);
+  const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football,{teamCol,statCols}=dynamicTableLayout(rows,cols,s.showLogos);
   title(parent,tx(s,"standings"),p);parent.addSpacer(3);
   const h=parent.addStack();h.layoutHorizontally();
   {
     const [,label,width]=teamCol,c=h.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
     const t=txt(c,label,8,p.muted,true);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer()
   }
-  h.addSpacer();
-  const hs=h.addStack();hs.layoutHorizontally();hs.size=new Size(statsWidth,0);
-  for(const [key,label,width] of statCols)lineCell(hs,label,width,p.muted,"center",true,8,.8);
+  for(const [key,label,width] of statCols){lineCell(h,label,width,p.muted,"center",true,8,1)}
   parent.addSpacer(3);
   for(const x of rows){
     const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();
     {
       const [key,,width]=teamCol,color=fav?p.accent:p.text,c=r.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
       if(s.showLogos&&x.logo){const img=await logo(x.logo,x.id||x.name);if(img){const im=c.addImage(img);im.imageSize=new Size(13,13);c.addSpacer(4)}}
-      const t=txt(c,standingValue(x,key),11,color,fav);t.lineLimit=1;t.minimumScaleFactor=.85;c.addSpacer()
+      const t=txt(c,standingValue(x,key),11,color,fav);t.lineLimit=1;t.minimumScaleFactor=.62;c.addSpacer()
     }
-    r.addSpacer();
-    const rs=r.addStack();rs.layoutHorizontally();rs.size=new Size(statsWidth,0);
-    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;lineCell(rs,standingValue(x,key),width,color,"center",fav||key==="points",10,.8)}
+    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;const t=lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",10,1);t.lineLimit=1}
     parent.addSpacer(1)
   }
 }
