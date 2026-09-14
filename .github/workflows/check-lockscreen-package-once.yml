@@ -1,0 +1,44 @@
+name: Check LockScreen package once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/check-lockscreen-package-once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Validate package and source
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          js_path = Path('apps/LockScreenGenerator/LockScreenGenerator.js')
+          pkg_path = Path('apps/LockScreenGenerator/LockScreenGenerator.scriptable')
+          js = js_path.read_text(encoding='utf-8')
+          raw = pkg_path.read_text(encoding='utf-8')
+          pkg = json.loads(raw)
+          script = pkg.get('script')
+          print('JS bytes:', len(js.encode('utf-8')))
+          print('Package bytes:', len(raw.encode('utf-8')))
+          print('Package name:', pkg.get('name'))
+          print('Script chars:', len(script or ''))
+          print('Exact script match:', script == js)
+          if not isinstance(script, str) or not script:
+              raise SystemExit('ERROR: package script missing')
+          if script != js:
+              raise SystemExit('ERROR: .scriptable embedded script differs from .js')
+          Path('/tmp/LockScreenGenerator-from-package.js').write_text(script, encoding='utf-8')
+          PY
+          node --check 'apps/LockScreenGenerator/LockScreenGenerator.js'
+          node --check '/tmp/LockScreenGenerator-from-package.js'
+          echo 'LOCKSCREEN_PACKAGE_OK'
