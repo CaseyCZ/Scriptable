@@ -59,12 +59,19 @@ jobs:
           for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
               assert marker in src, marker
 
-          # Regression guards for standings, form, layout and focused event loading.
+          # Regression guards for standings, form, per-size layout and focused event loading.
           assert 'points:String(x.points??x.pts??x.wins??"")' not in src, 'SportsAPI wins used as points'
           assert 'points:String(x.points??x.wins??"")' not in src, 'SofaScore wins used as points'
           assert 'return"OTL"' in src, 'hockey overtime-loss form handling missing'
-          assert 'const widths=family==="small"?[62,14,62]' in src, 'Small safe-width layout missing'
-          assert 'football:[["rank","#",14],["team","TÝM",116]' in src, 'football table width profile changed unexpectedly'
+          assert 'const LAYOUT_DEFAULTS=' in src, 'per-size layout defaults missing'
+          assert 'small:{teamWidth:64,scoreWidth:18' in src, 'Small layout defaults missing'
+          assert 'medium:{teamWidth:128,scoreWidth:40' in src, 'Medium layout defaults missing'
+          assert 'large:{teamWidth:128,scoreWidth:44' in src, 'Large layout defaults missing'
+          assert 'function tableSlotLayout' in src, '7-slot standings layout missing'
+          assert 'tableWideWidth:30' in src and 'tableNarrowWidth:23' in src, 'wide/narrow standings widths missing'
+          assert 'id="layoutSmall"' in src and 'id="layoutMedium"' in src and 'id="layoutLarge"' in src, 'per-size layout settings screens missing'
+          assert 'football:[["team","TÝM"],["played","Z"],["wins","V"],["draws","R"],["losses","P"],["score","SK"],["diff","RS"],["points","B"]]' in src, 'football 7-stat profile changed unexpectedly'
+          assert 'hockey:[["team","TÝM"],["played","Z"],["wins","V"],["otWins","VP"],["otLosses","PP"],["losses","P"],["score","SK"],["points","B"]]' in src, 'hockey 7-stat profile changed unexpectedly'
           assert 'range(-60,0)' not in src and 'range(0,120)' not in src, 'legacy broad event windows returned'
           assert 'idx-4' not in src and 'idx+7' not in src, 'legacy OneFootball matchday window returned'
           assert 'function eventNeeds(s)' in src, 'dynamic event needs missing'
