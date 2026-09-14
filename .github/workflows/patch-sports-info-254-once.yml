@@ -1,0 +1,42 @@
+name: Patch Sports Info v2.5.4 once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-info-254-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sports-info-254-patch
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sports Info
+        run: python .github/scripts/patch_sports_info_254.py
+
+      - name: Validate JavaScript
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Sync package and release surfaces
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Commit release
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Sports Info v2.5.4 wider layouts and table logos"
+          git push origin HEAD:Master
