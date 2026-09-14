@@ -1,0 +1,32 @@
+name: Run Sports Info 2.5.8 focused loading patch
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/run-sports-info-258-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Patch and validate Sports Info
+        run: python .github/scripts/patch_sports_info_258.py
+      - name: Commit Sports Info 2.5.8
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            README.md \
+            index.html
+          git commit -m "Sports Info 2.5.8: fetch only needed events"
+          git push origin HEAD:Master
