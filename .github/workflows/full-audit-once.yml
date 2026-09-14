@@ -1,0 +1,80 @@
+name: Full Scriptable apps audit once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/full-audit-once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Syntax check
+        run: |
+          cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/LockScreenGenerator.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Package and release consistency
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          apps=[
+            ('LockScreen Generator',Path('apps/LockScreenGenerator/LockScreenGenerator.js'),Path('apps/LockScreenGenerator/LockScreenGenerator.scriptable')),
+            ('Sports Info',Path('apps/Sports-Info/Sports Info.js'),Path('apps/Sports-Info/Sports Info.scriptable')),
+          ]
+          site=Path('index.html').read_text(encoding='utf-8')
+          root=Path('README.md').read_text(encoding='utf-8')
+          for name,srcp,pkgp in apps:
+            src=srcp.read_text(encoding='utf-8')
+            pkg=json.loads(pkgp.read_text(encoding='utf-8'))
+            v=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src).group(1)
+            assert pkg['script']==src, f'{name}: package script mismatch'
+            assert pkg['name']==name, f'{name}: package name mismatch'
+            assert f"name:'{name}',version:'{v}'" in site, f'{name}: website version mismatch'
+            assert f'**{name}** | ✅ v{v}' in root, f'{name}: root README version mismatch'
+            print(name, v, 'package/web/README OK')
+          PY
+
+      - name: ESLint undefined-variable audit
+        run: |
+          cat >/tmp/eslint.config.mjs <<'EOF'
+          export default [{
+            files:['**/*.js'],
+            languageOptions:{
+              ecmaVersion:'latest',sourceType:'module',
+              globals:{
+                FileManager:'readonly',Device:'readonly',Alert:'readonly',Calendar:'readonly',CalendarEvent:'readonly',Reminder:'readonly',Location:'readonly',Request:'readonly',Safari:'readonly',WebView:'readonly',Timer:'readonly',Data:'readonly',QuickLook:'readonly',Script:'readonly',config:'readonly',module:'readonly',args:'readonly',URLScheme:'readonly',Pasteboard:'readonly',ListWidget:'readonly',Color:'readonly',Font:'readonly',Size:'readonly',Rect:'readonly',SFSymbol:'readonly',DrawContext:'readonly'
+              }
+            },
+            rules:{'no-undef':'error'}
+          }]
+          EOF
+          npx --yes eslint@9 --config /tmp/eslint.config.mjs 'apps/LockScreenGenerator/LockScreenGenerator.js' 'apps/Sports-Info/Sports Info.js'
+
+      - name: Known-regression audit
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lock=Path('apps/LockScreenGenerator/LockScreenGenerator.js').read_text(encoding='utf-8')
+          sports=Path('apps/Sports-Info/Sports Info.js').read_text(encoding='utf-8')
+          for bad in ['repr(', 'falsewindow.__updateReady', 'JSON.stringify(PHONE_TEXT.loading)']:
+            assert bad not in lock, f'LockScreen regression: {bad}'
+          assert 'async function fetchCrypto(settings,value)' in lock
+          assert 'fetchCrypto(settings,settings.cryptoCoins)' in lock
+          assert 'range(-60,0)' not in sports and 'range(0,120)' not in sports
+          assert 'idx-4' not in sports and 'idx+7' not in sports
+          assert 'function eventNeeds(s)' in sports
+          assert 'points:String(x.points??x.pts??x.wins??"")' not in sports
+          print('Known regression guards OK')
+          PY
