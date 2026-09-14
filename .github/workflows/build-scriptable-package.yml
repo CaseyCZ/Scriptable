@@ -1,0 +1,49 @@
+name: Build Scriptable install package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/LockScreenGenerator/LockScreenGenerator.js'
+      - '.github/scripts/build_scriptable_package.py'
+      - '.github/workflows/build-scriptable-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Build .scriptable package
+        run: python .github/scripts/build_scriptable_package.py
+      - name: Validate package
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          app=Path('apps/LockScreenGenerator')
+          src=(app/'LockScreenGenerator.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'LockScreenGenerator.scriptable').read_text(encoding='utf-8'))
+          assert pkg['name']=='LockScreen Generator'
+          assert pkg['script']==src
+          assert 'APP_VERSION' in src
+          assert len(src)>1000
+          print('Canonical package OK')
+          PY
+      - name: Commit package
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add apps/LockScreenGenerator/LockScreenGenerator.scriptable
+          if git diff --cached --quiet; then
+            echo "Package unchanged"
+            exit 0
+          fi
+          git commit -m "Build LockScreenGenerator package"
+          git push origin HEAD:Master

@@ -1,0 +1,57 @@
+name: Build Sports Info package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/Sports-Info/Sports Info.js'
+      - '.github/scripts/build_sports_info_package.py'
+      - '.github/workflows/build-sports-info-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+      - name: Build .scriptable package
+        run: |
+          python .github/scripts/build_sports_info_package.py
+      - name: Validate package
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert pkg['name']=='Sports Info'
+          assert pkg['script']==src
+          assert 'const APP_NAME = "Sports Info";' in src
+          assert re.search(r'const APP_VERSION\s*=\s*"[^"]+"',src)
+          for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
+              assert marker in src, marker
+          assert len(src)>30000
+          print('Sports Info package OK')
+          PY
+      - name: Commit generated package
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add 'apps/Sports-Info/Sports Info.scriptable'
+          if git diff --cached --quiet; then
+            echo "Generated package unchanged"
+            exit 0
+          fi
+          git commit -m "Sync Sports Info package"
+          git push origin HEAD:Master
