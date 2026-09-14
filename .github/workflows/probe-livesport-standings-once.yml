@@ -9,10 +9,10 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe representative standings pages
+      - name: Probe standings config and feeds
         shell: python
         run: |
-          import re, urllib.request
+          import re, urllib.request, json
           urls = {
             'hockey':'https://www.livesport.com/hockey/czech-republic/extraliga/standings/',
             'basketball':'https://www.livesport.com/basketball/czech-republic/nbl/standings/',
@@ -23,9 +23,16 @@ jobs:
           for name,url in urls.items():
             req=urllib.request.Request(url,headers=H)
             with urllib.request.urlopen(req,timeout=20) as r: html=r.read().decode('utf-8','replace')
-            rows=len(re.findall(r'ui-table__row',html))
-            bodies=len(re.findall(r'ui-table__body',html))
-            feeds=sorted(set(re.findall(r'cjs\.initialFeeds\["([^"]+)"\]',html)))
-            print(name,'bytes',len(html),'rows',rows,'bodies',bodies,'feeds',feeds[:30])
-            for token in ['tableCellParticipant__name','table__cell--points','standings','tournament-table']:
-              print(' ',token, token in html)
+            print('\n###',name,'bytes',len(html))
+            for key in ['tournament_id','season_id','feed_sign','tournamentId','seasonId','tournamentStageId','sportId']:
+              vals=[]
+              for pat in [rf'"{key}"\s*:\s*"?([^",}}]+)',rf'{key}\s*[=:]\s*["\']([^"\']+)']:
+                vals += re.findall(pat,html,re.I)
+              print(key, list(dict.fromkeys(vals))[:10])
+            for pat in [r'/standings/([A-Za-z0-9_-]+)/', r'/table/([A-Za-z0-9_-]+)/', r'([A-Za-z0-9]{8})_table_overall']:
+              vals=re.findall(pat,html)
+              if vals: print('pat',pat,list(dict.fromkeys(vals))[:20])
+            # compact contexts around potentially useful config tokens
+            for token in ['feed_sign','tournament_id','season_id','tournamentStageId','standings/']:
+              i=html.find(token)
+              if i>=0: print('CTX',token,re.sub(r'\s+',' ',html[max(0,i-180):i+300])[:500])
