@@ -75,7 +75,7 @@ jobs:
           assert 'range(-60,0)' not in src and 'range(0,120)' not in src, 'legacy broad event windows returned'
           assert 'idx-4' not in src and 'idx+7' not in src, 'legacy OneFootball matchday window returned'
           assert 'function eventNeeds(s)' in src, 'dynamic event needs missing'
-          assert 'function eventWindow(s,needs)' in src, 'dynamic event window missing'
+          assert 'function eventWindow(s,needs' in src, 'dynamic event window missing'
           assert 'oneFootballBundle(s,needs' in src, 'OneFootball does not use requested event needs'
           assert '.slice(0,needs.recent)' in src and '.slice(0,needs.upcoming)' in src, 'event lists are not trimmed to requested counts'
           assert len(src)>30000
