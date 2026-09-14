@@ -1,6 +1,6 @@
 # 🏆 Sports Info
 
-**Sports Info v2.5.0 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
+**Sports Info v2.5.1 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
 
 ## Sporty
 
@@ -25,6 +25,9 @@ Widget požádá iOS o další obnovu podle situace:
 Cache slouží pouze jako nouzová záloha při výpadku internetu nebo datového zdroje.
 
 ## Template a funkce
+
+- Small widget: loga zůstávají zachovaná a název týmu se může zalomit až na 2 řádky
+- Large widget: tabulka dynamicky využívá volné místo a přitom drží bezpečný limit řádků
 
 - původní moderní tmavé nastavení ve stylu LockScreen Generatoru
 - Small / Medium / Large náhled přímo z nastavení
