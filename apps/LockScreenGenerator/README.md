@@ -7,7 +7,7 @@
 ### Moderní dynamická tapeta pro iPhone vytvořená v Scriptable
 ### A modern dynamic iPhone Lock Screen wallpaper generator for Scriptable
 
-[![Version](https://img.shields.io/badge/version-2.9.1-0284c7?style=for-the-badge)](./LockScreenGenerator.js)
+[![Version](https://img.shields.io/badge/version-2.9.2-0284c7?style=for-the-badge)](./LockScreenGenerator.js)
 [![Scriptable](https://img.shields.io/badge/Scriptable-iPhone-172033?style=for-the-badge)](https://apps.apple.com/app/scriptable/id1405459188)
 [![Languages](https://img.shields.io/badge/CZ%20%7C%20EN%20%7C%20DE%20%7C%20ES-4%20languages-172033?style=for-the-badge)](#jazyky--languages)
 
