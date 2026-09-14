@@ -58,8 +58,15 @@ jobs:
 
           for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
               assert marker in src, marker
+
+          # Regression guards for standings and form correctness.
+          assert 'points:String(x.points??x.pts??x.wins??"")' not in src, 'SportsAPI wins used as points'
+          assert 'points:String(x.points??x.wins??"")' not in src, 'SofaScore wins used as points'
+          assert 'return"OTL"' in src, 'hockey overtime-loss form handling missing'
+          assert 'const widths=family==="small"?[62,14,62]' in src, 'Small safe-width layout missing'
+          assert 'football:[["rank","#",14],["team","TÝM",116]' in src, 'football table width profile changed unexpectedly'
           assert len(src)>30000
-          print(f'Sports Info v{version}: package + website + READMEs are synchronized')
+          print(f'Sports Info v{version}: JS + package + website + READMEs are synchronized')
           PY
 
       - name: Commit synchronized release files
