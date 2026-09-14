@@ -59,12 +59,18 @@ jobs:
           for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
               assert marker in src, marker
 
-          # Regression guards for standings and form correctness.
+          # Regression guards for standings, form, layout and focused event loading.
           assert 'points:String(x.points??x.pts??x.wins??"")' not in src, 'SportsAPI wins used as points'
           assert 'points:String(x.points??x.wins??"")' not in src, 'SofaScore wins used as points'
           assert 'return"OTL"' in src, 'hockey overtime-loss form handling missing'
           assert 'const widths=family==="small"?[62,14,62]' in src, 'Small safe-width layout missing'
           assert 'football:[["rank","#",14],["team","TÝM",116]' in src, 'football table width profile changed unexpectedly'
+          assert 'range(-60,0)' not in src and 'range(0,120)' not in src, 'legacy broad event windows returned'
+          assert 'idx-4' not in src and 'idx+7' not in src, 'legacy OneFootball matchday window returned'
+          assert 'function eventNeeds(s)' in src, 'dynamic event needs missing'
+          assert 'function eventWindow(s,needs)' in src, 'dynamic event window missing'
+          assert 'oneFootballBundle(s,needs' in src, 'OneFootball does not use requested event needs'
+          assert '.slice(0,needs.recent)' in src and '.slice(0,needs.upcoming)' in src, 'event lists are not trimmed to requested counts'
           assert len(src)>30000
           print(f'Sports Info v{version}: JS + package + website + READMEs are synchronized')
           PY
