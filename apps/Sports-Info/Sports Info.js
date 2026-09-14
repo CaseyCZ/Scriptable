@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.0
+// Sports Info v2.5.1
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.5.1";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -192,14 +192,50 @@ function time(s,iso){return new Date(iso).toLocaleTimeString(s.language||"en",{h
 function state(s,e){if(e.state==="in")return `${tx(s,"liveNow")} · ${e.status||""}`;if(e.completed||e.state==="post")return e.status||day(s,e.date);return `${day(s,e.date)} · ${time(s,e.date)}`}
 function score(e){return(e.state==="in"||e.completed||e.state==="post")?`${e.home.score||"0"} : ${e.away.score||"0"}`:"–"}
 async function logo(url,key){if(!url)return null;const p=fm.joinPath(fm.cacheDirectory(),`SportsInfo_${String(key).replace(/[^a-zA-Z0-9_-]/g,"_")}.png`);try{if(fm.fileExists(p))return fm.readImage(p);const r=new Request(url);r.timeoutInterval=API_TIMEOUT;const i=await r.loadImage();fm.writeImage(p,i);return i}catch(_){try{return fm.fileExists(p)?fm.readImage(p):null}catch(__){return null}}}
-function teamLabel(t,family){return family==="small"?(t.short||t.abbr||t.name):(t.name||t.short||t.abbr)}
-async function teamCell(parent,t,s,p,family,right=false,width=0){const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();if(width)r.size=new Size(width,0);if(right)r.addSpacer();if(s.showLogos){const i=await logo(t.logo,t.id||t.abbr);if(i){const v=r.addImage(i);v.imageSize=new Size(family==="small"?14:17,family==="small"?14:17);r.addSpacer(5)}}const z=txt(r,teamLabel(t,family),family==="small"?10:11,p.text,true);z.minimumScaleFactor=family==="small"?.55:.65;if(!right)r.addSpacer()}
-async function matchCard(parent,e,s,p,family="medium"){const b=parent.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(family==="small"?8:10,10,family==="small"?8:10,10);const h=b.addStack();h.layoutHorizontally();txt(h,state(s,e),9,e.state==="in"?p.live:p.muted,true);h.addSpacer();if(e.state==="in")txt(h,"●",9,p.live,true);b.addSpacer(7);const r=b.addStack();r.layoutHorizontally();r.centerAlignContent();const widths=family==="small"?[46,30,46]:[124,40,124];await teamCell(r,e.home,s,p,family,true,widths[0]);const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(widths[1],0);mid.addSpacer();const sc=txt(mid,score(e),family==="small"?18:20,p.text,true);sc.centerAlignText();mid.addSpacer();await teamCell(r,e.away,s,p,family,false,widths[2])}
+function teamLabel(t,family){
+  const full=t.name||t.short||t.abbr||"";
+  if(family!=="small")return full;
+  return full.length<=18?full:(t.short||t.abbr||full)
+}
+async function teamCell(parent,t,s,p,family,right=false,width=0){
+  const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();if(width)r.size=new Size(width,0);if(right)r.addSpacer();
+  if(s.showLogos){const i=await logo(t.logo,t.id||t.abbr);if(i){const v=r.addImage(i);const z=family==="small"?12:17;v.imageSize=new Size(z,z);r.addSpacer(family==="small"?3:5)}}
+  const z=txt(r,teamLabel(t,family),family==="small"?9:11,p.text,true);
+  if(family==="small"){z.lineLimit=2;z.minimumScaleFactor=.5}else z.minimumScaleFactor=.65;
+  if(!right)r.addSpacer()
+}
+async function matchCard(parent,e,s,p,family="medium"){
+  const b=parent.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(family==="small"?8:10,10,family==="small"?8:10,10);
+  const h=b.addStack();h.layoutHorizontally();txt(h,state(s,e),9,e.state==="in"?p.live:p.muted,true);h.addSpacer();if(e.state==="in")txt(h,"●",9,p.live,true);
+  b.addSpacer(family==="small"?5:7);
+  const r=b.addStack();r.layoutHorizontally();r.centerAlignContent();
+  const widths=family==="small"?[56,18,56]:[124,40,124];
+  await teamCell(r,e.home,s,p,family,true,widths[0]);
+  const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(widths[1],0);mid.addSpacer();
+  const sc=txt(mid,score(e),family==="small"?15:20,p.text,true);sc.centerAlignText();mid.addSpacer();
+  await teamCell(r,e.away,s,p,family,false,widths[2])
+}
 function lineCell(parent,value,width,p,align="left",bold=false,size=10){const c=parent.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);if(align==="right"||align==="center")c.addSpacer();const t=txt(c,value,size,p,bold);t.minimumScaleFactor=.62;if(align==="center"){t.centerAlignText();c.addSpacer()}else if(align==="left")c.addSpacer();return t}
 async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();const dateW=45,teamW=family==="medium"?93:96,scoreW=43;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9);lineCell(r,teamLabel(e.home,family),teamW,p.text,"right",true,10);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10);lineCell(r,teamLabel(e.away,family),teamW,p.text,"left",true,10)}
 function title(parent,v,p){const r=parent.addStack();r.layoutHorizontally();txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
-function table(parent,s,d,p){let all=d.table||[];if(!all.length)return;const hasFav=!!(s.teamId||s.teamName),favIndex=hasFav?all.findIndex(x=>teamMatches(x,s)):-1,maxRows=Math.min(all.length,d.current?8:16);let rows;if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);title(parent,tx(s,"standings"),p);parent.addSpacer(3);const detailed=rows.some(x=>x.won!==undefined&&x.won!=="");if(detailed){const h=parent.addStack();h.layoutHorizontally();lineCell(h,"#",17,p.muted,"left",true,8);lineCell(h,(s.language==="cs"?"TÝM":s.language==="de"?"TEAM":s.language==="es"?"EQUIPO":"TEAM"),119,p.muted,"left",true,8);lineCell(h,tx(s,"played"),22,p.muted,"center",true,8);lineCell(h,(s.language==="cs"?"V/R/P":"W/D/L"),51,p.muted,"center",true,8);lineCell(h,(s.language==="de"?"TORE":s.language==="es"?"GOL":"GÓLY"),43,p.muted,"center",true,8);lineCell(h,tx(s,"points"),26,p.muted,"right",true,8);parent.addSpacer(2)}for(const x of rows){const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();if(detailed){lineCell(r,String(x.rank),17,fav?p.accent:p.muted,"left",fav,8);const nm=lineCell(r,x.name||x.short,119,fav?p.accent:p.text,"left",fav,9);nm.minimumScaleFactor=.5;lineCell(r,x.played||"–",22,p.muted,"center",true,8);lineCell(r,`${x.won||"0"}/${x.drawn||"0"}/${x.lost||"0"}`,51,p.muted,"center",false,8);lineCell(r,`${x.gf||"–"}:${x.ga||"–"}`,43,p.muted,"center",false,8);lineCell(r,x.points||"–",26,fav?p.accent:p.muted,"right",true,9)}else{txt(r,x.rank,9,fav?p.accent:p.muted,fav);r.addSpacer(6);const nm=txt(r,x.name||x.short,10,fav?p.accent:p.text,fav);nm.minimumScaleFactor=.55;r.addSpacer();txt(r,`${tx(s,"played")} ${x.played||"–"}  ${tx(s,"points")} ${x.points||"–"}`,9,p.muted,true)}}}
+function table(parent,s,d,p){
+  let all=d.table||[];if(!all.length)return;
+  const hasFav=!!(s.teamId||s.teamName),favIndex=hasFav?all.findIndex(x=>teamMatches(x,s)):-1;
+  const shownUpcoming=s.showNext&&d.current?Math.min(d.next.filter(x=>x.id!==d.current.id).length,2):0;
+  const shownLast=s.showLast&&d.current?Math.min(d.done.filter(x=>x.id!==d.current.id).length,s.showTable?3:s.maxMatches):0;
+  let capacity=d.current?15:16;
+  if(shownUpcoming>1)capacity-=shownUpcoming-1;
+  if(shownLast)capacity-=shownLast+1;
+  if(s.showForm&&(s.teamId||s.teamName)&&d.form.length)capacity-=1;
+  const maxRows=Math.min(all.length,clamp(capacity,6,16));
+  let rows;
+  if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);
+  title(parent,tx(s,"standings"),p);parent.addSpacer(3);
+  const detailed=rows.some(x=>x.won!==undefined&&x.won!=="");
+  if(detailed){const h=parent.addStack();h.layoutHorizontally();lineCell(h,"#",17,p.muted,"left",true,8);lineCell(h,(s.language==="cs"?"TÝM":s.language==="de"?"TEAM":s.language==="es"?"EQUIPO":"TEAM"),119,p.muted,"left",true,8);lineCell(h,tx(s,"played"),22,p.muted,"center",true,8);lineCell(h,(s.language==="cs"?"V/R/P":"W/D/L"),51,p.muted,"center",true,8);lineCell(h,(s.language==="de"?"TORE":s.language==="es"?"GOL":"GÓLY"),43,p.muted,"center",true,8);lineCell(h,tx(s,"points"),26,p.muted,"right",true,8);parent.addSpacer(2)}
+  for(const x of rows){const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();if(detailed){lineCell(r,String(x.rank),17,fav?p.accent:p.muted,"left",fav,8);const nm=lineCell(r,x.name||x.short,119,fav?p.accent:p.text,"left",fav,9);nm.minimumScaleFactor=.5;lineCell(r,x.played||"–",22,p.muted,"center",true,8);lineCell(r,`${x.won||"0"}/${x.drawn||"0"}/${x.lost||"0"}`,51,p.muted,"center",false,8);lineCell(r,`${x.gf||"–"}:${x.ga||"–"}`,43,p.muted,"center",false,8);lineCell(r,x.points||"–",26,fav?p.accent:p.muted,"right",true,9)}else{txt(r,x.rank,9,fav?p.accent:p.muted,fav);r.addSpacer(6);const nm=txt(r,x.name||x.short,10,fav?p.accent:p.text,fav);nm.minimumScaleFactor=.55;r.addSpacer();txt(r,`${tx(s,"played")} ${x.played||"–"}  ${tx(s,"points")} ${x.points||"–"}`,9,p.muted,true)}}
+}
 function autoRefreshMinutes(s,d){if((d.live||[]).length)return 2;const n=(d.next||[])[0];if(n?.date){const ms=new Date(n.date).getTime()-Date.now();if(ms>0&&ms<=30*60000)return 5}return s.refreshMinutes}
 async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();w.backgroundColor=p.bg;w.setPadding(s.compact?10:12,s.compact?10:12,s.compact?10:12,s.compact?10:12);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);table(w,s,d,p)}if(family==="large"){w.addSpacer();const f=w.addStack();f.addSpacer();txt(f,`${tx(s,"updated")}: ${new Date(d.at||Date.now()).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}`,8,p.muted);f.addSpacer()}Script.setWidget(w);return w}
 
