@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.11
+// Sports Info v2.5.12
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.11";
+const APP_VERSION = "2.5.12";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -286,11 +286,11 @@ async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.lay
 function title(parent,v,p){const r=parent.addStack();r.layoutHorizontally();txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
 const TABLE_PROFILES={
-  football:[["team","TÝM",116],["played","Z",20],["wins","V",20],["draws","R",20],["losses","P",20],["score","SK",42],["diff","RS",28],["points","B",28]],
-  hockey:[["team","TÝM",118],["played","Z",20],["wins","V",20],["otWins","VP",22],["otLosses","PP",22],["losses","P",20],["score","SK",40],["points","B",28]],
-  basketball:[["team","TÝM",130],["played","Z",22],["wins","V",22],["losses","P",22],["pct","%",44],["score","SK",52]],
-  floorball:[["team","TÝM",124],["played","Z",20],["wins","V",20],["draws","R",20],["losses","P",20],["score","SK",42],["points","B",28]],
-  baseball:[["team","TÝM",138],["played","Z",22],["wins","W",22],["losses","L",22],["pct","PCT",48],["gb","GB",40]]
+  football:[["team","TÝM",110],["played","Z",18],["wins","V",18],["draws","R",18],["losses","P",18],["score","SK",40],["diff","RS",26],["points","B",28]],
+  hockey:[["team","TÝM",110],["played","Z",18],["wins","V",18],["otWins","VP",22],["otLosses","PP",22],["losses","P",18],["score","SK",40],["points","B",28]],
+  basketball:[["team","TÝM",126],["played","Z",20],["wins","V",20],["losses","P",20],["pct","%",42],["score","SK",48]],
+  floorball:[["team","TÝM",136],["played","Z",18],["wins","V",18],["draws","R",18],["losses","P",18],["score","SK",40],["points","B",28]],
+  baseball:[["team","TÝM",130],["played","Z",20],["wins","W",20],["losses","L",20],["pct","PCT",46],["gb","GB",40]]
 };
 function standingTeamLabel(x){const full=x.name||x.short||"";if(full.length<=20)return full;return x.short&&x.short!==full?x.short:full}
 function standingValue(x,key){
@@ -310,10 +310,10 @@ async function table(parent,s,d,p){
   const hasFav=!!(s.teamId||s.teamName),favIndex=hasFav?all.findIndex(x=>teamMatches(x,s)):-1;
   const shownUpcoming=s.showNext&&d.current?Math.min(d.next.filter(x=>x.id!==d.current.id).length,2):0;
   const shownLast=s.showLast&&d.current?Math.min(d.done.filter(x=>x.id!==d.current.id).length,s.showTable?3:s.maxMatches):0;
-  let capacity=d.current?13:16;if(shownUpcoming>1)capacity-=shownUpcoming-1;if(shownLast)capacity-=shownLast+1;if(s.showForm&&(s.teamId||s.teamName)&&d.form.length)capacity-=1;
-  const maxRows=Math.min(all.length,clamp(capacity,6,16));
+  let capacity=d.current?14:17;if(shownUpcoming>1)capacity-=shownUpcoming-1;if(shownLast)capacity-=shownLast+1;if(s.showForm&&(s.teamId||s.teamName)&&d.form.length)capacity-=1;
+  const maxRows=Math.min(all.length,clamp(capacity,6,17));
   let rows;if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);
-  const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football,teamCol=cols[0],statCols=cols.slice(1);
+  const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football,teamCol=cols[0],statCols=cols.slice(1),statsWidth=statCols.reduce((a,c)=>a+c[2],0);
   title(parent,tx(s,"standings"),p);parent.addSpacer(3);
   const h=parent.addStack();h.layoutHorizontally();
   {
@@ -321,22 +321,24 @@ async function table(parent,s,d,p){
     const t=txt(c,label,8,p.muted,true);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer()
   }
   h.addSpacer();
-  for(const [key,label,width] of statCols)lineCell(h,label,width,p.muted,"center",true,8,1);
+  const hs=h.addStack();hs.layoutHorizontally();hs.size=new Size(statsWidth,0);
+  for(const [key,label,width] of statCols)lineCell(hs,label,width,p.muted,"center",true,8,.8);
   parent.addSpacer(3);
   for(const x of rows){
     const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();
     {
       const [key,,width]=teamCol,color=fav?p.accent:p.text,c=r.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
       if(s.showLogos&&x.logo){const img=await logo(x.logo,x.id||x.name);if(img){const im=c.addImage(img);im.imageSize=new Size(13,13);c.addSpacer(4)}}
-      const t=txt(c,standingValue(x,key),11,color,fav);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer()
+      const t=txt(c,standingValue(x,key),11,color,fav);t.lineLimit=1;t.minimumScaleFactor=.85;c.addSpacer()
     }
     r.addSpacer();
-    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",10,1)}
+    const rs=r.addStack();rs.layoutHorizontally();rs.size=new Size(statsWidth,0);
+    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;lineCell(rs,standingValue(x,key),width,color,"center",fav||key==="points",10,.8)}
     parent.addSpacer(1)
   }
 }
 function autoRefreshMinutes(s,d){if((d.live||[]).length)return 2;const n=(d.next||[])[0];if(n?.date){const ms=new Date(n.date).getTime()-Date.now();if(ms>0&&ms<=30*60000)return 5}return s.refreshMinutes}
-async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();w.backgroundColor=p.bg;const sidePad=family==="small"?6:(s.compact?10:12),verticalPad=s.compact?10:12;w.setPadding(verticalPad,sidePad,verticalPad,sidePad);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}if(family==="large"){w.addSpacer();const f=w.addStack();f.addSpacer();txt(f,`${tx(s,"updated")}: ${new Date(d.at||Date.now()).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}`,8,p.muted);f.addSpacer()}Script.setWidget(w);return w}
+async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();w.backgroundColor=p.bg;const sidePad=family==="small"?6:(s.compact?10:12),verticalPad=s.compact?10:12;w.setPadding(verticalPad,sidePad,verticalPad,sidePad);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function sw(id,label,on,detail=""){return `<label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(label)}</div>${detail?`<div class="rowDetail">${esc(detail)}</div>`:""}</div><span class="switch"><input id="${id}" type="checkbox" ${on?"checked":""}><span class="slider"></span></span></label>`}
