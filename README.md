@@ -21,7 +21,7 @@
 | Aplikace | Stav | Projekt |
 |---|---|---|
 | 🪄 **LockScreen Generator** | ✅ v2.9.1 | [`apps/LockScreenGenerator/`](./apps/LockScreenGenerator/) |
-| 🏆 **Sports Info** | ✅ v2.5.0 | [`apps/Sports-Info/`](./apps/Sports-Info/) |
+| 🏆 **Sports Info** | ✅ v2.5.1 | [`apps/Sports-Info/`](./apps/Sports-Info/) |
 | 🔴 **Sports Live** | 🧪 připravujeme | [`apps/Sports-Live/`](./apps/Sports-Live/) |
 
 ### 🪄 LockScreen Generator
