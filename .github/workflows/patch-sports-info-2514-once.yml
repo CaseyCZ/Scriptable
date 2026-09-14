@@ -1,0 +1,53 @@
+name: Patch Sports Info 2.5.14 once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-info-2514-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Apply Sports Info 2.5.14 patch
+        run: python .github/scripts/patch_sports_info_2514.py
+
+      - name: Syntax check
+        run: node --check 'apps/Sports-Info/Sports Info.js'
+
+      - name: Synchronize package and release metadata
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Validate 2.5.14
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          src = Path('apps/Sports-Info/Sports Info.js').read_text(encoding='utf-8')
+          pkg = json.loads(Path('apps/Sports-Info/Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert 'const APP_VERSION = "2.5.14";' in src
+          assert 'function dynamicTableLayout(rows,cols,showLogos)' in src
+          assert 'const when=`${day(s,e.date)} · ${time(s,e.date)}`' in src
+          assert 'scoreW=clamp(tableTextWidth(scoreText,20,true),38,58)' in src
+          assert 'sc.minimumScaleFactor=1' in src
+          assert pkg['script'] == src
+          assert "Sports Info',version:'2.5.14'" in Path('index.html').read_text(encoding='utf-8')
+          print('Sports Info 2.5.14 validation OK')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name 'CaseyCZ Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 'apps/Sports-Info/Sports Info.js' 'apps/Sports-Info/Sports Info.scriptable' 'apps/Sports-Info/README.md' README.md index.html
+          git commit -m 'Sports Info 2.5.14 fix match time and score width'
+          git push origin Master
