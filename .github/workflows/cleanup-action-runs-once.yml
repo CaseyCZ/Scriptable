@@ -1,0 +1,59 @@
+name: Cleanup old Actions runs once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/cleanup-action-runs-once.yml'
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Remove cleanup workflow from repository
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git rm '.github/workflows/cleanup-action-runs-once.yml'
+          git commit -m "Remove one-time Actions cleanup workflow"
+          git push origin HEAD:Master
+
+      - name: Cancel other active runs
+        run: |
+          current="$GITHUB_RUN_ID"
+          gh api --paginate "/repos/$REPO/actions/runs?per_page=100" --jq '.workflow_runs[] | [.id,.status] | @tsv' > /tmp/runs.tsv
+          while IFS=$'\t' read -r id status; do
+            [ "$id" = "$current" ] && continue
+            if [ "$status" != "completed" ]; then
+              gh api -X POST "/repos/$REPO/actions/runs/$id/cancel" >/dev/null 2>&1 || true
+            fi
+          done < /tmp/runs.tsv
+          sleep 8
+
+      - name: Delete all other workflow runs
+        run: |
+          current="$GITHUB_RUN_ID"
+          for attempt in 1 2 3 4; do
+            gh api --paginate "/repos/$REPO/actions/runs?per_page=100" --jq '.workflow_runs[].id' > /tmp/run_ids.txt
+            remaining=0
+            while read -r id; do
+              [ "$id" = "$current" ] && continue
+              remaining=$((remaining+1))
+              gh api -X DELETE "/repos/$REPO/actions/runs/$id" >/dev/null 2>&1 || true
+            done < /tmp/run_ids.txt
+            [ "$remaining" -eq 0 ] && break
+            sleep 5
+          done
+          echo "Cleanup finished; current cleanup run is intentionally kept until it completes."
