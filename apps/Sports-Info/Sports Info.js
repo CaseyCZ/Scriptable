@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.13
+// Sports Info v2.5.14
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.13";
+const APP_VERSION = "2.5.14";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -245,7 +245,7 @@ function txt(stack,v,size,color,bold=false){const x=stack.addText(String(v??""))
 function same(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
 function day(s,iso){const d=new Date(iso),n=new Date(),t=new Date(n),y=new Date(n);t.setDate(n.getDate()+1);y.setDate(y.getDate()-1);if(same(d,n))return tx(s,"today");if(same(d,t))return tx(s,"tomorrow");if(same(d,y))return tx(s,"yesterday");return d.toLocaleDateString(s.language||"en",{day:"2-digit",month:"2-digit"})}
 function time(s,iso){return new Date(iso).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}
-function state(s,e){if(e.state==="in")return `${tx(s,"liveNow")} · ${e.status||""}`;if(e.completed||e.state==="post")return e.status||day(s,e.date);return `${day(s,e.date)} · ${time(s,e.date)}`}
+function state(s,e){const when=`${day(s,e.date)} · ${time(s,e.date)}`;if(e.state==="in")return `${when} · ${tx(s,"liveNow")}${e.status?` · ${e.status}`:""}`;if(e.completed||e.state==="post")return `${when}${e.status?` · ${e.status}`:""}`;return when}
 function score(e){return(e.state==="in"||e.completed||e.state==="post")?`${e.home.score||"0"} : ${e.away.score||"0"}`:"–"}
 async function logo(url,key){if(!url)return null;const p=fm.joinPath(fm.cacheDirectory(),`SportsInfo_${String(key).replace(/[^a-zA-Z0-9_-]/g,"_")}.png`);try{if(fm.fileExists(p))return fm.readImage(p);const r=new Request(url);r.timeoutInterval=API_TIMEOUT;const i=await r.loadImage();fm.writeImage(p,i);return i}catch(_){try{return fm.fileExists(p)?fm.readImage(p):null}catch(__){return null}}}
 function teamLabel(t,family){
@@ -275,10 +275,11 @@ async function matchCard(parent,e,s,p,family="medium"){
     r.addSpacer();
     await teamCell(r,e.away,s,p,family,true,64)
   }else{
-    await teamCell(r,e.home,s,p,family,true,128);
-    const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(36,0);mid.addSpacer();
-    const sc=txt(mid,score(e),20,p.text,true);sc.centerAlignText();mid.addSpacer();
-    await teamCell(r,e.away,s,p,family,false,128)
+    const scoreText=score(e),scoreW=clamp(tableTextWidth(scoreText,20,true),38,58),rowW=284,teamW=Math.floor((rowW-scoreW)/2);
+    await teamCell(r,e.home,s,p,family,true,teamW);
+    const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(scoreW,0);mid.addSpacer();
+    const sc=txt(mid,scoreText,20,p.text,true);sc.centerAlignText();sc.minimumScaleFactor=1;mid.addSpacer();
+    await teamCell(r,e.away,s,p,family,false,teamW)
   }
 }
 function lineCell(parent,value,width,p,align="left",bold=false,size=10,minScale=.62){const c=parent.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);if(align==="right"||align==="center")c.addSpacer();const t=txt(c,value,size,p,bold);t.minimumScaleFactor=minScale;if(align==="center"){t.centerAlignText();c.addSpacer()}else if(align==="left")c.addSpacer();return t}
