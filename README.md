@@ -2,7 +2,7 @@
 
 # ⚡ Scriptable Apps
 
-### Scriptable aplikace pro iPhone od CaseyCZ + veřejný katalog komunitních projektů
+### Scriptable aplikace + veřejný katalog
 
 [![Website](https://img.shields.io/badge/WEB-caseycz.github.io%2FScriptable-0284c7?style=for-the-badge&logo=githubpages&logoColor=white)](https://caseycz.github.io/Scriptable/)
 [![Report issue](https://img.shields.io/badge/%F0%9F%90%9E-Nahl%C3%A1sit%20probl%C3%A9m-dc2626?style=for-the-badge)](https://github.com/CaseyCZ/Scriptable/issues/new/choose)
