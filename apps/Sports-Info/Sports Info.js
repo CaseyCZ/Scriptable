@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.1
+// Sports Info v2.5.2
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.5.2";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -194,14 +194,16 @@ function score(e){return(e.state==="in"||e.completed||e.state==="post")?`${e.hom
 async function logo(url,key){if(!url)return null;const p=fm.joinPath(fm.cacheDirectory(),`SportsInfo_${String(key).replace(/[^a-zA-Z0-9_-]/g,"_")}.png`);try{if(fm.fileExists(p))return fm.readImage(p);const r=new Request(url);r.timeoutInterval=API_TIMEOUT;const i=await r.loadImage();fm.writeImage(p,i);return i}catch(_){try{return fm.fileExists(p)?fm.readImage(p):null}catch(__){return null}}}
 function teamLabel(t,family){
   const full=t.name||t.short||t.abbr||"";
-  if(family!=="small")return full;
-  return full.length<=18?full:(t.short||t.abbr||full)
+  if(family==="small")return full;
+  if(full.length<=22)return full;
+  const short=t.short&&t.short!==full?t.short:(t.abbr||full);
+  return short
 }
 async function teamCell(parent,t,s,p,family,right=false,width=0){
   const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();if(width)r.size=new Size(width,0);if(right)r.addSpacer();
   if(s.showLogos){const i=await logo(t.logo,t.id||t.abbr);if(i){const v=r.addImage(i);const z=family==="small"?12:17;v.imageSize=new Size(z,z);r.addSpacer(family==="small"?3:5)}}
   const z=txt(r,teamLabel(t,family),family==="small"?9:11,p.text,true);
-  if(family==="small"){z.lineLimit=2;z.minimumScaleFactor=.5}else z.minimumScaleFactor=.65;
+  if(family==="small"){z.lineLimit=2;z.minimumScaleFactor=1}else{z.lineLimit=1;z.minimumScaleFactor=1}
   if(!right)r.addSpacer()
 }
 async function matchCard(parent,e,s,p,family="medium"){
@@ -209,14 +211,14 @@ async function matchCard(parent,e,s,p,family="medium"){
   const h=b.addStack();h.layoutHorizontally();txt(h,state(s,e),9,e.state==="in"?p.live:p.muted,true);h.addSpacer();if(e.state==="in")txt(h,"●",9,p.live,true);
   b.addSpacer(family==="small"?5:7);
   const r=b.addStack();r.layoutHorizontally();r.centerAlignContent();
-  const widths=family==="small"?[56,18,56]:[124,40,124];
+  const widths=family==="small"?[58,16,58]:[128,36,128];
   await teamCell(r,e.home,s,p,family,true,widths[0]);
   const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(widths[1],0);mid.addSpacer();
   const sc=txt(mid,score(e),family==="small"?15:20,p.text,true);sc.centerAlignText();mid.addSpacer();
   await teamCell(r,e.away,s,p,family,false,widths[2])
 }
-function lineCell(parent,value,width,p,align="left",bold=false,size=10){const c=parent.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);if(align==="right"||align==="center")c.addSpacer();const t=txt(c,value,size,p,bold);t.minimumScaleFactor=.62;if(align==="center"){t.centerAlignText();c.addSpacer()}else if(align==="left")c.addSpacer();return t}
-async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();const dateW=45,teamW=family==="medium"?93:96,scoreW=43;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9);lineCell(r,teamLabel(e.home,family),teamW,p.text,"right",true,10);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10);lineCell(r,teamLabel(e.away,family),teamW,p.text,"left",true,10)}
+function lineCell(parent,value,width,p,align="left",bold=false,size=10,minScale=.62){const c=parent.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);if(align==="right"||align==="center")c.addSpacer();const t=txt(c,value,size,p,bold);t.minimumScaleFactor=minScale;if(align==="center"){t.centerAlignText();c.addSpacer()}else if(align==="left")c.addSpacer();return t}
+async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();const dateW=40,teamW=113,scoreW=39;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9,.8);lineCell(r,teamLabel(e.home,family),teamW,p.text,"right",true,10,1);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10,.85);lineCell(r,teamLabel(e.away,family),teamW,p.text,"left",true,10,1)}
 function title(parent,v,p){const r=parent.addStack();r.layoutHorizontally();txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
 function table(parent,s,d,p){
