@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.9
+// Sports Info v2.5.10
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.9";
+const APP_VERSION = "2.5.10";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -263,26 +263,34 @@ async function teamCell(parent,t,s,p,family,right=false,width=0){
   if(!right)r.addSpacer()
 }
 async function matchCard(parent,e,s,p,family="medium"){
-  const b=parent.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(family==="small"?8:10,family==="small"?3:10,family==="small"?8:10,family==="small"?3:10);
+  const b=parent.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(family==="small"?8:10,family==="small"?0:10,family==="small"?8:10,family==="small"?0:10);
   const h=b.addStack();h.layoutHorizontally();txt(h,state(s,e),9,e.state==="in"?p.live:p.muted,true);h.addSpacer();if(e.state==="in")txt(h,"●",9,p.live,true);
   b.addSpacer(family==="small"?5:7);
   const r=b.addStack();r.layoutHorizontally();r.centerAlignContent();
-  const widths=family==="small"?[62,14,62]:[128,36,128];
-  await teamCell(r,e.home,s,p,family,true,widths[0]);
-  const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(widths[1],0);mid.addSpacer();
-  const sc=txt(mid,score(e),family==="small"?15:20,p.text,true);sc.centerAlignText();mid.addSpacer();
-  await teamCell(r,e.away,s,p,family,false,widths[2])
+  if(family==="small"){
+    await teamCell(r,e.home,s,p,family,false,64);
+    r.addSpacer();
+    const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(14,0);mid.addSpacer();
+    const sc=txt(mid,score(e),15,p.text,true);sc.centerAlignText();mid.addSpacer();
+    r.addSpacer();
+    await teamCell(r,e.away,s,p,family,true,64)
+  }else{
+    await teamCell(r,e.home,s,p,family,true,128);
+    const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(36,0);mid.addSpacer();
+    const sc=txt(mid,score(e),20,p.text,true);sc.centerAlignText();mid.addSpacer();
+    await teamCell(r,e.away,s,p,family,false,128)
+  }
 }
 function lineCell(parent,value,width,p,align="left",bold=false,size=10,minScale=.62){const c=parent.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);if(align==="right"||align==="center")c.addSpacer();const t=txt(c,value,size,p,bold);t.minimumScaleFactor=minScale;if(align==="center"){t.centerAlignText();c.addSpacer()}else if(align==="left")c.addSpacer();return t}
 async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();const dateW=40,teamW=106,scoreW=54;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9,.8);lineCell(r,teamLabel(e.home,family),teamW,p.text,"right",true,10,1);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10,1);lineCell(r,teamLabel(e.away,family),teamW,p.text,"left",true,10,1)}
 function title(parent,v,p){const r=parent.addStack();r.layoutHorizontally();txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
 const TABLE_PROFILES={
-  football:[["rank","#",14],["team","TÝM",116],["played","Z",16],["wins","V",16],["draws","R",16],["losses","P",16],["score","SK",36],["diff","RS",22],["points","B",20]],
-  hockey:[["rank","#",14],["team","TÝM",108],["played","Z",16],["wins","V",16],["otWins","VP",19],["otLosses","PP",19],["losses","P",16],["score","SK",34],["points","B",20]],
-  basketball:[["rank","#",14],["team","TÝM",122],["played","Z",18],["wins","V",18],["losses","P",18],["pct","%",38],["score","SK",46]],
-  floorball:[["rank","#",14],["team","TÝM",116],["played","Z",16],["wins","V",16],["draws","R",16],["losses","P",16],["score","SK",36],["points","B",20]],
-  baseball:[["rank","#",14],["team","TÝM",124],["played","Z",18],["wins","W",18],["losses","L",18],["pct","PCT",38],["gb","GB",30]]
+  football:[["team","TÝM",136],["played","Z",22],["wins","V",22],["draws","R",22],["losses","P",22],["score","SK",44],["diff","RS",30],["points","B",24]],
+  hockey:[["team","TÝM",148],["played","Z",20],["wins","V",20],["otWins","VP",24],["otLosses","PP",24],["losses","P",20],["score","SK",42],["points","B",24]],
+  basketball:[["team","TÝM",150],["played","Z",24],["wins","V",24],["losses","P",24],["pct","%",48],["score","SK",52]],
+  floorball:[["team","TÝM",136],["played","Z",22],["wins","V",22],["draws","R",22],["losses","P",22],["score","SK",44],["points","B",24]],
+  baseball:[["team","TÝM",160],["played","Z",24],["wins","W",24],["losses","L",24],["pct","PCT",50],["gb","GB",40]]
 };
 function standingTeamLabel(x){const full=x.name||x.short||"";if(full.length<=20)return full;return x.short&&x.short!==full?x.short:full}
 function standingValue(x,key){
@@ -306,21 +314,24 @@ async function table(parent,s,d,p){
   const maxRows=Math.min(all.length,clamp(capacity,6,16));
   let rows;if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);
   const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football;
-  const addGap=(stack,key,index)=>{if(key!=="rank"&&index<cols.length-1)stack.addSpacer()};
   title(parent,tx(s,"standings"),p);parent.addSpacer(3);
   const h=parent.addStack();h.layoutHorizontally();
-  for(let i=0;i<cols.length;i++){const [key,label,width]=cols[i];lineCell(h,label,width,p.muted,key==="team"?"left":"center",true,8,1);addGap(h,key,i)}
+  for(const [key,label,width] of cols){
+    if(key==="team"){
+      const c=h.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
+      c.addSpacer(17);const t=txt(c,label,8,p.muted,true);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer()
+    }else lineCell(h,label,width,p.muted,"center",true,8,1)
+  }
   parent.addSpacer(3);
   for(const x of rows){
     const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();
-    for(let i=0;i<cols.length;i++){
-      const [key,,width]=cols[i],color=fav?p.accent:(key==="team"?p.text:p.muted);
+    for(const [key,,width] of cols){
+      const color=fav?p.accent:(key==="team"?p.text:p.muted);
       if(key==="team"){
         const c=r.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
         if(s.showLogos&&x.logo){const img=await logo(x.logo,x.id||x.name);if(img){const im=c.addImage(img);im.imageSize=new Size(13,13);c.addSpacer(4)}}
         const t=txt(c,standingValue(x,key),11,color,fav);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer();
-      }else lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",10,1);
-      addGap(r,key,i)
+      }else lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",10,1)
     }
     parent.addSpacer(1)
   }
