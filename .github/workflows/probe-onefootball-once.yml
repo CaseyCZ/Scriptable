@@ -9,35 +9,26 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe current public feeds
+      - name: Validate football league feeds
         shell: python
         run: |
           import json, urllib.request
           H={'User-Agent':'Mozilla/5.0'}
+          leagues={
+            'cze.1':(159,39284),'eng.1':(9,39301),'esp.1':(10,39319),'ger.1':(1,39285),
+            'ita.1':(13,39325),'fra.1':(23,39245),'uefa.champions':(5,39356),'uefa.europa':(7,39357),
+          }
           def get(url):
             req=urllib.request.Request(url,headers=H)
-            with urllib.request.urlopen(req,timeout=15) as r:
-              raw=r.read(); print('GET',url,'HTTP',r.status,'bytes',len(raw))
-            return json.loads(raw)
-          st=get('https://feedmonster.onefootball.com/feeds/il/en/competitions/159/39284/standings.json')
-          ranking=(st.get('groups') or [{}])[0].get('ranking') or []
-          print('ranking',len(ranking))
-          for x in ranking:
-            t=x.get('team') or {}; stats=t.get('teamstats') or {}
-            if 'liberec' in (t.get('name') or '').lower(): print('LIBEREC',t,'stats',stats)
-          md=get('https://feedmonster.onefootball.com/feeds/il/en/competitions/159/39284/matchdaysOverview.json').get('matchdays') or []
-          cur=next((i for i,x in enumerate(md) if x.get('isCurrentMatchday')),0)
-          print('current-index',cur,'window',[(x.get('id'),x.get('name'),x.get('isCurrentMatchday')) for x in md[max(0,cur-2):cur+4]])
-          for x in md[max(0,cur-2):cur+4]:
-            mid=x.get('id')
-            try:
-              d=get(f'https://api.onefootball.com/scores-mixer/v1/en/cn/matchdays/{mid}')
-              print('MATCHDAY',mid,'keys',list(d)[:15],'kickoffs',len(d.get('kickoffs') or []))
-              for k in (d.get('kickoffs') or []):
-                for g in (k.get('groups') or []):
-                  for m in (g.get('matches') or []):
-                    hn=((m.get('team_home') or {}).get('name') or '')
-                    an=((m.get('team_away') or {}).get('name') or '')
-                    if 'liberec' in (hn+' '+an).lower():
-                      print('LIBEREC MATCH',mid,k.get('kickoff'),m)
-            except Exception as e: print('MATCHDAY ERROR',mid,type(e).__name__,e)
+            with urllib.request.urlopen(req,timeout=15) as r: raw=r.read(); status=r.status
+            return status,json.loads(raw)
+          for key,(cid,sid) in leagues.items():
+            su=f'https://feedmonster.onefootball.com/feeds/il/en/competitions/{cid}/{sid}/standings.json'
+            mu=f'https://feedmonster.onefootball.com/feeds/il/en/competitions/{cid}/{sid}/matchdaysOverview.json'
+            ss,st=get(su); sm,md=get(mu)
+            ranking=((st.get('groups') or [{}])[0].get('ranking') or [])
+            matchdays=md.get('matchdays') or []
+            cur=next((x for x in matchdays if x.get('isCurrentMatchday')),None)
+            ok=ss==200 and sm==200 and len(ranking)>0 and len(matchdays)>0 and cur
+            print(key,'OK' if ok else 'FAIL','table',len(ranking),'matchdays',len(matchdays),'current',cur and cur.get('id'))
+            if not ok: raise SystemExit(1)
