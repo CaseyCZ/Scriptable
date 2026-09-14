@@ -1,0 +1,58 @@
+name: Patch LockScreen 2.9.6 once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-lockscreen-296-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Apply LockScreen patch
+        run: python .github/scripts/patch_lockscreen_296.py
+
+      - name: Syntax check
+        run: node --check 'apps/LockScreenGenerator/LockScreenGenerator.js'
+
+      - name: Synchronize package and release metadata
+        run: python .github/scripts/build_scriptable_package.py
+
+      - name: Validate LockScreen 2.9.6
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          src = Path('apps/LockScreenGenerator/LockScreenGenerator.js').read_text(encoding='utf-8')
+          pkg = json.loads(Path('apps/LockScreenGenerator/LockScreenGenerator.scriptable').read_text(encoding='utf-8'))
+          assert 'const APP_VERSION = "2.9.6";' in src
+          assert 'const DEFAULT_SETTINGS={settingsVersion:8,' in src
+          assert 'startY:1200,marginX:60' in src
+          assert 'Number(saved.startY)===950' in src
+          assert 'merged.startY=1200' in src
+          assert 'settingsVersion=8' in src
+          assert "startY:parseFloat(v('startY'))||1200" in src
+          assert 'function filterF1ToVisibleRange(rows,settings)' in src
+          assert 'return filterF1ToVisibleRange(out,settings)' in src
+          assert 'return filterF1ToVisibleRange(settings.lastF1||[],settings)' in src
+          assert pkg['script'] == src
+          assert "LockScreen Generator',version:'2.9.6'" in Path('index.html').read_text(encoding='utf-8')
+          print('LockScreen 2.9.6 validation OK')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name 'CaseyCZ Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 'apps/LockScreenGenerator/LockScreenGenerator.js' 'apps/LockScreenGenerator/LockScreenGenerator.scriptable' 'apps/LockScreenGenerator/README.md' README.md index.html
+          git commit -m 'LockScreen 2.9.6 fix safe start and F1 range'
+          git push origin Master
