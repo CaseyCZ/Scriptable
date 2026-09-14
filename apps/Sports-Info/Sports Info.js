@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.3
+// Sports Info v2.5.4
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.3";
+const APP_VERSION = "2.5.4";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -130,13 +130,13 @@ async function espnStandings(s){
     const pct=stat(q,["winPercent","winPercentage","pct"],"");
     const gb=stat(q,["gamesBehind","gb"],"");
     const diff=stat(q,["pointDifferential","goalDifferential","runDifferential","diff"],"");
-    return {rank:Number(stat(q,["rank","position","playoffSeed"],i+1))||i+1,id:String(t.id||""),name:t.displayName||t.name||"",short:t.abbreviation||t.shortDisplayName||t.displayName||"",played:String(played??""),wins:String(wins??""),won:String(wins??""),draws:String(draws??""),drawn:String(draws??""),losses:String(losses??""),lost:String(losses??""),otWins:String(otWins??""),otLosses:String(otLosses??""),points:String(stat(q,["points","pts"],"")),pct:String(pct??""),gb:String(gb??""),gf:String(gf??""),ga:String(ga??""),diff:String(diff??"")}
+    return {rank:Number(stat(q,["rank","position","playoffSeed"],i+1))||i+1,id:String(t.id||""),name:t.displayName||t.name||"",short:t.abbreviation||t.shortDisplayName||t.displayName||"",logo:t.logos?.[0]?.href||t.logo||"",played:String(played??""),wins:String(wins??""),won:String(wins??""),draws:String(draws??""),drawn:String(draws??""),losses:String(losses??""),lost:String(losses??""),otWins:String(otWins??""),otLosses:String(otLosses??""),points:String(stat(q,["points","pts"],"")),pct:String(pct??""),gb:String(gb??""),gf:String(gf??""),ga:String(ga??""),diff:String(diff??"")}
   }).filter(x=>x.name)
 }
 
 const FOTMOB_MEM={};
 async function fotmobLeague(s){const m=league(s);if(!m.fm)throw new Error("No FotMob mapping");if(FOTMOB_MEM[m.id])return FOTMOB_MEM[m.id];const q=m.ccode&&m.ccode!=="INT"?`&ccode3=${encodeURIComponent(m.ccode)}`:"",base=s.apiFotmobBase||DEFAULTS.apiFotmobBase,d=await requestJSON(`${base}/leagues?id=${m.fm}${q}`,BROWSER_HEADERS);FOTMOB_MEM[m.id]=d;return d}
-function fotmobRows(d){const out=[],seen=new Set(),groups=Array.isArray(d?.table)?d.table:(d?.table?[d.table]:[]);const addRows=a=>{for(const x of Array.isArray(a)?a:[]){const id=String(x?.id||"");if(!id||seen.has(id))continue;seen.add(id);const wins=x.wins??x.won??"",draws=x.draws??x.drawn??"",losses=x.losses??x.lost??"",gf=x.gf??x.goalsFor??"",ga=x.ga??x.goalsAgainst??"";out.push({rank:Number(x.idx||x.rank||out.length+1),id,name:x.name||x.teamName||"",short:x.shortName||x.name||x.teamName||"",played:String(x.played??""),wins:String(wins),won:String(wins),draws:String(draws),drawn:String(draws),losses:String(losses),lost:String(losses),otWins:String(x.otWins??""),otLosses:String(x.otLosses??x.otl??""),points:String(x.pts??x.points??""),pct:String(x.pct??x.winPercentage??""),gb:String(x.gb??x.gamesBehind??""),gf:String(gf),ga:String(ga),diff:String(x.goalDifference??x.diff??""),form:Array.isArray(x.form)?x.form:[]})}};for(const g of groups){const d0=g?.data||g||{};if(d0.composite&&Array.isArray(d0.tables)){for(const sub of d0.tables)addRows(sub?.table?.all||sub?.table||[])}else addRows(d0?.table?.all||d0?.table||[])}return out.filter(x=>x.name)}
+function fotmobRows(d){const out=[],seen=new Set(),groups=Array.isArray(d?.table)?d.table:(d?.table?[d.table]:[]);const addRows=a=>{for(const x of Array.isArray(a)?a:[]){const id=String(x?.id||"");if(!id||seen.has(id))continue;seen.add(id);const wins=x.wins??x.won??"",draws=x.draws??x.drawn??"",losses=x.losses??x.lost??"",gf=x.gf??x.goalsFor??"",ga=x.ga??x.goalsAgainst??"";out.push({rank:Number(x.idx||x.rank||out.length+1),id,name:x.name||x.teamName||"",short:x.shortName||x.name||x.teamName||"",logo:id?`https://images.fotmob.com/image_resources/logo/teamlogo/${id}.png`:"",played:String(x.played??""),wins:String(wins),won:String(wins),draws:String(draws),drawn:String(draws),losses:String(losses),lost:String(losses),otWins:String(x.otWins??""),otLosses:String(x.otLosses??x.otl??""),points:String(x.pts??x.points??""),pct:String(x.pct??x.winPercentage??""),gb:String(x.gb??x.gamesBehind??""),gf:String(gf),ga:String(ga),diff:String(x.goalDifference??x.diff??""),form:Array.isArray(x.form)?x.form:[]})}};for(const g of groups){const d0=g?.data||g||{};if(d0.composite&&Array.isArray(d0.tables)){for(const sub of d0.tables)addRows(sub?.table?.all||sub?.table||[])}else addRows(d0?.table?.all||d0?.table||[])}return out.filter(x=>x.name)}
 function normFotmob(m){try{const st=m.status||{},h=m.home||{},a=m.away||{},finished=!!st.finished,started=!!st.started&&!finished,state=finished?"post":started?"in":"pre",scoreVal=x=>x==null?"":String(x);return{id:String(m.id||""),date:st.utcTime||m.utcTime||m.time||"",state,completed:finished,status:st.reason?.short||st.reason?.long||st.liveTime?.short||st.liveTime?.long||st.scoreStr||"",home:{id:String(h.id||""),name:h.name||"",short:h.shortName||h.name||"",abbr:h.shortName||h.name||"",logo:h.id?`https://images.fotmob.com/image_resources/logo/teamlogo/${h.id}.png`:"",score:scoreVal(h.score)},away:{id:String(a.id||""),name:a.name||"",short:a.shortName||a.name||"",abbr:a.shortName||a.name||"",logo:a.id?`https://images.fotmob.com/image_resources/logo/teamlogo/${a.id}.png`:"",score:scoreVal(a.score)}}}catch(_){return null}}
 function fotmobMatches(d){const a=d?.matches?.allMatches||d?.matches?.matches||d?.allMatches||[];return(Array.isArray(a)?a:[]).map(normFotmob).filter(x=>x&&x.id&&x.date)}
 function inDateRange(e,dates){if(!dates||!e?.date)return true;const p=String(dates).split("-"),k=dateKey(new Date(e.date));return p.length<2?k===p[0]:(k>=p[0]&&k<=p[1])}
@@ -194,7 +194,7 @@ function normTeamName(v){return String(v||"").normalize("NFD").replace(/[\u0300-
 function teamMatches(t,s){if(!t)return false;if(s.teamId&&String(t.id||"")===String(s.teamId))return true;const a=normTeamName(t.name||t.short),b=normTeamName(s.teamName);return !!b&&(a===b||a.includes(b)||b.includes(a))}
 function eventMatches(e,s){return teamMatches(e?.home,s)||teamMatches(e?.away,s)}
 function result(e,s){if(!(s.teamId||s.teamName)||!e.completed)return"";const h=Number(e.home.score),a=Number(e.away.score);if(Number.isNaN(h)||Number.isNaN(a))return"";const home=teamMatches(e.home,s),me=home?h:a,op=home?a:h;return me>op?"W":me<op?"L":"D"}
-async function data(s){const key=`${s.sportId}|${s.leagueId}|${s.teamId||"all"}`;try{const p=await Promise.allSettled([scoreboardFor(s,range(-60,0)),scoreboardFor(s,range(0,120))]),all=unique(p.flatMap(x=>x.status==="fulfilled"?x.value:[]));let table=[];if(s.showTable)try{table=await standingsFor(s)}catch(_){}if(!all.length&&!table.length)throw new Error("No data");const ev=all.filter(e=>!(s.teamId||s.teamName)||eventMatches(e,s)),now=Date.now(),live=ev.filter(e=>e.state==="in"),done=ev.filter(e=>e.completed||e.state==="post").sort((a,b)=>new Date(b.date)-new Date(a.date)),next=ev.filter(e=>e.state!=="in"&&!(e.completed||e.state==="post")&&new Date(e.date).getTime()>now-4*3600000).sort((a,b)=>new Date(a.date)-new Date(b.date));const d={source:"online",at:Date.now(),live,done:done.slice(0,8),next:next.slice(0,8),current:(s.showLive?live[0]:null)||next[0]||done[0]||null,form:(s.teamId||s.teamName)?done.slice(0,5).map(e=>result(e,s)).filter(Boolean):[],table};cacheWrite(key,d);return d}catch(e){console.log(e);const c=cacheRead(key);return c?.data?Object.assign({},c.data,{source:"cache",at:c.ts||c.data.at}):{source:"error",at:Date.now(),live:[],done:[],next:[],current:null,form:[],table:[]}}}
+async function data(s){const key=`${s.sportId}|${s.leagueId}|${s.teamId||"all"}`;try{const p=await Promise.allSettled([scoreboardFor(s,range(-60,0)),scoreboardFor(s,range(0,120))]),all=unique(p.flatMap(x=>x.status==="fulfilled"?x.value:[]));let table=[];if(s.showTable)try{table=await standingsFor(s)}catch(_){}if(s.showTable&&s.showLogos&&table.length&&table.some(x=>!x.logo)){try{const teams=await teamsFor(s),logos=new Map(teams.filter(x=>x?.id&&x?.logo).map(x=>[String(x.id),x.logo]));table=table.map(x=>Object.assign({},x,{logo:x.logo||logos.get(String(x.id||""))||""}))}catch(_){}}if(!all.length&&!table.length)throw new Error("No data");const ev=all.filter(e=>!(s.teamId||s.teamName)||eventMatches(e,s)),now=Date.now(),live=ev.filter(e=>e.state==="in"),done=ev.filter(e=>e.completed||e.state==="post").sort((a,b)=>new Date(b.date)-new Date(a.date)),next=ev.filter(e=>e.state!=="in"&&!(e.completed||e.state==="post")&&new Date(e.date).getTime()>now-4*3600000).sort((a,b)=>new Date(a.date)-new Date(b.date));const d={source:"online",at:Date.now(),live,done:done.slice(0,8),next:next.slice(0,8),current:(s.showLive?live[0]:null)||next[0]||done[0]||null,form:(s.teamId||s.teamName)?done.slice(0,5).map(e=>result(e,s)).filter(Boolean):[],table};cacheWrite(key,d);return d}catch(e){console.log(e);const c=cacheRead(key);return c?.data?Object.assign({},c.data,{source:"cache",at:c.ts||c.data.at}):{source:"error",at:Date.now(),live:[],done:[],next:[],current:null,form:[],table:[]}}}
 
 function timeoutAfter(ms,label="API"){return new Promise((_,reject)=>{Timer.schedule(ms,false,()=>reject(new Error(`${label} timeout ${Math.round(ms/1000)}s`)))})}
 async function limited(fn,ms=9000,label="API"){return await Promise.race([Promise.resolve().then(fn),timeoutAfter(ms,label)])}
@@ -227,11 +227,11 @@ async function teamCell(parent,t,s,p,family,right=false,width=0){
   if(!right)r.addSpacer()
 }
 async function matchCard(parent,e,s,p,family="medium"){
-  const b=parent.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(family==="small"?8:10,10,family==="small"?8:10,10);
+  const b=parent.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(family==="small"?8:10,family==="small"?5:10,family==="small"?8:10,family==="small"?5:10);
   const h=b.addStack();h.layoutHorizontally();txt(h,state(s,e),9,e.state==="in"?p.live:p.muted,true);h.addSpacer();if(e.state==="in")txt(h,"●",9,p.live,true);
   b.addSpacer(family==="small"?5:7);
   const r=b.addStack();r.layoutHorizontally();r.centerAlignContent();
-  const widths=family==="small"?[58,16,58]:[128,36,128];
+  const widths=family==="small"?[60,16,60]:[128,36,128];
   await teamCell(r,e.home,s,p,family,true,widths[0]);
   const mid=r.addStack();mid.layoutHorizontally();mid.centerAlignContent();mid.size=new Size(widths[1],0);mid.addSpacer();
   const sc=txt(mid,score(e),family==="small"?15:20,p.text,true);sc.centerAlignText();mid.addSpacer();
@@ -242,11 +242,11 @@ async function line(parent,e,s,p,family="large"){const r=parent.addStack();r.lay
 function title(parent,v,p){const r=parent.addStack();r.layoutHorizontally();txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
 const TABLE_PROFILES={
-  football:[["rank","#",15],["team","TÝM",100],["played","Z",19],["wins","V",18],["draws","R",18],["losses","P",18],["score","SK",39],["diff","RS",23],["points","B",22]],
-  hockey:[["rank","#",15],["team","TÝM",92],["played","Z",18],["wins","V",18],["otWins","VP",21],["otLosses","PP",21],["losses","P",18],["score","SK",37],["points","B",22]],
-  basketball:[["rank","#",15],["team","TÝM",108],["played","Z",22],["wins","V",22],["losses","P",22],["pct","%",38],["score","SK",47]],
-  floorball:[["rank","#",15],["team","TÝM",104],["played","Z",19],["wins","V",18],["draws","R",18],["losses","P",18],["score","SK",40],["points","B",23]],
-  baseball:[["rank","#",15],["team","TÝM",112],["played","Z",22],["wins","W",22],["losses","L",22],["pct","PCT",39],["gb","GB",31]]
+  football:[["rank","#",16],["team","TÝM",116],["played","Z",19],["wins","V",19],["draws","R",19],["losses","P",19],["score","SK",40],["diff","RS",24],["points","B",23]],
+  hockey:[["rank","#",16],["team","TÝM",112],["played","Z",18],["wins","V",18],["otWins","VP",22],["otLosses","PP",22],["losses","P",18],["score","SK",38],["points","B",23]],
+  basketball:[["rank","#",16],["team","TÝM",126],["played","Z",22],["wins","V",22],["losses","P",22],["pct","%",38],["score","SK",48]],
+  floorball:[["rank","#",16],["team","TÝM",136],["played","Z",19],["wins","V",19],["draws","R",19],["losses","P",19],["score","SK",41],["points","B",23]],
+  baseball:[["rank","#",16],["team","TÝM",134],["played","Z",22],["wins","W",22],["losses","L",22],["pct","PCT",40],["gb","GB",32]]
 };
 function standingTeamLabel(x){const full=x.name||x.short||"";if(full.length<=20)return full;return x.short&&x.short!==full?x.short:full}
 function standingValue(x,key){
@@ -261,7 +261,7 @@ function standingValue(x,key){
   if(key==="pct"){let v=val("pct");if(v){let n=Number(v);if(Number.isFinite(n)){if(n>1)n=n/100;return n.toFixed(3)}return v}const w=Number(val("wins")||val("won")),g=Number(val("played"));return Number.isFinite(w)&&Number.isFinite(g)&&g>0?(w/g).toFixed(3):"–"}
   return val(key)||"–"
 }
-function table(parent,s,d,p){
+async function table(parent,s,d,p){
   let all=d.table||[];if(!all.length)return;
   const hasFav=!!(s.teamId||s.teamName),favIndex=hasFav?all.findIndex(x=>teamMatches(x,s)):-1;
   const shownUpcoming=s.showNext&&d.current?Math.min(d.next.filter(x=>x.id!==d.current.id).length,2):0;
@@ -271,11 +271,22 @@ function table(parent,s,d,p){
   let rows;if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);
   const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football;
   title(parent,tx(s,"standings"),p);parent.addSpacer(3);
-  const h=parent.addStack();h.layoutHorizontally();for(const [key,label,width] of cols)lineCell(h,label,width,p.muted,key==="team"?"left":"center",true,7,.9);parent.addSpacer(2);
-  for(const x of rows){const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();for(const [key,,width] of cols){const color=fav?p.accent:(key==="team"?p.text:p.muted),size=key==="team"?9:8,min=key==="team"?1:.8;lineCell(r,standingValue(x,key),width,color,key==="team"?"left":"center",fav||key==="points",size,min)}}
+  const h=parent.addStack();h.layoutHorizontally();for(const [key,label,width] of cols)lineCell(h,label,width,p.muted,key==="team"?"left":"center",true,8,1);parent.addSpacer(3);
+  for(const x of rows){
+    const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();
+    for(const [key,,width] of cols){
+      const color=fav?p.accent:(key==="team"?p.text:p.muted);
+      if(key==="team"){
+        const c=r.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
+        if(s.showLogos&&x.logo){const i=await logo(x.logo,x.id||x.name);if(i){const im=c.addImage(i);im.imageSize=new Size(12,12);c.addSpacer(4)}}
+        const t=txt(c,standingValue(x,key),10,color,fav);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer();
+      }else lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",9,1)
+    }
+    parent.addSpacer(1)
+  }
 }
 function autoRefreshMinutes(s,d){if((d.live||[]).length)return 2;const n=(d.next||[])[0];if(n?.date){const ms=new Date(n.date).getTime()-Date.now();if(ms>0&&ms<=30*60000)return 5}return s.refreshMinutes}
-async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();w.backgroundColor=p.bg;w.setPadding(s.compact?10:12,s.compact?10:12,s.compact?10:12,s.compact?10:12);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);table(w,s,d,p)}if(family==="large"){w.addSpacer();const f=w.addStack();f.addSpacer();txt(f,`${tx(s,"updated")}: ${new Date(d.at||Date.now()).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}`,8,p.muted);f.addSpacer()}Script.setWidget(w);return w}
+async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();w.backgroundColor=p.bg;const sidePad=family==="small"?6:(family==="large"?8:(s.compact?10:12)),verticalPad=s.compact?10:12;w.setPadding(verticalPad,sidePad,verticalPad,sidePad);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}if(family==="large"){w.addSpacer();const f=w.addStack();f.addSpacer();txt(f,`${tx(s,"updated")}: ${new Date(d.at||Date.now()).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}`,8,p.muted);f.addSpacer()}Script.setWidget(w);return w}
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function sw(id,label,on,detail=""){return `<label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(label)}</div>${detail?`<div class="rowDetail">${esc(detail)}</div>`:""}</div><span class="switch"><input id="${id}" type="checkbox" ${on?"checked":""}><span class="slider"></span></span></label>`}
