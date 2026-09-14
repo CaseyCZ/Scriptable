@@ -1,0 +1,50 @@
+name: Run release fix once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/run-fix-release-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Apply patch
+        run: python .github/scripts/fix_release_293_256.py
+      - name: Validate JavaScript and packages
+        run: |
+          cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/LockScreenGenerator.mjs
+          node --check /tmp/SportsInfo.mjs
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          lock=Path('apps/LockScreenGenerator/LockScreenGenerator.js').read_text(encoding='utf-8')
+          sport=Path('apps/Sports-Info/Sports Info.js').read_text(encoding='utf-8')
+          lp=json.loads(Path('apps/LockScreenGenerator/LockScreenGenerator.scriptable').read_text(encoding='utf-8'))
+          sp=json.loads(Path('apps/Sports-Info/Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert lp['script']==lock and sp['script']==sport
+          assert 'const APP_VERSION = "2.9.3";' in lock
+          assert "textContent=PHONE_TEXT.loading" in lock
+          assert 'JSON.stringify(PHONE_TEXT.loading)' not in lock
+          assert 'falsewindow.__updateReady' not in lock
+          assert 'const APP_VERSION = "2.5.6";' in sport
+          assert 'let capacity=d.current?13:16' in sport
+          assert 'const sidePad=family==="small"?6:(s.compact?10:12)' in sport
+          print('release validation OK')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add apps/LockScreenGenerator apps/Sports-Info README.md index.html
+          git commit -m "LockScreen 2.9.3 and Sports Info 2.5.6 fixes"
+          git push origin HEAD:Master
