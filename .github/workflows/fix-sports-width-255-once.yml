@@ -1,0 +1,60 @@
+name: Sports Info v2.5.5 width fix once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/fix-sports-width-255-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sports Info widths
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('apps/Sports-Info/Sports Info.js')
+          s=p.read_text(encoding='utf-8')
+
+          reps={
+            'const APP_VERSION = "2.5.4";':'const APP_VERSION = "2.5.5";',
+            'b.setPadding(family==="small"?8:10,family==="small"?5:10,family==="small"?8:10,family==="small"?5:10);':'b.setPadding(family==="small"?8:10,family==="small"?2:10,family==="small"?8:10,family==="small"?2:10);',
+            'const widths=family==="small"?[60,16,60]:[128,36,128];':'const widths=family==="small"?[67,14,67]:[128,36,128];',
+            'football:[["rank","#",16],["team","TÝM",116],["played","Z",19],["wins","V",19],["draws","R",19],["losses","P",19],["score","SK",40],["diff","RS",24],["points","B",23]],':'football:[["rank","#",16],["team","TÝM",140],["played","Z",20],["wins","V",20],["draws","R",20],["losses","P",20],["score","SK",44],["diff","RS",28],["points","B",24]],',
+            'hockey:[["rank","#",16],["team","TÝM",112],["played","Z",18],["wins","V",18],["otWins","VP",22],["otLosses","PP",22],["losses","P",18],["score","SK",38],["points","B",23]],':'hockey:[["rank","#",16],["team","TÝM",145],["played","Z",18],["wins","V",18],["otWins","VP",22],["otLosses","PP",22],["losses","P",18],["score","SK",42],["points","B",24]],',
+            'basketball:[["rank","#",16],["team","TÝM",126],["played","Z",22],["wins","V",22],["losses","P",22],["pct","%",38],["score","SK",48]],':'basketball:[["rank","#",16],["team","TÝM",150],["played","Z",24],["wins","V",24],["losses","P",24],["pct","%",42],["score","SK",52]],',
+            'floorball:[["rank","#",16],["team","TÝM",136],["played","Z",19],["wins","V",19],["draws","R",19],["losses","P",19],["score","SK",41],["points","B",23]],':'floorball:[["rank","#",16],["team","TÝM",165],["played","Z",20],["wins","V",20],["draws","R",20],["losses","P",20],["score","SK",44],["points","B",24]],',
+            'baseball:[["rank","#",16],["team","TÝM",134],["played","Z",22],["wins","W",22],["losses","L",22],["pct","PCT",40],["gb","GB",32]]':'baseball:[["rank","#",16],["team","TÝM",165],["played","Z",24],["wins","W",24],["losses","L",24],["pct","PCT",42],["gb","GB",34]]',
+            'const t=txt(c,standingValue(x,key),10,color,fav);':'const t=txt(c,standingValue(x,key),11,color,fav);',
+            '}else lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",9,1)':' }else lineCell(r,standingValue(x,key),width,color,"center",fav||key==="points",10,1)',
+            'const im=c.addImage(i);im.imageSize=new Size(12,12);c.addSpacer(4)':'const im=c.addImage(i);im.imageSize=new Size(13,13);c.addSpacer(4)',
+            'const sidePad=family==="small"?6:(family==="large"?8:(s.compact?10:12))':'const sidePad=family==="small"?3:(family==="large"?8:(s.compact?10:12))'
+          }
+          for old,new in reps.items():
+              if old not in s:
+                  raise SystemExit(f'Missing marker: {old[:90]}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Validate JavaScript
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Commit fix
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add 'apps/Sports-Info/Sports Info.js'
+          git commit -m "Sports Info v2.5.5 maximize widget width"
+          git push origin HEAD:Master
