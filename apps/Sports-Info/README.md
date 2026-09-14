@@ -1,6 +1,6 @@
 # 🏆 Sports Info
 
-**Sports Info v2.5.8 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
+**Sports Info v2.5.9 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
 
 ## Sporty
 
