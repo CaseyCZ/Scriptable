@@ -54,7 +54,7 @@ jobs:
             languageOptions:{
               ecmaVersion:'latest',sourceType:'module',
               globals:{
-                FileManager:'readonly',Device:'readonly',Alert:'readonly',Calendar:'readonly',CalendarEvent:'readonly',Reminder:'readonly',Location:'readonly',Request:'readonly',Safari:'readonly',WebView:'readonly',Timer:'readonly',Data:'readonly',QuickLook:'readonly',Script:'readonly',config:'readonly',module:'readonly',args:'readonly',URLScheme:'readonly',Pasteboard:'readonly',ListWidget:'readonly',Color:'readonly',Font:'readonly',Size:'readonly',Rect:'readonly',SFSymbol:'readonly',DrawContext:'readonly'
+                console:'readonly',FileManager:'readonly',Device:'readonly',Alert:'readonly',Calendar:'readonly',CalendarEvent:'readonly',Reminder:'readonly',Location:'readonly',Request:'readonly',Safari:'readonly',WebView:'readonly',Timer:'readonly',Data:'readonly',QuickLook:'readonly',Script:'readonly',config:'readonly',module:'readonly',args:'readonly',URLScheme:'readonly',Pasteboard:'readonly',ListWidget:'readonly',Color:'readonly',Font:'readonly',Size:'readonly',Rect:'readonly',SFSymbol:'readonly',DrawContext:'readonly',DateFormatter:'readonly'
               }
             },
             rules:{'no-undef':'error'}
