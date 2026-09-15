@@ -86,3 +86,5 @@ jobs:
           fi
           git commit -m "Sync LockScreen release surfaces"
           git push origin HEAD:Master
+
+# v2.9.9 Base64 shortcut output guard
