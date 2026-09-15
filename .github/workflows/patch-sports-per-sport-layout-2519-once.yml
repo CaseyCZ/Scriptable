@@ -21,6 +21,18 @@ jobs:
       - name: Apply per-sport layout patch
         run: python .github/scripts/patch_sports_per_sport_layout_2519_once.py
 
+      - name: Fix nested WebView label string
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('apps/Sports-Info/Sports Info.js')
+          s=p.read_text(encoding='utf-8')
+          old="function sportLayoutLabel(id){const x=CATALOG.find(v=>v.id===id)||CATALOG[0];return `${x.icon||''} ${x[initial.language]||x.en||x.id}`.trim()}"
+          new="function sportLayoutLabel(id){const x=CATALOG.find(v=>v.id===id)||CATALOG[0];return ((x.icon||'')+' '+(x[initial.language]||x.en||x.id)).trim()}"
+          assert old in s
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
