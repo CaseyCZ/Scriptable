@@ -11,7 +11,7 @@ jobs:
           ref: Master
           fetch-depth: 0
       - name: Apply patch
-        run: python .github/scripts/patch_lockscreen_v2100.py
+        run: python .github/scripts/patch_lockscreen_v2100b.py
       - name: Validate JavaScript
         run: |
           cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
