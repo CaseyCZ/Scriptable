@@ -69,6 +69,12 @@ jobs:
           assert 'large:{teamWidth:128,scoreWidth:44' in src, 'Large layout defaults missing'
           assert 'function tableSlotLayout' in src, '7-slot standings layout missing'
           assert 'tableWideWidth:30' in src and 'tableNarrowWidth:23' in src, 'wide/narrow standings widths missing'
+          assert 'tableTeamWidth:[60,180]' in src, 'TEAM/start-position range regressed'
+          assert 'tableNarrowWidth:[20,50]' in src, 'last-three-stat range regressed'
+          assert 'layoutLargeTableTeamWidth",lt(s,"tableTeamWidth"),s.layout.large.tableTeamWidth,60,180' in src, 'TEAM/start-position UI range regressed'
+          assert 'layoutLargeTableNarrowWidth",lt(s,"narrowWidth"),s.layout.large.tableNarrowWidth,20,50' in src, 'last-three-stat UI range regressed'
+          assert 'h.addSpacer(4);\n  const hs=h.addStack()' in src, 'standings header first-stat gap is not fixed'
+          assert 'r.addSpacer(4);\n    const rs=r.addStack()' in src, 'standings row first-stat gap is not fixed'
           assert 'id="layoutSmall"' in src and 'id="layoutMedium"' in src and 'id="layoutLarge"' in src, 'per-size layout settings screens missing'
 
           # Layout persistence and visible help/ranges.
@@ -90,6 +96,7 @@ jobs:
           assert 'state=collect();switchLayoutSport(sid)' in src, 'sport switch does not save old and load new layout profile'
           assert 'class="layoutSportName"' in src, 'active sport badge missing from Layout settings'
           assert 'profile[family]=cloneProfile(LAYOUT_DEFAULTS)[family]' in src, 'Layout reset is not scoped to current sport/family'
+          assert "writeLayoutProfile(profile);emit('save',{settings:state})" in src, 'Layout reset does not immediately save restored defaults'
 
           assert 'football:[["team","TÝM"],["played","Z"],["wins","V"],["draws","R"],["losses","P"],["score","SK"],["diff","RS"],["points","B"]]' in src, 'football 7-stat profile changed unexpectedly'
           assert 'hockey:[["team","TÝM"],["played","Z"],["wins","V"],["otWins","VP"],["otLosses","PP"],["losses","P"],["score","SK"],["points","B"]]' in src, 'hockey 7-stat profile changed unexpectedly'
