@@ -61,7 +61,6 @@ jobs:
             'apps/Sports-Info/Sports Info.scriptable' \
             'apps/Sports-Info/README.md' \
             'README.md' \
-            'index.html' \
-            '.github/workflows/build-sports-info-package.yml'
+            'index.html'
           git commit -m "Sports Info 2.5.20 improve table layout controls"
           git push origin HEAD:Master
