@@ -1,0 +1,106 @@
+name: Fix Sports Info 2.5.17 layout save once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/fix-sports-layout-save-2517-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sports Info 2.5.17
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('apps/Sports-Info/Sports Info.js')
+          s = p.read_text(encoding='utf-8')
+
+          assert 'const APP_VERSION = "2.5.16";' in s, 'expected Sports Info 2.5.16'
+          assert "let timer;function save(){clearTimeout(timer);timer=setTimeout(()=>{state=collect();emit('save',{settings:state})},120)}" in s
+          assert "if(!['sportId','leagueId','teamId'].includes(x.id))x.addEventListener('change',save)" in s
+          assert "function preview(f){state=collect();" in s
+
+          s = s.replace('// Sports Info v2.5.16', '// Sports Info v2.5.17', 1)
+          s = s.replace('const APP_VERSION = "2.5.16";', 'const APP_VERSION = "2.5.17";', 1)
+
+          old = "if(e){const key=suffix[0].toLowerCase()+suffix.slice(1);z.layout[f][key]=Number(e.value)}}"
+          new = "if(e&&String(e.value).trim()!==''){const key=suffix[0].toLowerCase()+suffix.slice(1),n=Number(e.value);if(Number.isFinite(n))z.layout[f][key]=n}}"
+          assert old in s, 'layout numeric collection pattern missing'
+          s = s.replace(old, new, 1)
+
+          old = "function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0)}"
+          new = "function showScreen(id){const active=document.querySelector('.screen.active')?.id||'';if(active&&active!==id&&/^layout(?:Small|Medium|Large)$/.test(active))commitNow();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0)}"
+          assert old in s, 'showScreen pattern missing'
+          s = s.replace(old, new, 1)
+
+          old = "let timer;function save(){clearTimeout(timer);timer=setTimeout(()=>{state=collect();emit('save',{settings:state})},120)}"
+          new = "let timer;function commitNow(){clearTimeout(timer);state=collect();emit('save',{settings:state});return state}function save(){clearTimeout(timer);timer=setTimeout(commitNow,180)}"
+          s = s.replace(old, new, 1)
+
+          old = "document.querySelectorAll('input,select').forEach(x=>{if(!['sportId','leagueId','teamId'].includes(x.id))x.addEventListener('change',save)})"
+          new = "document.querySelectorAll('input,select').forEach(x=>{if(['sportId','leagueId','teamId'].includes(x.id))return;x.addEventListener('change',save);if(x.type==='number'||x.type==='color')x.addEventListener('input',save)})"
+          s = s.replace(old, new, 1)
+
+          s = s.replace("function preview(f){state=collect();", "function preview(f){state=commitNow();", 1)
+
+          assert 'const APP_VERSION = "2.5.17";' in s
+          assert 'function commitNow()' in s
+          assert "x.addEventListener('input',save)" in s
+          assert "function preview(f){state=commitNow();" in s
+          assert "String(e.value).trim()!==''" in s
+          assert "^layout(?:Small|Medium|Large)$" in s
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Validate and build release
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+          python .github/scripts/build_sports_info_package.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          app = Path('apps/Sports-Info')
+          src = (app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg = json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          app_readme = (app/'README.md').read_text(encoding='utf-8')
+          root_readme = Path('README.md').read_text(encoding='utf-8')
+          site = Path('index.html').read_text(encoding='utf-8')
+
+          assert 'const APP_VERSION = "2.5.17";' in src
+          assert pkg['script'] == src
+          assert 'function commitNow()' in src
+          assert "x.addEventListener('input',save)" in src
+          assert "function preview(f){state=commitNow();" in src
+          assert "String(e.value).trim()!==''" in src
+          assert '**Sports Info v2.5.17 — Production**' in app_readme
+          assert '| 🏆 **Sports Info** | ✅ v2.5.17 |' in root_readme
+          assert "{name:'Sports Info',version:'2.5.17'" in site
+          print('Sports Info 2.5.17 layout persistence validated')
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
+          git commit -m "Fix Sports Info layout saving in 2.5.17"
+          git push origin HEAD:Master
