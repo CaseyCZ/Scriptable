@@ -2,17 +2,18 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.24
+// Sports Info v2.5.25
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.24";
+const APP_VERSION = "2.5.25";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
+const RUNTIME_FILE = "SportsInfo_runtime.json";
 const API_TIMEOUT = 7;
 const CACHE_MAX_AGE = 6 * 60 * 60 * 1000;
 const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Info/Sports%20Info.js";
@@ -94,6 +95,12 @@ const fm=FileManager.local();
 const settingsPath=fm.joinPath(fm.documentsDirectory(),SETTINGS_FILE);
 const legacySettingsPath=fm.joinPath(fm.documentsDirectory(),LEGACY_SETTINGS_FILE);
 const cachePath=fm.joinPath(fm.cacheDirectory(),CACHE_FILE);
+const runtimePath=fm.joinPath(fm.documentsDirectory(),RUNTIME_FILE);
+function runtimeRead(){try{return fm.fileExists(runtimePath)?JSON.parse(fm.readString(runtimePath))||{}:{}}catch(_){return{}}}
+function runtimeWrite(v){try{fm.writeString(runtimePath,JSON.stringify(v||{}))}catch(_){}}
+function runtimeError(e){return String(e?.message||e||"").slice(0,180)}
+function recordRuntime(d,mode,family){runtimeWrite({lastRun:Date.now(),version:APP_VERSION,mode:mode||"foreground",family:family||"medium",source:d?.source||"unknown",lastError:d?.error||""})}
+function recordRuntimeFailure(e,mode,family){runtimeWrite({lastRun:Date.now(),version:APP_VERSION,mode:mode||"foreground",family:family||"medium",source:"error",lastError:runtimeError(e)})}
 const clone=o=>JSON.parse(JSON.stringify(o));
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function lang(){const l=(Device.locale()||"en").slice(0,2).toLowerCase();return ["cs","en","de","es"].includes(l)?l:"en"}
@@ -255,16 +262,18 @@ async function data(s){
     if(s.showTable&&s.showLogos&&table.length&&table.some(x=>!x.logo)){try{const teams=await teamsFor(s),logos=new Map(teams.filter(x=>x?.id&&x?.logo).map(x=>[String(x.id),x.logo]));table=table.map(x=>Object.assign({},x,{logo:x.logo||logos.get(String(x.id||""))||""}))}catch(_){}}
     if(!all.length&&!table.length)throw new Error("No data");
     const ev=all.filter(e=>!(s.teamId||s.teamName)||eventMatches(e,s)),now=Date.now(),live=ev.filter(e=>e.state==="in"),done=ev.filter(e=>e.completed||e.state==="post").sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,needs.recent),next=ev.filter(e=>e.state!=="in"&&!(e.completed||e.state==="post")&&new Date(e.date).getTime()>now-4*3600000).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,needs.upcoming);
-    const d={source:"online",at:Date.now(),live,done,next,current:(s.showLive?live[0]:null)||next[0]||done[0]||null,form:(s.teamId||s.teamName)?done.slice(0,5).map(e=>result(e,s)).filter(Boolean):[],table};cacheWrite(key,d);return d
-  }catch(e){console.log(e);const c=cacheRead(key);return c?.data?Object.assign({},c.data,{source:"cache",at:c.ts||c.data.at}):{source:"error",at:Date.now(),live:[],done:[],next:[],current:null,form:[],table:[]}}
+    const d={source:"online",at:Date.now(),error:"",live,done,next,current:(s.showLive?live[0]:null)||next[0]||done[0]||null,form:(s.teamId||s.teamName)?done.slice(0,5).map(e=>result(e,s)).filter(Boolean):[],table};cacheWrite(key,d);return d
+  }catch(e){console.log(e);const err=runtimeError(e),c=cacheRead(key);return c?.data?Object.assign({},c.data,{source:"cache",at:c.ts||c.data.at,error:err}):{source:"error",at:Date.now(),error:err,live:[],done:[],next:[],current:null,form:[],table:[]}}
 }
 
 function timeoutAfter(ms,label="API"){return new Promise((_,reject)=>{Timer.schedule(ms,false,()=>reject(new Error(`${label} timeout ${Math.round(ms/1000)}s`)))})}
 async function limited(fn,ms=9000,label="API"){return await Promise.race([Promise.resolve().then(fn),timeoutAfter(ms,label)])}
 async function probe(label,fn,ms=10000){const started=Date.now();try{const detail=await limited(fn,ms,label);const elapsed=Date.now()-started;return{label,state:"ok",detail:`${String(detail||"")} · ${elapsed} ms`}}catch(e){const elapsed=Date.now()-started;return{label,state:"error",detail:`${String(e?.message||e).slice(0,90)} · ${elapsed} ms`}}}
 async function sourceHealth(s){const m=league(s),today=dateKey(new Date());if(m.provider==="soccer"){const [o,e,f]=await Promise.allSettled([limited(()=>oneFootballHealth(s),7500,"OneFootball"),limited(()=>espnScoreboard(s,today),7500,"ESPN"),limited(()=>fotmobLeague(s),7500,"FotMob")]);const os=o.status==="fulfilled"?`OneFootball OK · ${o.value}`:"OneFootball ERROR",es=e.status==="fulfilled"?"ESPN OK":"ESPN ERROR",fs=f.status==="fulfilled"?"FotMob OK":"FotMob ERROR";if(o.status!=="fulfilled"&&e.status!=="fulfilled"&&f.status!=="fulfilled")throw new Error(`${os} · ${es} · ${fs}`);return `${os} · ${es} · ${fs}`}if(m.provider==="livesport"){const d=await limited(()=>livesportBundle(s),9000,"Livesport");return `Livesport OK · ${d.events.length} events`}if(m.provider==="floorball"){if(s.sportsApiKey){await limited(()=>sportsApiResolve(s),7500,"SportsAPI Pro");return "SportsAPI Pro OK"}throw new Error("No floorball source mapping")}if(m.provider==="sofa"){await limited(()=>sofaResolve(s),7500,"SofaScore");return "SofaScore OK"}await limited(()=>espnScoreboard(s,today),7500,"ESPN");return "ESPN OK"}
-function diagnosticPlaceholders(s){return[{label:`🌐 ${tx(s,"diagSource")}`,state:"idle",detail:sourceLabel(s)},{label:`👥 ${tx(s,"diagTeams")}`,state:"idle",detail:""},{label:`📊 ${tx(s,"diagTable")}`,state:"idle",detail:""},{label:`💾 ${tx(s,"diagCache")}`,state:fm.fileExists(cachePath)?"ok":"off",detail:fm.fileExists(cachePath)?tx(s,"cache"):""}]}
-async function collectDiagnostics(s,onUpdate=null){let rows=[{label:`🌐 ${tx(s,"diagSource")}`,state:"checking",detail:sourceLabel(s)},{label:`👥 ${tx(s,"diagTeams")}`,state:"checking",detail:""},{label:`📊 ${tx(s,"diagTable")}`,state:"checking",detail:""},{label:`💾 ${tx(s,"diagCache")}`,state:fm.fileExists(cachePath)?"ok":"off",detail:fm.fileExists(cachePath)?tx(s,"cache"):""}];const publish=async()=>{if(onUpdate)try{await onUpdate(rows.map(x=>Object.assign({},x)))}catch(_){}};await publish();const jobs=[probe(`🌐 ${tx(s,"diagSource")}`,()=>sourceHealth(s),9000).then(async r=>{rows[0]=r;await publish()}),probe(`👥 ${tx(s,"diagTeams")}`,async()=>{const a=await teamsFor(s);return `${a.length} teams · endpoint OK`},10000).then(async r=>{rows[1]=r;await publish()}),probe(`📊 ${tx(s,"diagTable")}`,async()=>{const a=await standingsFor(s);return a.length?`${a.length} rows`:`0 rows · source does not expose standings here`},10000).then(async r=>{rows[2]=r;await publish()})];await Promise.all(jobs);return rows}
+function runtimeLabels(s){const l=s.language||lang(),m={cs:{run:"Poslední spuštění",ver:"Verze skriptu",err:"Poslední chyba",none:"Bez chyby",bg:"pozadí",fg:"aplikace"},en:{run:"Last run",ver:"Script version",err:"Last error",none:"No error",bg:"background",fg:"app"},de:{run:"Letzter Lauf",ver:"Skriptversion",err:"Letzter Fehler",none:"Kein Fehler",bg:"Hintergrund",fg:"App"},es:{run:"Última ejecución",ver:"Versión del script",err:"Último error",none:"Sin error",bg:"segundo plano",fg:"app"}};return m[l]||m.en}
+function runtimeRows(s){const r=runtimeRead(),q=runtimeLabels(s),when=r.lastRun?new Date(r.lastRun).toLocaleString(s.language||"en",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–",mode=r.mode==="background"?q.bg:q.fg,detail=r.lastRun?`${when} · ${mode}${r.family?` · ${r.family}`:""}${r.source?` · ${r.source}`:""}`:"–";return[{label:`🕒 ${q.run}`,state:r.lastRun?"ok":"idle",detail},{label:`🧩 ${q.ver}`,state:(r.version||APP_VERSION)===APP_VERSION?"ok":"off",detail:`v${r.version||APP_VERSION}`},{label:`⚠️ ${q.err}`,state:r.lastError?"error":"ok",detail:r.lastError||q.none}]}
+function diagnosticPlaceholders(s){return[...runtimeRows(s),{label:`🌐 ${tx(s,"diagSource")}`,state:"idle",detail:sourceLabel(s)},{label:`👥 ${tx(s,"diagTeams")}`,state:"idle",detail:""},{label:`📊 ${tx(s,"diagTable")}`,state:"idle",detail:""},{label:`💾 ${tx(s,"diagCache")}`,state:fm.fileExists(cachePath)?"ok":"off",detail:fm.fileExists(cachePath)?tx(s,"cache"):""}]}
+async function collectDiagnostics(s,onUpdate=null){const fixed=runtimeRows(s),base=fixed.length;let rows=[...fixed,{label:`🌐 ${tx(s,"diagSource")}`,state:"checking",detail:sourceLabel(s)},{label:`👥 ${tx(s,"diagTeams")}`,state:"checking",detail:""},{label:`📊 ${tx(s,"diagTable")}`,state:"checking",detail:""},{label:`💾 ${tx(s,"diagCache")}`,state:fm.fileExists(cachePath)?"ok":"off",detail:fm.fileExists(cachePath)?tx(s,"cache"):""}];const publish=async()=>{if(onUpdate)try{await onUpdate(rows.map(x=>Object.assign({},x)))}catch(_){}};await publish();const jobs=[probe(`🌐 ${tx(s,"diagSource")}`,()=>sourceHealth(s),9000).then(async r=>{rows[base]=r;await publish()}),probe(`👥 ${tx(s,"diagTeams")}`,async()=>{const a=await teamsFor(s);return `${a.length} teams · endpoint OK`},10000).then(async r=>{rows[base+1]=r;await publish()}),probe(`📊 ${tx(s,"diagTable")}`,async()=>{const a=await standingsFor(s);return a.length?`${a.length} rows`:`0 rows · source does not expose standings here`},10000).then(async r=>{rows[base+2]=r;await publish()})];await Promise.all(jobs);return rows}
 
 function dark(s){return s.theme==="dark"||(s.theme==="auto"&&Device.isUsingDarkAppearance())}
 function pal(s){if(s.theme==="custom")return{bg:new Color(s.background),panel:new Color(s.panelColor,.98),text:new Color(s.textColor),muted:new Color(s.mutedColor),accent:new Color(s.accent),live:new Color(s.liveColor),ok:new Color(s.winColor)};const d=dark(s);return{bg:new Color(d?"#0b1020":"#f8fafc"),panel:new Color(d?"#111827":"#ffffff",.96),text:new Color(d?"#f8fafc":"#0f172a"),muted:new Color(d?"#94a3b8":"#64748b"),accent:new Color(s.accent||"#38bdf8"),live:new Color("#f87171"),ok:new Color("#86efac")}}
@@ -412,8 +421,8 @@ async function table(parent,s,d,p){
     parent.addSpacer(1)
   }
 }
-function autoRefreshMinutes(s,d){if((d.live||[]).length)return 2;const n=(d.next||[])[0];if(n?.date){const ms=new Date(n.date).getTime()-Date.now();if(ms>0&&ms<=30*60000)return 5}return s.refreshMinutes}
-async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();w.backgroundColor=p.bg;const sidePad=family==="small"?6:(s.compact?10:12),verticalPad=s.compact?10:12;w.setPadding(verticalPad,sidePad,verticalPad,sidePad);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}
+function autoRefreshMinutes(s,d){if(d?.source==="cache"||d?.source==="error")return Math.min(5,s.refreshMinutes);if((d.live||[]).length)return 2;const n=(d.next||[])[0];if(n?.date){const ms=new Date(n.date).getTime()-Date.now();if(ms>0&&ms<=30*60000)return 5}return s.refreshMinutes}
+async function widget(s,family){const d=await data(s),p=pal(s),w=new ListWidget();recordRuntime(d,config.runsInWidget?"background":"foreground",family);try{const u=URLScheme.forRunningScript();w.url=u+(u.includes("?")?"&":"?")+`sportsTap=1&sportsFamily=${encodeURIComponent(family)}`}catch(_){}w.backgroundColor=p.bg;const sidePad=family==="small"?6:(s.compact?10:12),verticalPad=s.compact?10:12;w.setPadding(verticalPad,sidePad,verticalPad,sidePad);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p);w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family);if(family==="large")w.addSpacer(2)}}if(family==="large"&&s.showLast&&d.done.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p);w.addSpacer(4);for(const e of d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches)){await line(w,e,s,p,family);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function sw(id,label,on,detail=""){return `<label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(label)}</div>${detail?`<div class="rowDetail">${esc(detail)}</div>`:""}</div><span class="switch"><input id="${id}" type="checkbox" ${on?"checked":""}><span class="slider"></span></span></label>`}
@@ -518,11 +527,15 @@ async function updater(s){try{const src=await getString(UPDATE_SOURCE_URL);if(!s
 
 let SETTINGS=await firstLanguage(loadSettings());
 const PREVIEW_FAMILY=String(args.queryParameters?.sportsPreview||"");
+const TAP_FAMILY=["small","medium","large"].includes(String(args.queryParameters?.sportsFamily||""))?String(args.queryParameters.sportsFamily):"medium";
 if(config.runsInWidget){
-  const w=await widget(SETTINGS,config.widgetFamily||"medium");Script.setWidget(w)
+  try{const w=await widget(SETTINGS,config.widgetFamily||"medium");Script.setWidget(w)}catch(e){recordRuntimeFailure(e,"background",config.widgetFamily||"medium");throw e}
 }else if(["small","medium","large"].includes(PREVIEW_FAMILY)){
   const w=await widget(SETTINGS,PREVIEW_FAMILY);
   if(PREVIEW_FAMILY==="small")await w.presentSmall();else if(PREVIEW_FAMILY==="large")await w.presentLarge();else await w.presentMedium();
   await settings(SETTINGS)
-}else await settings(SETTINGS);
+}else{
+  try{await widget(SETTINGS,TAP_FAMILY)}catch(e){console.log(e);recordRuntimeFailure(e,"foreground",TAP_FAMILY)}
+  await settings(SETTINGS)
+}
 Script.complete();
