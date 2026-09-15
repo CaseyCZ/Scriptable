@@ -116,7 +116,7 @@ jobs:
           assert 'function automaticTableSlotLayout' in src, 'dynamic standings width calculation missing'
           assert 'function textWidthUnits' in src and 'function tableTextWidth' in src, 'weighted text width estimator missing'
           assert 'tableSlotLayout(s,cols,rows)' in src, 'AUTO layout does not use visible standings rows'
-          assert 'key==="score"?80:56' in src, 'score column cannot expand for larger scores'
+          assert 'max=key==="score"?80:(key==="pct"?50:56)' in src, 'score/pct AUTO max widths regressed'
           assert 'function setTableAuto()' in src and 'function markTableManual()' in src, 'AUTO/MANUAL UI switching missing'
           assert "state.tableAutoBySport[layoutSportId]=!!auto" in src, 'AUTO/MANUAL state not scoped to sport'
           assert 'id="tableModeBadge"' in src and 'id="autoTableInfo"' in src, 'AUTO/MANUAL status UI missing'
