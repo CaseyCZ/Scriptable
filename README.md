@@ -21,7 +21,7 @@
 | Aplikace | Stav | Projekt |
 |---|---|---|
 | 🪄 **LockScreen Generator** | ✅ v2.9.6 | [`apps/LockScreenGenerator/`](./apps/LockScreenGenerator/) |
-| 🏆 **Sports Info** | ✅ v2.5.29 | [`apps/Sports-Info/`](./apps/Sports-Info/) |
+| 🏆 **Sports Info** | ✅ v2.5.30 | [`apps/Sports-Info/`](./apps/Sports-Info/) |
 | 🔴 **Sports Live** | 🧪 připravujeme | [`apps/Sports-Live/`](./apps/Sports-Live/) |
 
 ### 🪄 LockScreen Generator
@@ -36,7 +36,7 @@ Obsahuje zdrojový `.js`, instalační `.scriptable` balíček, README i obrázk
 
 ### 🏆 Sports Info
 
-Univerzální sportovní widget podle stejného template jako LockScreen Generator: moderní nastavení, náhledy, API/zdroje, diagnostika, údržba, cache/fail-open a aktualizace přímo z aplikace. Podporuje fotbal, hokej, basketbal, florbal a baseball.
+Univerzální sportovní widget podle stejného template jako LockScreen Generator: moderní nastavení, náhledy, API/zdroje, diagnostika, údržba, cache/fail-open a aktualizace přímo z aplikace. Podporuje fotbal, hokej, basketbal, florbal a baseball. Od v2.5.30 si každá zobrazovaná sekce počítá AUTO zarovnání samostatně, takže hlavní zápas, PŘÍŠTÍ, POSLEDNÍ a TABULKA si navzájem nemění šířky.
 
 **[`apps/Sports-Info/`](./apps/Sports-Info/)**
 
