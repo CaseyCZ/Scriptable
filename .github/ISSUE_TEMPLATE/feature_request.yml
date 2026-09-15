@@ -1,0 +1,51 @@
+name: ✨ Feature request
+description: Navrhnout novou funkci / Suggest a new feature
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: Aplikace / App
+      options:
+        - LockScreen Generator
+        - Sports Info
+        - Sports Live
+        - Web / community catalog
+        - New Scriptable app
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Co chceš vyřešit? / Problem to solve
+      description: Popiš potřebu nebo problém, ne jen název funkce.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Návrh řešení / Proposed solution
+      description: Jak by se podle tebe měla funkce chovat?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativy / Alternatives
+      description: Volitelné — jiné možné řešení, podobná aplikace nebo inspirace.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Kontrola / Checklist
+      options:
+        - label: Zkontroloval(a) jsem existující Issues, zda návrh už neexistuje.
+          required: true
+        - label: Návrh neobsahuje API klíče, tokeny ani osobní údaje.
+          required: true

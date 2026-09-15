@@ -1,0 +1,81 @@
+name: Build Scriptable install package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/LockScreenGenerator/LockScreenGenerator.js'
+      - '.github/scripts/build_scriptable_package.py'
+      - '.github/workflows/build-scriptable-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
+          node --check /tmp/LockScreenGenerator.mjs
+
+      - name: Build package and sync release metadata
+        run: python .github/scripts/build_scriptable_package.py
+
+      - name: Validate one-source-of-truth release
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+
+          app=Path('apps/LockScreenGenerator')
+          src=(app/'LockScreenGenerator.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'LockScreenGenerator.scriptable').read_text(encoding='utf-8'))
+          app_readme=(app/'README.md').read_text(encoding='utf-8')
+          root_readme=Path('README.md').read_text(encoding='utf-8')
+          site=Path('index.html').read_text(encoding='utf-8')
+
+          vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
+
+          assert pkg['name']=='LockScreen Generator'
+          assert pkg['script']==src, '.scriptable does not contain exact LockScreenGenerator.js'
+          assert f'version-{version}-0284c7' in app_readme, 'app README version mismatch'
+          assert f'| 🪄 **LockScreen Generator** | ✅ v{version} |' in root_readme, 'root README version mismatch'
+          assert f"{{name:'LockScreen Generator',version:'{version}'" in site, 'website version mismatch'
+          assert "install:'./apps/LockScreenGenerator/LockScreenGenerator.scriptable'" in site, 'website install path mismatch'
+          assert 'https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/LockScreenGenerator/LockScreenGenerator.js' in src, 'updater is not pinned to Master'
+
+          # Regression guards for previous runtime failures.
+          assert 'repr(' not in src, 'Python repr leaked into JavaScript'
+          assert 'falsewindow.__updateReady' not in src, 'missing WebView statement separator'
+          assert 'JSON.stringify(PHONE_TEXT.loading)' not in src, 'PHONE_TEXT evaluated in the wrong JS context'
+          assert 'async function fetchCrypto(settings,value)' in src, 'crypto settings are not passed into fetchCrypto'
+          assert 'fetchCrypto(settings,settings.cryptoCoins)' in src, 'crypto call does not pass settings'
+          assert len(src)>20000
+          print(f'LockScreen Generator v{version}: JS + package + website + READMEs are synchronized')
+          PY
+
+      - name: Commit synchronized release files
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            apps/LockScreenGenerator/LockScreenGenerator.scriptable \
+            apps/LockScreenGenerator/README.md \
+            README.md \
+            index.html
+          if git diff --cached --quiet; then
+            echo "LockScreen release surfaces already synchronized"
+            exit 0
+          fi
+          git commit -m "Sync LockScreen release surfaces"
+          git push origin HEAD:Master

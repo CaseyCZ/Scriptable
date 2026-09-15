@@ -1,0 +1,170 @@
+name: Build Sports Info package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/Sports-Info/Sports Info.js'
+      - '.github/scripts/build_sports_info_package.py'
+      - '.github/scripts/audit_sports_info_ui.py'
+      - '.github/scripts/test_sports_info_layout.cjs'
+      - '.github/workflows/build-sports-info-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Build package and sync release metadata
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Render and validate settings WebView JavaScript
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const src=fs.readFileSync('apps/Sports-Info/Sports Info.js','utf8');
+          const marker='let SETTINGS=await firstLanguage(loadSettings());';
+          const i=src.indexOf(marker); if(i<0)throw new Error('main marker missing');
+          const fm={documentsDirectory:()=>'/tmp',cacheDirectory:()=>'/tmp',joinPath:(a,b)=>a+'/'+b,fileExists:()=>false,readString:()=>'',writeString:()=>{},remove:()=>{},readImage:()=>null,writeImage:()=>{},listContents:()=>[]};
+          const ctx={console,FileManager:{local:()=>fm,iCloud:()=>fm},Device:{locale:()=> 'cs-CZ',isUsingDarkAppearance:()=>true,screenSize:()=>({width:390,height:844})},config:{runsInWidget:false},args:{queryParameters:{}},module:{filename:'/tmp/Sports Info.js'}};
+          vm.createContext(ctx);
+          vm.runInContext(src.slice(0,i)+'\nglobalThis.__AUDIT_HTML=html(merge({...DEFAULTS,language:"cs"}));',ctx);
+          fs.writeFileSync('/tmp/sports-settings.html',ctx.__AUDIT_HTML);
+          const m=ctx.__AUDIT_HTML.match(/<script>([\s\S]*?)<\/script>/); if(!m)throw new Error('settings script missing');
+          fs.writeFileSync('/tmp/sports-settings-ui.js',m[1]);
+          NODE
+          node --check /tmp/sports-settings-ui.js
+
+      - name: Audit settings UI wiring
+        run: python .github/scripts/audit_sports_info_ui.py
+
+      - name: Test iPhone geometry and AUTO/MANUAL regressions
+        run: node .github/scripts/test_sports_info_layout.cjs
+
+      - name: Validate one-source-of-truth release
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          app_readme=(app/'README.md').read_text(encoding='utf-8')
+          root_readme=Path('README.md').read_text(encoding='utf-8')
+          site=Path('index.html').read_text(encoding='utf-8')
+          vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
+
+          # Release identity and package parity.
+          assert pkg['name']=='Sports Info'
+          assert pkg['script']==src, '.scriptable does not contain exact Sports Info.js'
+          assert pkg.get('always_run_in_app') is False
+          assert 'const APP_NAME = "Sports Info";' in src
+          assert f'**Sports Info v{version} — Production**' in app_readme
+          assert f'| 🏆 **Sports Info** | ✅ v{version} |' in root_readme
+          assert f"{{name:'Sports Info',version:'{version}'" in site
+          assert "install:'./apps/Sports-Info/Sports%20Info.scriptable'" in site
+          assert 'https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Info/Sports%20Info.js' in src
+          assert 'const target=module.filename' in src
+          assert 'if(config.runsInWidget)' in src
+          assert 'const TAP_FAMILY=' in src and 'sportsFamily=' in src
+
+          # Supported sports and data regressions.
+          for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
+              assert marker in src, marker
+          assert 'points:String(x.points??x.pts??x.wins??"")' not in src
+          assert 'points:String(x.points??x.wins??"")' not in src
+          assert 'return"OTL"' in src
+          assert 'function eventNeeds(s)' in src and 'function eventWindow(s,needs' in src
+          assert 'oneFootballBundle(s,needs' in src
+          assert '.slice(0,needs.recent)' in src and '.slice(0,needs.upcoming)' in src
+
+          # Existing manual per-size/per-sport controls remain available.
+          assert 'const LAYOUT_DEFAULTS=' in src
+          assert 'small:{teamWidth:64,scoreWidth:18' in src
+          assert 'medium:{teamWidth:128,scoreWidth:40' in src
+          assert 'large:{teamWidth:128,scoreWidth:44' in src
+          assert 'sportLayouts:{}' in src
+          assert 'function normalizeLayout(raw)' in src
+          assert 's.sportLayouts[sp.id]=normalizeLayout(profiles[sp.id]||legacy)' in src
+          assert 's.sportLayouts?.[s.sportId]?.[family]' in src
+          assert 'function switchLayoutSport(id)' in src
+          assert 'z.sportLayouts[layoutSportId]=readLayoutProfile' in src
+
+          # AUTO/MANUAL is available for every width-driven section.
+          assert 'layoutAutoBySport:{}' in src
+          assert 'function layoutAutoEnabled(s,family,section)' in src
+          assert 'function widgetAvailableWidth(s,family)' in src
+          assert 'function effectiveMatchLayout(s,family,e)' in src
+          assert 'function effectiveListLayout(s,family,events=[])' in src
+          assert 'function automaticTableSlotLayout' in src
+          assert 'function tableStatWidth' in src
+          assert 'function textWidthUnits' in src and 'function tableTextWidth' in src
+          assert 'const L=effectiveMatchLayout(s,family,e)' in src
+          assert 'const listLayout=effectiveListLayout(s,family,[...upcoming,...recent])' in src
+          assert 'AUTO_WIDTH_INPUTS' in src
+          for marker in [
+              "setLayoutAuto('small','match')",
+              "setLayoutAuto('medium','match')",
+              "setLayoutAuto('medium','lists')",
+              "setLayoutAuto('large','match')",
+              "setLayoutAuto('large','lists')",
+              "setLayoutAuto('large','table')"
+          ]:
+              assert marker in src, marker
+          for marker in ['smallMatchModeBadge','mediumMatchModeBadge','mediumListsModeBadge','largeMatchModeBadge','largeListsModeBadge','tableModeBadge']:
+              assert marker in src, marker
+          assert "!['left','center','right'].includes(L.tableAlign)" in src
+          assert '[["left",lt(s,"left")],["center",lt(s,"center")],["right",lt(s,"right")]]' in src
+
+          # Sport/team changes are persisted immediately and request an early next refresh.
+          assert 'state.settingsChangedAt=Date.now()' in src
+          assert 'Date.now()-s.settingsChangedAt<30*60000' in src
+          assert "document.getElementById('sportId').addEventListener('change',fillLeagues)" in src
+          assert "document.getElementById('leagueId').addEventListener('change'" in src
+          assert "document.getElementById('teamId').addEventListener('change'" in src
+          assert 'function commitNow()' in src
+          assert "function preview(f){state=commitNow();" in src
+
+          # iPhone UI/preview/cache contracts.
+          assert 'touchstart' in src and "setAttribute('inputmode','numeric')" in src
+          assert "document.querySelectorAll('.previewBtn').forEach(b=>b.disabled=true)" not in src
+          assert 'previewAction[data-preview=' in src
+          assert 'await w.presentSmall()' in src and 'await w.presentMedium()' in src and 'await w.presentLarge()' in src
+          assert 'action:"previewDone"' in src and "m.action==='previewDone'" in src
+          assert 'function logoCachePath(url,key)' in src
+          assert 'name.startsWith("SportsInfo_")&&name.endsWith(".png")' in src
+          assert len(src)>30000
+          print(f'Sports Info v{version}: source, package, AUTO modes, UI and release surfaces synchronized')
+          PY
+
+      - name: Commit synchronized release files
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
+          if git diff --cached --quiet; then
+            echo "Sports Info release surfaces already synchronized"
+            exit 0
+          fi
+          git commit -m "Sync Sports Info release surfaces"
+          git push origin HEAD:Master
