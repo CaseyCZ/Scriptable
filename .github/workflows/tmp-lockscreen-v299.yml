@@ -1,0 +1,26 @@
+name: LockScreen v299 patch
+on: [push]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/lockscreen-v2.9.9-base64-output
+          fetch-depth: 0
+      - name: Apply patch
+        run: python .github/scripts/patch_lockscreen_v299.py
+      - name: Validate JavaScript
+        run: |
+          cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
+          node --check /tmp/LockScreenGenerator.mjs
+      - name: Commit result
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/tmp-lockscreen-v299.yml .github/scripts/patch_lockscreen_v299.py .github/tmp-v299-trigger.txt
+          git add 'apps/LockScreenGenerator/LockScreenGenerator.js' 'apps/LockScreenGenerator/README.md'
+          git commit -m 'LockScreen Generator v2.9.9: return overlay as Base64'
+          git push origin HEAD:work/lockscreen-v2.9.9-base64-output
