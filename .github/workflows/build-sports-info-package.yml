@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/Sports-Info/Sports Info.js'
       - '.github/scripts/build_sports_info_package.py'
+      - '.github/scripts/audit_sports_info_ui.py'
       - '.github/workflows/build-sports-info-package.yml'
   workflow_dispatch:
 
@@ -29,6 +30,26 @@ jobs:
       - name: Build package and sync release metadata
         run: |
           python .github/scripts/build_sports_info_package.py
+
+      - name: Render and validate settings WebView JavaScript
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const src=fs.readFileSync('apps/Sports-Info/Sports Info.js','utf8');
+          const marker='let SETTINGS=await firstLanguage(loadSettings());';
+          const i=src.indexOf(marker); if(i<0)throw new Error('main marker missing');
+          const fm={documentsDirectory:()=>'/tmp',cacheDirectory:()=>'/tmp',joinPath:(a,b)=>a+'/'+b,fileExists:()=>false,readString:()=>'',writeString:()=>{},remove:()=>{},readImage:()=>null,writeImage:()=>{},listContents:()=>[]};
+          const ctx={console,FileManager:{local:()=>fm,iCloud:()=>fm},Device:{locale:()=> 'cs-CZ',isUsingDarkAppearance:()=>true},config:{runsInWidget:false},args:{queryParameters:{}},module:{filename:'/tmp/Sports Info.js'}};
+          vm.createContext(ctx);
+          vm.runInContext(src.slice(0,i)+'\nglobalThis.__AUDIT_HTML=html(merge({...DEFAULTS,language:"cs"}));',ctx);
+          fs.writeFileSync('/tmp/sports-settings.html',ctx.__AUDIT_HTML);
+          const m=ctx.__AUDIT_HTML.match(/<script>([\s\S]*?)<\/script>/); if(!m)throw new Error('settings script missing');
+          fs.writeFileSync('/tmp/sports-settings-ui.js',m[1]);
+          NODE
+          node --check /tmp/sports-settings-ui.js
+
+      - name: Audit settings UI wiring
+        run: python .github/scripts/audit_sports_info_ui.py
 
       - name: Validate one-source-of-truth release
         run: |
@@ -59,34 +80,62 @@ jobs:
           for marker in ['id:"football"','id:"hockey"','id:"basketball"','id:"floorball"','id:"baseball"']:
               assert marker in src, marker
 
-          # Regression guards for standings, form, per-size/per-sport layout, settings UI and focused event loading.
+          # Regression guards for data, event loading and standings profiles.
           assert 'points:String(x.points??x.pts??x.wins??"")' not in src, 'SportsAPI wins used as points'
           assert 'points:String(x.points??x.wins??"")' not in src, 'SofaScore wins used as points'
           assert 'return"OTL"' in src, 'hockey overtime-loss form handling missing'
+          assert 'football:[["team","TÝM"],["played","Z"],["wins","V"],["draws","R"],["losses","P"],["score","SK"],["diff","RS"],["points","B"]]' in src, 'football 7-stat profile changed unexpectedly'
+          assert 'hockey:[["team","TÝM"],["played","Z"],["wins","V"],["otWins","VP"],["otLosses","PP"],["losses","P"],["score","SK"],["points","B"]]' in src, 'hockey 7-stat profile changed unexpectedly'
+          assert 'range(-60,0)' not in src and 'range(0,120)' not in src, 'legacy broad event windows returned'
+          assert 'idx-4' not in src and 'idx+7' not in src, 'legacy OneFootball matchday window returned'
+          assert 'function eventNeeds(s)' in src, 'dynamic event needs missing'
+          assert 'function eventWindow(s,needs' in src, 'dynamic event window missing'
+          assert 'oneFootballBundle(s,needs' in src, 'OneFootball does not use requested event needs'
+          assert '.slice(0,needs.recent)' in src and '.slice(0,needs.upcoming)' in src, 'event lists are not trimmed to requested counts'
+
+          # Per-size and per-sport manual values remain available.
           assert 'const LAYOUT_DEFAULTS=' in src, 'per-size layout defaults missing'
           assert 'small:{teamWidth:64,scoreWidth:18' in src, 'Small layout defaults missing'
           assert 'medium:{teamWidth:128,scoreWidth:40' in src, 'Medium layout defaults missing'
           assert 'large:{teamWidth:128,scoreWidth:44' in src, 'Large layout defaults missing'
-          assert 'function tableSlotLayout' in src, '7-slot standings layout missing'
-          assert 'tableWideWidth:30' in src and 'tableNarrowWidth:23' in src, 'wide/narrow standings widths missing'
           assert 'tableTeamWidth:[60,180]' in src, 'TEAM/start-position range regressed'
-          assert 'tableNarrowWidth:[20,50]' in src, 'last-three-stat range regressed'
+          assert 'tableWideWidth:[24,50]' in src, 'first-four-stat manual range regressed'
+          assert 'tableNarrowWidth:[20,50]' in src, 'last-three-stat manual range regressed'
           assert 'layoutLargeTableTeamWidth",lt(s,"tableTeamWidth"),s.layout.large.tableTeamWidth,60,180' in src, 'TEAM/start-position UI range regressed'
+          assert 'layoutLargeTableWideWidth",lt(s,"wideWidth"),s.layout.large.tableWideWidth,24,50' in src, 'first-four-stat UI range regressed'
           assert 'layoutLargeTableNarrowWidth",lt(s,"narrowWidth"),s.layout.large.tableNarrowWidth,20,50' in src, 'last-three-stat UI range regressed'
           assert 'h.addSpacer(4);\n  const hs=h.addStack()' in src, 'standings header first-stat gap is not fixed'
           assert 'r.addSpacer(4);\n    const rs=r.addStack()' in src, 'standings row first-stat gap is not fixed'
-          assert 'id="layoutSmall"' in src and 'id="layoutMedium"' in src and 'id="layoutLarge"' in src, 'per-size layout settings screens missing'
 
-          # Layout persistence and visible help/ranges.
+          # New iPhone Large submenu and AUTO/MANUAL standings layout.
+          assert all(f'id="{x}"' in src for x in ['layoutSmall','layoutMedium','layoutLarge','layoutLargeMatch','layoutLargeTable','layoutLargeLists']), 'Layout screens missing'
+          assert 'tableAutoBySport:{}' in src, 'per-sport AUTO/MANUAL storage missing'
+          assert 'function tableAutoEnabled(s)' in src, 'AUTO table mode helper missing'
+          assert 'function automaticTableSlotLayout' in src, 'dynamic standings width calculation missing'
+          assert 'function textWidthUnits' in src and 'function tableTextWidth' in src, 'weighted text width estimator missing'
+          assert 'tableSlotLayout(s,cols,rows)' in src, 'AUTO layout does not use visible standings rows'
+          assert 'key==="score"?80:56' in src, 'score column cannot expand for larger scores'
+          assert 'function setTableAuto()' in src and 'function markTableManual()' in src, 'AUTO/MANUAL UI switching missing'
+          assert "state.tableAutoBySport[layoutSportId]=!!auto" in src, 'AUTO/MANUAL state not scoped to sport'
+          assert 'id="tableModeBadge"' in src and 'id="autoTableInfo"' in src, 'AUTO/MANUAL status UI missing'
+          assert 'resetLayoutSection' in src, 'focused Large reset missing'
+
+          # Persistence, iPhone touch behavior and preview bridge.
           assert 'function commitNow()' in src, 'immediate settings commit missing'
           assert "x.addEventListener('input',save)" in src, 'live numeric layout persistence missing'
           assert "function preview(f){state=commitNow();" in src, 'preview does not persist current layout first'
           assert "String(e.value).trim()!==''" in src, 'empty numeric layout guard missing'
-          assert "^layout(?:Small|Medium|Large)$" in src, 'layout navigation commit guard missing'
+          assert "^layout(?:Small|Medium|Large)(?:Match|Table|Lists)?$" in src, 'nested Layout navigation commit guard missing'
           assert 'function layoutRangeDetail' in src and 'function layoutField' in src, 'layout range/help UI missing'
           assert 'out.large.tableAlign=ta.value' in src, 'table alignment is not collected from layout UI'
+          assert "document.querySelectorAll('.previewBtn').forEach(b=>b.disabled=true)" not in src, 'preview can disable unrelated controls'
+          assert 'previewAction[data-preview=' in src, 'preview busy state is not scoped'
+          assert 'await w.presentSmall()' in src and 'await w.presentMedium()' in src and 'await w.presentLarge()' in src, 'native direct preview missing'
+          assert 'Safari.open(base+' not in src, 'legacy URL relaunch preview returned'
+          assert 'action:"previewDone"' in src and "m.action==='previewDone'" in src, 'preview completion bridge missing'
+          assert 'touchstart' in src and "setAttribute('inputmode','numeric')" in src, 'iPhone interaction tuning missing'
 
-          # Each sport must own an independent Small / Medium / Large layout profile.
+          # Each sport owns independent manual Layout values.
           assert 'sportLayouts:{}' in src, 'per-sport layout storage missing'
           assert 'function normalizeLayout(raw)' in src, 'per-sport layout normalization missing'
           assert 's.sportLayouts[sp.id]=normalizeLayout(profiles[sp.id]||legacy)' in src, 'legacy layout migration to per-sport profiles missing'
@@ -96,18 +145,13 @@ jobs:
           assert 'state=collect();switchLayoutSport(sid)' in src, 'sport switch does not save old and load new layout profile'
           assert 'class="layoutSportName"' in src, 'active sport badge missing from Layout settings'
           assert 'profile[family]=cloneProfile(LAYOUT_DEFAULTS)[family]' in src, 'Layout reset is not scoped to current sport/family'
-          assert "writeLayoutProfile(profile);emit('save',{settings:state})" in src, 'Layout reset does not immediately save restored defaults'
 
-          assert 'football:[["team","TÝM"],["played","Z"],["wins","V"],["draws","R"],["losses","P"],["score","SK"],["diff","RS"],["points","B"]]' in src, 'football 7-stat profile changed unexpectedly'
-          assert 'hockey:[["team","TÝM"],["played","Z"],["wins","V"],["otWins","VP"],["otLosses","PP"],["losses","P"],["score","SK"],["points","B"]]' in src, 'hockey 7-stat profile changed unexpectedly'
-          assert 'range(-60,0)' not in src and 'range(0,120)' not in src, 'legacy broad event windows returned'
-          assert 'idx-4' not in src and 'idx+7' not in src, 'legacy OneFootball matchday window returned'
-          assert 'function eventNeeds(s)' in src, 'dynamic event needs missing'
-          assert 'function eventWindow(s,needs' in src, 'dynamic event window missing'
-          assert 'oneFootballBundle(s,needs' in src, 'OneFootball does not use requested event needs'
-          assert '.slice(0,needs.recent)' in src and '.slice(0,needs.upcoming)' in src, 'event lists are not trimmed to requested counts'
+          # Cache and logo isolation.
+          assert 'function logoCachePath(url,key)' in src, 'URL-fingerprinted logo cache missing'
+          assert 'name.startsWith("SportsInfo_")&&name.endsWith(".png")' in src, 'Clear cache does not remove logo images'
+
           assert len(src)>30000
-          print(f'Sports Info v{version}: JS + package + website + READMEs are synchronized')
+          print(f'Sports Info v{version}: JS + package + settings UI + website + READMEs are synchronized')
           PY
 
       - name: Commit synchronized release files
