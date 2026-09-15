@@ -61,11 +61,19 @@ jobs:
           assert 'async function fetchCrypto(settings,value)' in src, 'crypto settings are not passed into fetchCrypto'
           assert 'fetchCrypto(settings,settings.cryptoCoins)' in src, 'crypto call does not pass settings'
 
-          # Shortcuts overlay output: return the transparent PNG as Base64 text.
-          assert 'const overlayBase64=png.toBase64String()' in src, 'Shortcut overlay Base64 conversion missing'
-          assert 'Script.setShortcutOutput(overlayBase64)' in src, 'Shortcut overlay Base64 is not returned to Shortcuts'
-          assert 'Data.fromPNG(image)' in src, 'Shortcut overlay is not encoded as PNG data'
-          assert 'Script.setShortcutOutput(out)' not in src, 'Old file-path Shortcut output still present'
+          # Shortcuts compatibility fallback: transparent overlay can still be returned as Base64.
+          assert 'const overlayBase64=png.toBase64String()' in src, 'Shortcut overlay Base64 fallback missing'
+          assert 'Script.setShortcutOutput(overlayBase64)' in src, 'Shortcut overlay Base64 fallback is not returned'
+          assert 'Data.fromPNG(image)' in src, 'PNG image encoding missing'
+          assert 'Script.setShortcutOutput(out)' not in src, 'Old temporary file-path output still present'
+
+          # v2.10.0 wallpaper source modes.
+          assert 'wallpaperSource:"shortcut"' in src, 'Shortcut wallpaper mode default missing'
+          assert 'const BACKGROUND_FILE = "LockScreenGenerator_background.png"' in src, 'Stored wallpaper file missing'
+          assert 'Array.isArray(args.images)&&args.images.length?args.images[0]:null' in src, 'Shortcut Images input missing'
+          assert 'Photos.fromLibrary()' in src, 'Generator photo picker missing'
+          assert 'composeWallpaper(size,background,overlay)' in src, 'Internal wallpaper composition missing'
+          assert 'Script.setShortcutOutput(path)' in src, 'Finished wallpaper path is not returned to Shortcuts'
 
           assert len(src)>20000
           print(f'LockScreen Generator v{version}: JS + package + website + READMEs are synchronized')
@@ -87,4 +95,4 @@ jobs:
           git commit -m "Sync LockScreen release surfaces"
           git push origin HEAD:Master
 
-# v2.9.9 Base64 shortcut output guard
+# v2.10.0 wallpaper source mode guards
