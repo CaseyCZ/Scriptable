@@ -1,0 +1,10 @@
+name: Sports migration runner
+on:
+  push:
+    branches:
+      - Master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo runner-ok
