@@ -61,9 +61,10 @@ jobs:
           assert 'async function fetchCrypto(settings,value)' in src, 'crypto settings are not passed into fetchCrypto'
           assert 'fetchCrypto(settings,settings.cryptoCoins)' in src, 'crypto call does not pass settings'
 
-          # Shortcuts must receive a real temporary PNG overlay, not only the persistent iCloud path.
+          # Scriptable only documents Shortcut file-path outputs for files stored in iCloud.
           assert 'LockScreenOverlay.png' in src, 'Shortcut overlay PNG output missing'
-          assert 'local.temporaryDirectory()' in src, 'Shortcut overlay is not written to a temporary local file'
+          assert 'fm.documentsDirectory()' in src, 'Shortcut overlay is not written to Scriptable iCloud Documents'
+          assert 'local.temporaryDirectory()' not in src, 'Shortcut overlay must not use a local temporary path'
           assert 'Script.setShortcutOutput(out)' in src, 'Shortcut overlay file is not returned to Shortcuts'
           assert 'Data.fromPNG(image)' in src, 'Shortcut overlay is not encoded as PNG data'
 
