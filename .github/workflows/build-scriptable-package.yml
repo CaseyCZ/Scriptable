@@ -60,6 +60,13 @@ jobs:
           assert 'JSON.stringify(PHONE_TEXT.loading)' not in src, 'PHONE_TEXT evaluated in the wrong JS context'
           assert 'async function fetchCrypto(settings,value)' in src, 'crypto settings are not passed into fetchCrypto'
           assert 'fetchCrypto(settings,settings.cryptoCoins)' in src, 'crypto call does not pass settings'
+
+          # Shortcuts must receive a real temporary PNG overlay, not only the persistent iCloud path.
+          assert 'LockScreenOverlay.png' in src, 'Shortcut overlay PNG output missing'
+          assert 'local.temporaryDirectory()' in src, 'Shortcut overlay is not written to a temporary local file'
+          assert 'Script.setShortcutOutput(out)' in src, 'Shortcut overlay file is not returned to Shortcuts'
+          assert 'Data.fromPNG(image)' in src, 'Shortcut overlay is not encoded as PNG data'
+
           assert len(src)>20000
           print(f'LockScreen Generator v{version}: JS + package + website + READMEs are synchronized')
           PY
