@@ -1,0 +1,90 @@
+name: Patch Sports Info 2.5.22 iPhone auto layout once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-iphone-auto-layout-2522-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Apply Sports Info 2.5.22 patch
+        run: python .github/scripts/patch_sports_iphone_auto_layout_2522_once.py
+
+      - name: Validate outer JavaScript
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Build package and release surfaces
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Render settings and validate embedded WebView JavaScript
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const src=fs.readFileSync('apps/Sports-Info/Sports Info.js','utf8');
+          const marker='let SETTINGS=await firstLanguage(loadSettings());';
+          const i=src.indexOf(marker); if(i<0)throw new Error('main marker missing');
+          const fm={documentsDirectory:()=>'/tmp',cacheDirectory:()=>'/tmp',joinPath:(a,b)=>a+'/'+b,fileExists:()=>false,readString:()=>'',writeString:()=>{},remove:()=>{},readImage:()=>null,writeImage:()=>{},listContents:()=>[]};
+          const ctx={console,FileManager:{local:()=>fm,iCloud:()=>fm},Device:{locale:()=> 'cs-CZ',isUsingDarkAppearance:()=>true},config:{runsInWidget:false},args:{queryParameters:{}},module:{filename:'/tmp/Sports Info.js'}};
+          vm.createContext(ctx);
+          vm.runInContext(src.slice(0,i)+'\nglobalThis.__AUDIT_HTML=html(merge({...DEFAULTS,language:"cs"}));',ctx);
+          fs.writeFileSync('/tmp/sports-settings.html',ctx.__AUDIT_HTML);
+          const m=ctx.__AUDIT_HTML.match(/<script>([\s\S]*?)<\/script>/); if(!m)throw new Error('settings script missing');
+          fs.writeFileSync('/tmp/sports-settings-ui.js',m[1]);
+          NODE
+          node --check /tmp/sports-settings-ui.js
+
+      - name: Full UI wiring audit
+        run: python .github/scripts/audit_sports_info_ui_2521.py
+
+      - name: Validate AUTO/MANUAL and release parity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert 'const APP_VERSION = "2.5.22";' in src
+          assert pkg['script']==src
+          assert 'function automaticTableSlotLayout' in src
+          assert 'function tableAutoEnabled' in src
+          assert 'tableAutoBySport' in src
+          assert 'id="layoutLargeMatch"' in src and 'id="layoutLargeTable"' in src and 'id="layoutLargeLists"' in src
+          assert 'AUTO počítá šířky' in src
+          assert 'markTableManual' in src and 'setTableAuto' in src
+          assert "document.querySelectorAll('.previewBtn').forEach(b=>b.disabled=true)" not in src
+          assert 'Safari.open(base+' not in src
+          assert 'await w.presentSmall()' in src and 'await w.presentMedium()' in src and 'await w.presentLarge()' in src
+          assert 'touchstart' in src and "inputmode','numeric" in src
+          assert 'name.startsWith("SportsInfo_")&&name.endsWith(".png")' in src
+          assert '**Sports Info v2.5.22 — Production**' in (app/'README.md').read_text(encoding='utf-8')
+          assert '| 🏆 **Sports Info** | ✅ v2.5.22 |' in Path('README.md').read_text(encoding='utf-8')
+          assert "{name:'Sports Info',version:'2.5.22'" in Path('index.html').read_text(encoding='utf-8')
+          print('Sports Info 2.5.22 validated')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
+          git commit -m "Sports Info 2.5.22 iPhone auto layout"
+          git push origin HEAD:Master
