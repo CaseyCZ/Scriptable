@@ -1,0 +1,66 @@
+name: Patch Sports Info 2.5.19 per-sport layout once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-per-sport-layout-2519-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Apply per-sport layout patch
+        run: python .github/scripts/patch_sports_per_sport_layout_2519_once.py
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Build package
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Validate release
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert 'const APP_VERSION = "2.5.19";' in src
+          assert pkg['script']==src
+          assert 'function normalizeLayout(raw)' in src
+          assert 's.sportLayouts[sp.id]=normalizeLayout(profiles[sp.id]||legacy)' in src
+          assert 's.sportLayouts?.[s.sportId]?.[family]' in src
+          assert 'function switchLayoutSport(id)' in src
+          assert 'z.sportLayouts[layoutSportId]=readLayoutProfile' in src
+          assert 'state=collect();switchLayoutSport(sid)' in src
+          assert 'class="layoutSportName"' in src
+          assert '**Sports Info v2.5.19 — Production**' in (app/'README.md').read_text(encoding='utf-8')
+          assert '| 🏆 **Sports Info** | ✅ v2.5.19 |' in Path('README.md').read_text(encoding='utf-8')
+          assert "{name:'Sports Info',version:'2.5.19'" in Path('index.html').read_text(encoding='utf-8')
+          print('Sports Info 2.5.19 per-sport layout validated')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
+          git commit -m "Sports Info 2.5.19 add per-sport layout profiles"
+          git push origin HEAD:Master
