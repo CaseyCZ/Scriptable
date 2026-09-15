@@ -80,7 +80,7 @@ for(const alignment of ['left','center','right'])assert.ok(html.includes(`option
 fs.writeFileSync('/tmp/sports-settings.html',html);
 fs.writeFileSync('/tmp/sports-settings-ui.js',ui);
 
-// 2.5.28: AUTO width modes are available for every size/section and remain sport-scoped.
+// 2.5.30: AUTO width modes are sport-scoped and every visible section owns its layout calculation.
 for(const sportId of Object.keys(a.TABLE_PROFILES)){
   const leagueId=sportId==='baseball'?'mlb':sportId==='hockey'?'nhl':sportId==='basketball'?'nba':sportId==='floorball'?'floorball.cz':'cze.1';
   const s=a.merge({...a.DEFAULTS,sportId,leagueId});
@@ -99,6 +99,14 @@ const basketballEvent={state:'post',completed:true,date:new Date().toISOString()
 assert.ok(a.effectiveMatchLayout(basketball,'medium',basketballEvent).scoreWidth>a.effectiveMatchLayout(football,'medium',footballEvent).scoreWidth,'basketball score should reserve more AUTO width');
 const list=a.effectiveListLayout(basketball,'medium',[basketballEvent]);
 assert.equal(list.listDateWidth+2*list.listTeamWidth+list.listScoreWidth,a.widgetAvailableWidth(basketball,'medium'),'AUTO lists fill widget width');
+assert.ok(src.includes('const nextLayout=upcoming.length?effectiveListLayout(s,family,upcoming):null;'),'NEXT must calculate its own AUTO layout');
+assert.ok(src.includes('const lastLayout=recent.length?effectiveListLayout(s,family,recent):null;'),'LAST must calculate its own AUTO layout');
+assert.ok(!src.includes('const listLayout=effectiveListLayout(s,family,[...upcoming,...recent]);'),'NEXT and LAST must never share one AUTO layout');
+const nextEvent={state:'pre',completed:false,date:'2026-09-19T15:00:00Z',home:{score:''},away:{score:''}};
+const lastEvent={state:'post',completed:true,date:'2026-09-13T15:00:00Z',home:{score:'115'},away:{score:'108'}};
+const nextOnly=a.effectiveListLayout(basketball,'large',[nextEvent]);
+const lastOnly=a.effectiveListLayout(basketball,'large',[lastEvent]);
+assert.notEqual(nextOnly.listScoreWidth,lastOnly.listScoreWidth,'independent sections may reserve different score widths from their own content');
 const manual=a.merge({...basketball,layoutAutoBySport:{basketball:{small:{match:false},medium:{match:false,lists:false},large:{match:false,lists:false,table:false}}},sportLayouts:{...basketball.sportLayouts,basketball:{...basketball.sportLayouts.basketball,medium:{...basketball.sportLayouts.basketball.medium,scoreWidth:67}}}});
 assert.equal(a.layoutAutoEnabled(manual,'medium','match'),false);
 assert.equal(a.effectiveMatchLayout(manual,'medium',basketballEvent).scoreWidth,67,'MANUAL must keep saved width');
@@ -120,5 +128,5 @@ assert.ok(html.includes('smallMatchModeBadge')&&html.includes('mediumListsModeBa
   }
   const pkg=JSON.parse(fs.readFileSync('apps/Sports-Info/Sports Info.scriptable','utf8'));
   assert.equal(pkg.script,src);assert.equal(pkg.name,'Sports Info');assert.equal(pkg.always_run_in_app,false);
-  console.log(`PASS: ${cases} AUTO combinations, 5 native table-tree fixtures, alignments, UI syntax, package parity. Native iPhone visual check still required.`);
+  console.log(`PASS: ${cases} AUTO combinations, independent NEXT/LAST layouts, 5 native table-tree fixtures, alignments, UI syntax, package parity. Native iPhone visual check still required.`);
 })().catch(e=>{console.error(e);process.exitCode=1;});
