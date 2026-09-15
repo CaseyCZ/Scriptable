@@ -1,6 +1,6 @@
 # 🏆 Sports Info
 
-**Sports Info v2.5.29 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
+**Sports Info v2.5.30 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
 
 ## Sporty
 
@@ -25,6 +25,16 @@ Widget požádá iOS o další obnovu podle situace:
 Cache slouží pouze jako nouzová záloha při výpadku internetu nebo datového zdroje.
 
 ## Template a funkce
+
+### Samostatné AUTO zarovnání sekcí v2.5.30
+
+- AUTO layout se počítá **pro každou sekci samostatně**, nikoli jednou pro celý widget.
+- `PŘÍŠTÍ` používá pouze svoje zápasy a `POSLEDNÍ` pouze svoje výsledky, takže obsah jedné sekce už nemění šířky druhé.
+- Hlavní zápas, seznamy zápasů a tabulka mají vlastní layout logiku. Tabulka dál používá sportovní profil sloupců podle typu sportu.
+- Stejný princip platí napříč podporovanými sporty a pro Small / Medium / Large všude, kde se daná sekce zobrazuje.
+- Skóre, čas a statistické hodnoty mají konzervativnější rezervu šířky a při krajním nedostatku místa mohou využít nativní zmenšení textu místo ořezu na `…`.
+- MANUAL režim zůstává zachovaný pro ruční šířky a zarovnání. AUTO změny nepřepisují uložené manuální profily.
+- Release obsahuje synchronizovaný `Sports Info.js` a `Sports Info.scriptable`; automatické testy kontrolují syntaxi, geometrii, AUTO/MANUAL režimy a shodu instalačního balíčku.
 
 ### Oprava AUTO tabulky v2.5.24
 
