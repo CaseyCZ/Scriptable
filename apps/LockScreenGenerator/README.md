@@ -186,3 +186,12 @@ Our apps and selected community projects are available on our website.
 Built for **Scriptable + iPhone + Shortcuts**
 
 </div>
+
+## 🖼 Zdroje tapety (v2.10.0)
+
+LockScreen Generator má dva režimy základní fotografie:
+
+- **Fotka uložená v generátoru** – v Nastavení → Tapeta jednou vyber fotografii. Při spuštění ze Zkratek není potřeba žádný vstupní obrázek; skript vytvoří hotovou tapetu.
+- **Fotka ze Zkratek** – Zkratka může vybrat libovolnou nebo náhodnou fotografii z alba a předat ji do pole **Images** akce **Run Script**. Generátor fotografii sám ořízne na poměr displeje a spojí s překrytím.
+
+Pokud je dostupná základní fotka, skript uloží hotový výsledek do `LockScreenWallpaper.png` a vrátí jeho iCloud cestu. Starý režim `overlay`/Base64 zůstává jako kompatibilní fallback, když není předaná ani uložená fotka.
