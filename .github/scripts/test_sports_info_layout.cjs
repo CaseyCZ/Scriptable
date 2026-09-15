@@ -37,7 +37,9 @@ for(const [width,height] of [[320,568],[375,667],[390,844],[393,852],[414,736],[
     assert.equal(g.teamCol[2]+4+g.statsWidth,a.tableAvailableWidth(s));
     assert.ok(g.teamCol[2]>=80);
     for(const [key,label,w] of g.statCols){
-      assert.ok(w>=a.tableStatWidth(label,g.headerFont));
+      const headerNeed=a.tableStatWidth(label,g.headerFont);
+      // v2.5.30 headers may use the native 0.8 scale fallback when the full table is tight.
+      assert.ok(w>=headerNeed || w>=Math.ceil(headerNeed*.8),`${sportId}/${width}/${key}/header`);
       for(const row of rows){
         const need=a.tableStatWidth(a.standingValue(row,key),g.font);
         // Extreme 11-character scores on SE-size screens may use the cell's native scaling.
@@ -106,7 +108,7 @@ const nextEvent={state:'pre',completed:false,date:'2026-09-19T15:00:00Z',home:{s
 const lastEvent={state:'post',completed:true,date:'2026-09-13T15:00:00Z',home:{score:'115'},away:{score:'108'}};
 const nextOnly=a.effectiveListLayout(basketball,'large',[nextEvent]);
 const lastOnly=a.effectiveListLayout(basketball,'large',[lastEvent]);
-assert.notEqual(nextOnly.listScoreWidth,lastOnly.listScoreWidth,'independent sections may reserve different score widths from their own content');
+for(const sectionLayout of [nextOnly,lastOnly])assert.equal(sectionLayout.listDateWidth+2*sectionLayout.listTeamWidth+sectionLayout.listScoreWidth,a.widgetAvailableWidth(basketball,'large'),'each list section must fill widget width independently');
 const manual=a.merge({...basketball,layoutAutoBySport:{basketball:{small:{match:false},medium:{match:false,lists:false},large:{match:false,lists:false,table:false}}},sportLayouts:{...basketball.sportLayouts,basketball:{...basketball.sportLayouts.basketball,medium:{...basketball.sportLayouts.basketball.medium,scoreWidth:67}}}});
 assert.equal(a.layoutAutoEnabled(manual,'medium','match'),false);
 assert.equal(a.effectiveMatchLayout(manual,'medium',basketballEvent).scoreWidth,67,'MANUAL must keep saved width');
