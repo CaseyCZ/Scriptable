@@ -1,0 +1,25 @@
+name: LockScreen v2100 patch
+on: [push]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+      - name: Apply patch
+        run: python .github/scripts/patch_lockscreen_v2100.py
+      - name: Validate JavaScript
+        run: |
+          cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
+          node --check /tmp/LockScreenGenerator.mjs
+      - name: Commit result
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add 'apps/LockScreenGenerator/LockScreenGenerator.js' 'apps/LockScreenGenerator/README.md'
+          git commit -m 'LockScreen Generator v2.10.0: add wallpaper source modes'
+          git push origin HEAD:Master
