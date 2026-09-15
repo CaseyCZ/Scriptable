@@ -116,7 +116,9 @@ jobs:
           assert 'function tableStatWidth' in src
           assert 'function textWidthUnits' in src and 'function tableTextWidth' in src
           assert 'const L=effectiveMatchLayout(s,family,e)' in src
-          assert 'const listLayout=effectiveListLayout(s,family,[...upcoming,...recent])' in src
+          assert 'const nextLayout=upcoming.length?effectiveListLayout(s,family,upcoming):null;' in src
+          assert 'const lastLayout=recent.length?effectiveListLayout(s,family,recent):null;' in src
+          assert 'const listLayout=effectiveListLayout(s,family,[...upcoming,...recent]);' not in src
           assert 'AUTO_WIDTH_INPUTS' in src
           for marker in [
               "setLayoutAuto('small','match')",
@@ -150,7 +152,7 @@ jobs:
           assert 'function logoCachePath(url,key)' in src
           assert 'name.startsWith("SportsInfo_")&&name.endsWith(".png")' in src
           assert len(src)>30000
-          print(f'Sports Info v{version}: source, package, AUTO modes, UI and release surfaces synchronized')
+          print(f'Sports Info v{version}: source, package, section-local AUTO modes, UI and release surfaces synchronized')
           PY
 
       - name: Commit synchronized release files
