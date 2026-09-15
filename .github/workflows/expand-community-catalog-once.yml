@@ -1,0 +1,60 @@
+name: Expand community catalog once
+on:
+  push:
+    branches: [Master]
+    paths: ['.github/workflows/expand-community-catalog-once.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch and validate catalog
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          extra=Path('community-extra.js').read_text(encoding='utf-8')
+          count=len(re.findall(r'^communityItem\(',extra,re.M))
+          assert count==84, f'Expected 84 extra apps, got {count}'
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          assert 'const PAGE_SIZE=6;' in s
+          if '<script src="./community-extra.js"></script>' not in s:
+              s=s.replace('  <script>\n    const PAGE_SIZE=6;', '  <script src="./community-extra.js"></script>\n  <script>\n    const PAGE_SIZE=6;',1)
+          marker='    const communityApps=['
+          start=s.index(marker)
+          end=s.index('\n    ];',start)+len('\n    ];')
+          push='\n    communityApps.push(...(window.communityExtraApps||[]));'
+          if push.strip() not in s[start:end+len(push)+20]:
+              s=s[:end]+push+s[end:]
+          old="const CATEGORY_ORDER=['all','sport','weather','news','calendar','finance','space','tools','reading'];"
+          new="const CATEGORY_ORDER=['all','sport','weather','news','calendar','finance','space','tools','reading','cars','gaming','music','social','mobile','health','travel','art'];"
+          s=s.replace(old,new)
+          old_labels="const CATEGORY_LABELS={all:{cs:'Vše',en:'All'},sport:{cs:'Sport',en:'Sport'},weather:{cs:'Počasí',en:'Weather'},news:{cs:'Zprávy',en:'News'},calendar:{cs:'Kalendář',en:'Calendar'},finance:{cs:'Finance',en:'Finance'},space:{cs:'Vesmír',en:'Space'},tools:{cs:'Nástroje',en:'Tools'},reading:{cs:'Čtení',en:'Reading'}};"
+          new_labels="const CATEGORY_LABELS={all:{cs:'Vše',en:'All'},sport:{cs:'Sport',en:'Sport'},weather:{cs:'Počasí',en:'Weather'},news:{cs:'Zprávy',en:'News'},calendar:{cs:'Kalendář',en:'Calendar'},finance:{cs:'Finance',en:'Finance'},space:{cs:'Vesmír',en:'Space'},tools:{cs:'Nástroje',en:'Tools'},reading:{cs:'Čtení',en:'Reading'},cars:{cs:'Auta',en:'Cars'},gaming:{cs:'Hry',en:'Gaming'},music:{cs:'Hudba',en:'Music'},social:{cs:'Sociální',en:'Social'},mobile:{cs:'Mobil',en:'Mobile'},health:{cs:'Zdraví',en:'Health'},travel:{cs:'Cestování',en:'Travel'},art:{cs:'Design',en:'Design'}};"
+          assert old_labels in s or new_labels in s
+          s=s.replace(old_labels,new_labels)
+          old_pag=re.search(r'    function renderPagination\(\)\{.*?\n    function renderCommunity',s,re.S)
+          assert old_pag
+          new_pag='''    function renderPagination(){const rows=filteredCommunityApps();const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(communityPage>=pages)communityPage=pages-1;const p=document.getElementById('pagination');let html=`<button class="pageBtn" ${communityPage===0?'disabled':''} onclick="setCommunityPage(${communityPage-1})">‹</button>`;const wanted=new Set([0,pages-1,communityPage-1,communityPage,communityPage+1].filter(x=>x>=0&&x<pages));let last=-2;for(const i of [...wanted].sort((a,b)=>a-b)){if(i-last>1)html+=`<span class="pageInfo">…</span>`;html+=`<button class="pageBtn ${i===communityPage?'active':''}" onclick="setCommunityPage(${i})">${i+1}</button>`;last=i}html+=`<button class="pageBtn" ${communityPage===pages-1?'disabled':''} onclick="setCommunityPage(${communityPage+1})">›</button>`;p.innerHTML=html;document.getElementById('pageInfo').textContent=tr(`Stránka ${communityPage+1} z ${pages} · ${rows.length} vybraných`,`Page ${communityPage+1} of ${pages} · ${rows.length} selected`)}
+    function renderCommunity'''
+          s=s[:old_pag.start()]+new_pag+s[old_pag.end():]
+          old_footer='<footer><span data-cs="Výběr komunitních projektů byl inspirován seznamem Awesome Scriptable." data-en="The community selection was inspired by the Awesome Scriptable list.">Výběr komunitních projektů byl inspirován seznamem Awesome Scriptable.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a></footer>'
+          new_footer='<footer><span data-cs="Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity." data-en="The community catalog is curated from public Scriptable projects and community recommendations.">Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a> · <a class="mutedLink" href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a> · <a class="mutedLink" href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a></footer>'
+          s=s.replace(old_footer,new_footer)
+          p.write_text(s,encoding='utf-8')
+          # validation of names and integration
+          assert s.count('<script src="./community-extra.js"></script>')==1
+          assert 'communityApps.push(...(window.communityExtraApps||[]));' in s
+          assert "PAGE_SIZE=6" in s
+          print('extra apps:',count)
+      - name: Commit website integration
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --check
+          git commit -m "Expand community catalog to 84 more apps"
+          git push
