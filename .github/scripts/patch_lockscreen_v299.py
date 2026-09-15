@@ -2,7 +2,6 @@ from pathlib import Path
 
 js = Path('apps/LockScreenGenerator/LockScreenGenerator.js')
 readme = Path('apps/LockScreenGenerator/README.md')
-workflow = Path('.github/workflows/build-scriptable-package.yml')
 
 src = js.read_text(encoding='utf-8')
 old = 'const APP_VERSION = "2.9.8";'
@@ -25,25 +24,6 @@ if old_md not in md:
     raise SystemExit('README automation paragraph not found')
 md = md.replace(old_md, new_md, 1)
 readme.write_text(md, encoding='utf-8')
-
-wf = workflow.read_text(encoding='utf-8')
-old_guard = """          # Scriptable only documents Shortcut file-path outputs for files stored in iCloud.
-          assert 'LockScreenOverlay.png' in src, 'Shortcut overlay PNG output missing'
-          assert 'fm.documentsDirectory()' in src, 'Shortcut overlay is not written to Scriptable iCloud Documents'
-          assert 'local.temporaryDirectory()' not in src, 'Shortcut overlay must not use a local temporary path'
-          assert 'Script.setShortcutOutput(out)' in src, 'Shortcut overlay file is not returned to Shortcuts'
-          assert 'Data.fromPNG(image)' in src, 'Shortcut overlay is not encoded as PNG data'
-"""
-new_guard = """          # Shortcuts overlay output: return the transparent PNG as Base64 text.
-          assert 'const overlayBase64=png.toBase64String()' in src, 'Shortcut overlay Base64 conversion missing'
-          assert 'Script.setShortcutOutput(overlayBase64)' in src, 'Shortcut overlay Base64 is not returned to Shortcuts'
-          assert 'Data.fromPNG(image)' in src, 'Shortcut overlay is not encoded as PNG data'
-          assert 'Script.setShortcutOutput(out)' not in src, 'Old file-path Shortcut output still present'
-"""
-if old_guard not in wf:
-    raise SystemExit('workflow guard block not found')
-wf = wf.replace(old_guard, new_guard, 1)
-workflow.write_text(wf, encoding='utf-8')
 
 assert 'const APP_VERSION = "2.9.9";' in src
 assert 'Script.setShortcutOutput(overlayBase64)' in src
