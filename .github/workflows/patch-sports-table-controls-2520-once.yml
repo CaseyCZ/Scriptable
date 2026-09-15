@@ -1,0 +1,67 @@
+name: Patch Sports Info 2.5.20 table controls once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-table-controls-2520-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Apply Sports Info 2.5.20 patch
+        run: python .github/scripts/patch_sports_table_controls_2520_once.py
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Build package and release surfaces
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Validate Sports Info 2.5.20
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert 'const APP_VERSION = "2.5.20";' in src
+          assert pkg['script']==src
+          assert 'tableTeamWidth:[60,180]' in src
+          assert 'tableNarrowWidth:[20,50]' in src
+          assert 'layoutLargeTableTeamWidth",lt(s,"tableTeamWidth"),s.layout.large.tableTeamWidth,60,180' in src
+          assert 'layoutLargeTableNarrowWidth",lt(s,"narrowWidth"),s.layout.large.tableNarrowWidth,20,50' in src
+          assert 'h.addSpacer(4);\n  const hs=h.addStack()' in src
+          assert 'r.addSpacer(4);\n    const rs=r.addStack()' in src
+          assert "writeLayoutProfile(profile);emit('save',{settings:state})" in src
+          assert '**Sports Info v2.5.20 — Production**' in (app/'README.md').read_text(encoding='utf-8')
+          assert '| 🏆 **Sports Info** | ✅ v2.5.20 |' in Path('README.md').read_text(encoding='utf-8')
+          assert "{name:'Sports Info',version:'2.5.20'" in Path('index.html').read_text(encoding='utf-8')
+          print('Sports Info 2.5.20 table controls validated')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html' \
+            '.github/workflows/build-sports-info-package.yml'
+          git commit -m "Sports Info 2.5.20 improve table layout controls"
+          git push origin HEAD:Master
