@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.29
+// Sports Info v2.5.30
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.29";
+const APP_VERSION = "2.5.30";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -326,7 +326,7 @@ async function matchCard(parent,e,s,p,family="medium"){
   r.addSpacer();await teamCell(r,e.away,s,p,family,"away",L.teamWidth,awayImg,L)
 }
 function lineCell(parent,value,width,p,align="left",bold=false,size=10,minScale=.62){const c=parent.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);if(align==="right"||align==="center")c.addSpacer();const t=txt(c,value,size,p,bold);t.minimumScaleFactor=minScale;if(align==="center"){t.centerAlignText();c.addSpacer()}else if(align==="left")c.addSpacer();return t}
-async function line(parent,e,s,p,family="large",layoutOverride=null){const L=fitListLayout(s,family,layoutOverride||layoutFor(s,family)),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();r.size=new Size(widgetAvailableWidth(s,family),0);const dateW=L.listDateWidth||40,teamW=L.listTeamWidth||106,scoreW=L.listScoreWidth||54;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9,.8);lineCell(r,teamLabel(e.home,family,teamW,10,false),teamW,p.text,"right",true,10,1);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10,1);lineCell(r,teamLabel(e.away,family,teamW,10,false),teamW,p.text,"left",true,10,1)}
+async function line(parent,e,s,p,family="large",layoutOverride=null){const L=fitListLayout(s,family,layoutOverride||layoutFor(s,family)),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();r.size=new Size(widgetAvailableWidth(s,family),0);const dateW=L.listDateWidth||40,teamW=L.listTeamWidth||106,scoreW=L.listScoreWidth||54;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9,.8);lineCell(r,teamLabel(e.home,family,teamW,10,false),teamW,p.text,"right",true,10,.75);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10,.72);lineCell(r,teamLabel(e.away,family,teamW,10,false),teamW,p.text,"left",true,10,.75)}
 function title(parent,v,p,width=0){const r=parent.addStack();r.layoutHorizontally();if(width)r.size=new Size(width,0);txt(r,String(v).toUpperCase(),9,p.muted,true);r.addSpacer()}
 function form(parent,s,d,p){if(!(s.teamId||s.teamName)||!d.form.length)return;const r=parent.addStack();r.layoutHorizontally();txt(r,tx(s,"formTitle")+":",9,p.muted,true);r.addSpacer(6);for(const x of d.form){txt(r,x,10,x==="W"?p.ok:x==="L"?p.live:p.muted,true);r.addSpacer(4)}r.addSpacer()}
 const TABLE_PROFILES={
@@ -377,8 +377,8 @@ function effectiveListLayout(s,family,events=[]){
   const L=clone(layoutFor(s,family));if(family==="small")return L;
   if(layoutAutoEnabled(s,family,"lists")){
     const target=widgetAvailableWidth(s,family),dateValues=events.map(e=>day(s,e.date)),scoreValues=events.map(e=>score(e)==="–"?time(s,e.date):score(e));
-    let dateWidth=clamp(Math.max(30,...dateValues.map(v=>tableTextWidth(v,9,true))),30,68),scoreWidth=clamp(Math.max(36,...scoreValues.map(v=>tableTextWidth(v,10,true))),36,84),teamWidth=Math.floor((target-dateWidth-scoreWidth)/2);
-    if(teamWidth<60){let need=60-teamWidth,cut=Math.min(need*2,Math.max(0,scoreWidth-36));scoreWidth-=cut;teamWidth=Math.floor((target-dateWidth-scoreWidth)/2)}
+    let dateWidth=clamp(Math.max(30,...dateValues.map(v=>tableTextWidth(v,9,true)+2)),30,68),scoreWidth=clamp(Math.max(42,...scoreValues.map(v=>tableTextWidth(v,10,true)+10)),42,90),teamWidth=Math.floor((target-dateWidth-scoreWidth)/2);
+    if(teamWidth<60){let need=60-teamWidth,cut=Math.min(need*2,Math.max(0,scoreWidth-42));scoreWidth-=cut;teamWidth=Math.floor((target-dateWidth-scoreWidth)/2)}
     if(teamWidth<60){let need=60-teamWidth,cut=Math.min(need*2,Math.max(0,dateWidth-30));dateWidth-=cut;teamWidth=Math.floor((target-dateWidth-scoreWidth)/2)}
     teamWidth=Math.max(52,teamWidth);scoreWidth+=target-(dateWidth+scoreWidth+teamWidth*2);L.listDateWidth=dateWidth;L.listTeamWidth=teamWidth;L.listScoreWidth=Math.max(30,scoreWidth)
   }
@@ -388,7 +388,7 @@ function effectiveListLayout(s,family,events=[]){
 // Standard iPhone widget widths in points; unknown/zoomed sizes use a conservative fallback.
 function tableAvailableWidth(s){return widgetAvailableWidth(s,"large")}
 // Fixed-pitch statistics: reserve a conservative glyph advance plus 8pt breathing room.
-function tableStatWidth(value,font){return Math.ceil(Array.from(String(value??"–")).length*font*.68+8)}
+function tableStatWidth(value,font){return Math.ceil(Array.from(String(value??"–")).length*font*.72+10)}
 function automaticTableSlotLayout(s,cols,rows=[]){
   const L=layoutFor(s,"large"),stats=cols.slice(1),target=tableAvailableWidth(s),teamMin=80;
   let font=L.tableFont,headerFont=L.tableHeaderFont;
@@ -460,7 +460,7 @@ async function table(parent,s,d,p){
   }
   h.addSpacer(4);
   const hs=h.addStack();hs.layoutHorizontally();hs.spacing=0;hs.setPadding(0,0,0,0);hs.size=new Size(statsWidth,0);
-  for(const [key,label,width] of statCols)statCell(hs,label,width,p.muted,TL.tableAlign,true,headerFont,1);
+  for(const [key,label,width] of statCols)statCell(hs,label,width,p.muted,TL.tableAlign,true,headerFont,.8);
   parent.addSpacer(3);
   const rowLogos=s.showLogos?await Promise.all(rows.map(x=>x.logo?logo(x.logo,x.id||x.name):Promise.resolve(null))):[];
   for(let i=0;i<rows.length;i++){
@@ -474,16 +474,18 @@ async function table(parent,s,d,p){
     }
     r.addSpacer(4);
     const rs=r.addStack();rs.layoutHorizontally();rs.spacing=0;rs.setPadding(0,0,0,0);rs.size=new Size(statsWidth,0);
-    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;statCell(rs,standingValue(x,key),width,color,TL.tableAlign,fav||key==="points",statFont,1)}
+    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;statCell(rs,standingValue(x,key),width,color,TL.tableAlign,fav||key==="points",statFont,.72)}
     parent.addSpacer(1)
   }
 }
 function autoRefreshMinutes(s,d){if(s.settingsChangedAt&&Date.now()-s.settingsChangedAt<30*60000)return 2;if(d.source==="error")return 5;if(d.source==="cache")return Math.min(s.refreshMinutes,10);if((d.live||[]).length)return 2;const n=(d.next||[])[0];if(n?.date){const ms=new Date(n.date).getTime()-Date.now();if(ms>0&&ms<=30*60000)return 5}return s.refreshMinutes}
 async function widget(s,family){const budgetMs=config.runsInWidget?12000:24000;const d=await dataWithBudget(s,budgetMs);runStatusWrite(d.source!=="error",d.source,null,family);const p=pal(s),w=new ListWidget();try{const u=URLScheme.forRunningScript();w.url=u+(u.includes("?")?"&":"?")+`sportsTap=1&sportsFamily=${encodeURIComponent(family)}`}catch(_){}w.backgroundColor=p.bg;const sidePad=family==="small"?6:(s.compact?10:12),verticalPad=s.compact?10:12;w.setPadding(verticalPad,sidePad,verticalPad,sidePad);w.refreshAfterDate=new Date(Date.now()+autoRefreshMinutes(s,d)*60000);const h=w.addStack();h.layoutHorizontally();h.centerAlignContent();txt(h,sport(s).icon,14,p.text,true);h.addSpacer(5);txt(h,`${league(s).flag||""} ${leagueName(s)}`.trim(),family==="small"?10:12,p.text,true);h.addSpacer();txt(h,d.source==="cache"?tx(s,"cache"):d.source==="error"?tx(s,"error"):d.live.length?tx(s,"liveNow"):wh(s,"currentData"),8,d.live.length?p.live:d.source==="error"?p.live:p.accent,true);w.addSpacer(s.compact?6:9);if(!d.current){const b=w.addStack();b.layoutVertically();b.backgroundColor=p.panel;b.cornerRadius=14;b.setPadding(12,12,12,12);txt(b,tx(s,"noData"),11,p.text,true);if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}await matchCard(w,d.current,s,p,family);if(s.showForm&&s.teamId){w.addSpacer(6);form(w,s,d,p)}if(family==="small"){Script.setWidget(w);return w}const upcoming=s.showNext?d.next.filter(x=>x.id!==d.current.id).slice(0,family==="large"&&s.showTable?Math.min(s.maxMatches,2):family==="large"?s.maxMatches:2):[];
 const recent=family==="large"&&s.showLast&&d.done.length?d.done.filter(x=>x.id!==d.current.id).slice(0,s.showTable?Math.min(s.maxMatches,3):s.maxMatches):[];
-const listLayout=effectiveListLayout(s,family,[...upcoming,...recent]);
-if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family,listLayout);if(family==="large")w.addSpacer(2)}}
-if(recent.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of recent){await line(w,e,s,p,family,listLayout);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}
+// AUTO layout is section-local: NEXT and LAST never influence each other.
+const nextLayout=upcoming.length?effectiveListLayout(s,family,upcoming):null;
+const lastLayout=recent.length?effectiveListLayout(s,family,recent):null;
+if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family,nextLayout);if(family==="large")w.addSpacer(2)}}
+if(recent.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of recent){await line(w,e,s,p,family,lastLayout);w.addSpacer(2)}}if(family==="large"&&s.showTable&&d.table.length){w.addSpacer(9);await table(w,s,d,p)}Script.setWidget(w);return w}
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function sw(id,label,on,detail=""){return `<label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(label)}</div>${detail?`<div class="rowDetail">${esc(detail)}</div>`:""}</div><span class="switch"><input id="${id}" type="checkbox" ${on?"checked":""}><span class="slider"></span></span></label>`}
@@ -535,7 +537,7 @@ function sportLayoutLabel(id){const x=CATALOG.find(v=>v.id===id)||CATALOG[0];ret
 const MODE_IDS={"small:match":["smallMatchModeBadge","smallMatchModeInfo"],"medium:match":["mediumMatchModeBadge","mediumMatchModeInfo"],"medium:lists":["mediumListsModeBadge","mediumListsModeInfo"],"large:match":["largeMatchModeBadge","largeMatchModeInfo"],"large:lists":["largeListsModeBadge","largeListsModeInfo"],"large:table":["tableModeBadge","tableModeInfo"]};
 function ensureLayoutModeSport(){state.layoutAutoBySport=state.layoutAutoBySport||{};state.layoutAutoBySport[layoutSportId]=state.layoutAutoBySport[layoutSportId]||{small:{match:true},medium:{match:true,lists:true},large:{match:true,lists:true,table:true}};return state.layoutAutoBySport[layoutSportId]}
 function layoutAutoUI(family,section){const m=ensureLayoutModeSport();m[family]=m[family]||{};return m[family][section]!==false}
-function updateLayoutModeUI(family,section){const ids=MODE_IDS[family+":"+section];if(!ids)return;const b=document.getElementById(ids[0]),i=document.getElementById(ids[1]);if(!b||!i)return;const a=layoutAutoUI(family,section);b.textContent=a?'AUTO':'MANUAL';b.className='modeBadge '+(a?'auto':'manual');i.textContent=a?'AUTO počítá šířky podle obsahu, sportu a skutečné velikosti widgetu.':'MANUAL používá tvoje uložené šířky; pokud by byly širší než widget, Sports Info je bezpečně zmenší.'}
+function updateLayoutModeUI(family,section){const ids=MODE_IDS[family+":"+section];if(!ids)return;const b=document.getElementById(ids[0]),i=document.getElementById(ids[1]);if(!b||!i)return;const a=layoutAutoUI(family,section);b.textContent=a?'AUTO':'MANUAL';b.className='modeBadge '+(a?'auto':'manual');i.textContent=a?'AUTO počítá šířky pro každou sekci zvlášť podle jejího obsahu, sportu a skutečné velikosti widgetu.':'MANUAL používá tvoje uložené šířky; pokud by byly širší než widget, Sports Info je bezpečně zmenší.'}
 function updateAllLayoutModeUI(){for(const k of Object.keys(MODE_IDS)){const [f,q]=k.split(':');updateLayoutModeUI(f,q)}}
 function updateLayoutSportBadges(id){document.querySelectorAll('.layoutSportName').forEach(e=>e.textContent=sportLayoutLabel(id));updateAllLayoutModeUI()}
 function setLayoutMode(family,section,auto,commit=true){const m=ensureLayoutModeSport();m[family]=m[family]||{};m[family][section]=!!auto;if(family==='large'&&section==='table'){state.tableAutoBySport=state.tableAutoBySport||{};state.tableAutoBySport[layoutSportId]=!!auto}updateLayoutModeUI(family,section);if(commit)commitNow()}
