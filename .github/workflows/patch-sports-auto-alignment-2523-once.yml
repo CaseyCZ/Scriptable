@@ -1,0 +1,88 @@
+name: Patch Sports Info 2.5.23 AUTO alignment once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-auto-alignment-2523-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Apply Sports Info 2.5.23 patch
+        run: python .github/scripts/patch_sports_auto_alignment_2523_once.py
+
+      - name: Validate outer JavaScript
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Build release surfaces
+        run: python .github/scripts/build_sports_info_package.py
+
+      - name: Render and validate settings WebView JavaScript
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const src=fs.readFileSync('apps/Sports-Info/Sports Info.js','utf8');
+          const marker='let SETTINGS=await firstLanguage(loadSettings());';
+          const i=src.indexOf(marker); if(i<0)throw new Error('main marker missing');
+          const fm={documentsDirectory:()=>'/tmp',cacheDirectory:()=>'/tmp',joinPath:(a,b)=>a+'/'+b,fileExists:()=>false,readString:()=>'',writeString:()=>{},remove:()=>{},readImage:()=>null,writeImage:()=>{},listContents:()=>[]};
+          const ctx={console,FileManager:{local:()=>fm,iCloud:()=>fm},Device:{locale:()=> 'cs-CZ',isUsingDarkAppearance:()=>true},config:{runsInWidget:false},args:{queryParameters:{}},module:{filename:'/tmp/Sports Info.js'}};
+          vm.createContext(ctx);
+          vm.runInContext(src.slice(0,i)+'\nglobalThis.__AUDIT_HTML=html(merge({...DEFAULTS,language:"cs"}));',ctx);
+          fs.writeFileSync('/tmp/sports-settings.html',ctx.__AUDIT_HTML);
+          const m=ctx.__AUDIT_HTML.match(/<script>([\s\S]*?)<\/script>/); if(!m)throw new Error('settings script missing');
+          fs.writeFileSync('/tmp/sports-settings-ui.js',m[1]);
+          NODE
+          node --check /tmp/sports-settings-ui.js
+
+      - name: Run persistent UI audit
+        run: python .github/scripts/audit_sports_info_ui.py
+
+      - name: Validate 2.5.23 behavior and install identity
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          assert 'const APP_VERSION = "2.5.23";' in src
+          assert pkg['name']=='Sports Info'
+          assert pkg['script']==src
+          assert 'if(config.runsInWidget)' in src
+          assert 'const target=module.filename' in src
+          assert "!['left','center','right'].includes(L.tableAlign)" in src
+          assert '[["left",lt(s,"left")],["center",lt(s,"center")],["right",lt(s,"right")]]' in src
+          assert "document.querySelectorAll('#layoutLargeTable input[type=number]')" in src
+          assert 'let slack=target-(teamWidth+4+statsWidth)' in src
+          assert 'while(slack>0)' in src
+          assert 'teamMin=96,teamMax=150' in src
+          assert '**Sports Info v2.5.23 — Production**' in (app/'README.md').read_text(encoding='utf-8')
+          assert '| 🏆 **Sports Info** | ✅ v2.5.23 |' in Path('README.md').read_text(encoding='utf-8')
+          assert "{name:'Sports Info',version:'2.5.23'" in Path('index.html').read_text(encoding='utf-8')
+          print('Sports Info 2.5.23 validated')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
+          git commit -m "Sports Info 2.5.23 fix AUTO table alignment"
+          git push origin HEAD:Master
