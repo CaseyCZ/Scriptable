@@ -1,10 +1,96 @@
-name: Sports migration runner
+name: Sports Info v2.5.30 migration
 on:
   push:
     branches:
       - Master
+permissions:
+  contents: write
 jobs:
-  test:
+  migrate:
     runs-on: ubuntu-latest
     steps:
-      - run: echo runner-ok
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+      - name: Patch Sports Info
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          js_path = Path('apps/Sports-Info/Sports Info.js')
+          bundle_path = Path('apps/Sports-Info/Sports Info.scriptable')
+          src = js_path.read_text(encoding='utf-8')
+
+          def rep(old, new, label):
+              global src
+              n = src.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, got {n}')
+              src = src.replace(old, new, 1)
+
+          rep('// Sports Info v2.5.29', '// Sports Info v2.5.30', 'version comment')
+          rep('const APP_VERSION = "2.5.29";', 'const APP_VERSION = "2.5.30";', 'APP_VERSION')
+
+          rep(
+              'async function line(parent,e,s,p,family="large",layoutOverride=null){const L=fitListLayout(s,family,layoutOverride||layoutFor(s,family)),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();r.size=new Size(widgetAvailableWidth(s,family),0);const dateW=L.listDateWidth||40,teamW=L.listTeamWidth||106,scoreW=L.listScoreWidth||54;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9,.8);lineCell(r,teamLabel(e.home,family,teamW,10,false),teamW,p.text,"right",true,10,1);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10,1);lineCell(r,teamLabel(e.away,family,teamW,10,false),teamW,p.text,"left",true,10,1)}',
+              'async function line(parent,e,s,p,family="large",layoutOverride=null){const L=fitListLayout(s,family,layoutOverride||layoutFor(s,family)),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();r.size=new Size(widgetAvailableWidth(s,family),0);const dateW=L.listDateWidth||40,teamW=L.listTeamWidth||106,scoreW=L.listScoreWidth||54;lineCell(r,day(s,e.date),dateW,p.muted,"left",true,9,.8);lineCell(r,teamLabel(e.home,family,teamW,10,false),teamW,p.text,"right",true,10,.75);lineCell(r,score(e)==="–"?time(s,e.date):score(e),scoreW,e.state==="in"?p.live:p.text,"center",true,10,.72);lineCell(r,teamLabel(e.away,family,teamW,10,false),teamW,p.text,"left",true,10,.75)}',
+              'list row scaling'
+          )
+
+          rep(
+              'let dateWidth=clamp(Math.max(30,...dateValues.map(v=>tableTextWidth(v,9,true))),30,68),scoreWidth=clamp(Math.max(36,...scoreValues.map(v=>tableTextWidth(v,10,true))),36,84),teamWidth=Math.floor((target-dateWidth-scoreWidth)/2);',
+              'let dateWidth=clamp(Math.max(30,...dateValues.map(v=>tableTextWidth(v,9,true)+2)),30,68),scoreWidth=clamp(Math.max(42,...scoreValues.map(v=>tableTextWidth(v,10,true)+10)),42,90),teamWidth=Math.floor((target-dateWidth-scoreWidth)/2);',
+              'list auto measurement'
+          )
+          rep('Math.max(0,scoreWidth-36)', 'Math.max(0,scoreWidth-42)', 'list score minimum')
+
+          rep(
+              'function tableStatWidth(value,font){return Math.ceil(Array.from(String(value??"–")).length*font*.68+8)}',
+              'function tableStatWidth(value,font){return Math.ceil(Array.from(String(value??"–")).length*font*.72+10)}',
+              'table stat measurement'
+          )
+          rep('statCell(hs,label,width,p.muted,TL.tableAlign,true,headerFont,1);', 'statCell(hs,label,width,p.muted,TL.tableAlign,true,headerFont,.8);', 'table header scaling')
+          rep('statCell(rs,standingValue(x,key),width,color,TL.tableAlign,fav||key==="points",statFont,1)', 'statCell(rs,standingValue(x,key),width,color,TL.tableAlign,fav||key==="points",statFont,.72)', 'table row scaling')
+
+          old_widget = '''const listLayout=effectiveListLayout(s,family,[...upcoming,...recent]);
+if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family,listLayout);if(family==="large")w.addSpacer(2)}}
+if(recent.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of recent){await line(w,e,s,p,family,listLayout);w.addSpacer(2)}}'''
+          new_widget = '''// AUTO layout is section-local: NEXT and LAST never influence each other.
+const nextLayout=upcoming.length?effectiveListLayout(s,family,upcoming):null;
+const lastLayout=recent.length?effectiveListLayout(s,family,recent):null;
+if(upcoming.length){w.addSpacer(8);title(w,tx(s,"nextTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of upcoming){await line(w,e,s,p,family,nextLayout);if(family==="large")w.addSpacer(2)}}
+if(recent.length){w.addSpacer(9);title(w,tx(s,"lastTitle"),p,widgetAvailableWidth(s,family));w.addSpacer(4);for(const e of recent){await line(w,e,s,p,family,lastLayout);w.addSpacer(2)}}'''
+          rep(old_widget, new_widget, 'independent NEXT/LAST layouts')
+
+          rep(
+              "i.textContent=a?'AUTO počítá šířky podle obsahu, sportu a skutečné velikosti widgetu.':'MANUAL používá tvoje uložené šířky; pokud by byly širší než widget, Sports Info je bezpečně zmenší.'",
+              "i.textContent=a?'AUTO počítá šířky pro každou sekci zvlášť podle jejího obsahu, sportu a skutečné velikosti widgetu.':'MANUAL používá tvoje uložené šířky; pokud by byly širší než widget, Sports Info je bezpečně zmenší.'",
+              'AUTO UI description'
+          )
+
+          js_path.write_text(src, encoding='utf-8')
+
+          bundle = json.loads(bundle_path.read_text(encoding='utf-8'))
+          bundle['script'] = src
+          bundle_path.write_text(json.dumps(bundle, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          assert 'const APP_VERSION = "2.5.30";' in src
+          assert 'const nextLayout=upcoming.length?effectiveListLayout(s,family,upcoming):null;' in src
+          assert 'const lastLayout=recent.length?effectiveListLayout(s,family,recent):null;' in src
+          assert 'const listLayout=effectiveListLayout(s,family,[...upcoming,...recent]);' not in src
+          print('Sports Info v2.5.30 patched and bundle synchronized')
+          PY
+          cp "apps/Sports-Info/Sports Info.js" /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+      - name: Commit v2.5.30
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/tmp-sports-migrate.yml .github/tmp-sports-trigger.txt 2>/dev/null || true
+          git add "apps/Sports-Info/Sports Info.js" "apps/Sports-Info/Sports Info.scriptable"
+          git commit -m "Sports Info v2.5.30: independent auto layout per section"
+          git push origin HEAD:Master
