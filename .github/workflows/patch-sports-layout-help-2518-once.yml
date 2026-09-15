@@ -1,0 +1,133 @@
+name: Patch Sports Info 2.5.18 layout help once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/patch-sports-layout-help-2518-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sports Info 2.5.18
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('apps/Sports-Info/Sports Info.js')
+          s=p.read_text(encoding='utf-8')
+          assert 'const APP_VERSION = "2.5.17";' in s
+          assert 'function selectField(id,label,value,items)' in s
+
+          s=s.replace('// Sports Info v2.5.17','// Sports Info v2.5.18',1)
+          s=s.replace('const APP_VERSION = "2.5.17";','const APP_VERSION = "2.5.18";',1)
+
+          marker='function lt(s,k){const l=s.language||"en";return(LAYOUT_TEXT[l]||LAYOUT_TEXT.en)[k]||LAYOUT_TEXT.en[k]||k}\n'
+          assert marker in s
+          help_block='''const LAYOUT_HELP={\ncs:{range:"Rozsah",teamWidth:"Určuje šířku prostoru pro jeden tým v hlavní kartě.",scoreWidth:"Určuje šířku prostředního pole se skóre mezi oběma týmy.",teamFont:"Mění velikost názvů týmů v hlavní kartě.",scoreFont:"Mění velikost skóre v hlavní kartě.",logoSize:"Mění velikost log týmů v hlavní kartě.",logoGap:"Mění mezeru mezi logem a názvem týmu.",cardPaddingX:"Mění vnitřní levé a pravé odsazení hlavní karty.",teamAlign:"Určuje, kam se název týmu uvnitř jeho prostoru zarovná.",dateWidth:"Určuje šířku sloupce s datem v řádcích PŘÍŠTÍ/POSLEDNÍ.",listTeamWidth:"Určuje šířku názvu týmu v řádcích PŘÍŠTÍ/POSLEDNÍ.",listScoreWidth:"Určuje šířku prostředního pole se skóre nebo časem v řádcích PŘÍŠTÍ/POSLEDNÍ.",tableTeamWidth:"Určuje šířku levého sloupce TÝM v tabulce.",wideWidth:"Určuje základní šířku prvních 4 statistických sloupců tabulky.",narrowWidth:"Určuje základní šířku posledních 3 statistických sloupců tabulky.",headerFont:"Mění velikost textu hlaviček statistik, například Z, V, R, P.",tableFont:"Mění velikost čísel a statistik v řádcích tabulky.",tableTeamFont:"Mění velikost názvů týmů v tabulce.",tableAlign:"Určuje zarovnání čísel uvnitř statistických sloupců."},\nen:{range:"Range",teamWidth:"Sets the width reserved for one team in the main match card.",scoreWidth:"Sets the width of the center score area between both teams.",teamFont:"Changes team-name text size in the main match card.",scoreFont:"Changes score text size in the main match card.",logoSize:"Changes team logo size in the main match card.",logoGap:"Changes the gap between a logo and team name.",cardPaddingX:"Changes the left and right inner padding of the main match card.",teamAlign:"Controls where the team name is aligned inside its reserved area.",dateWidth:"Sets the date column width in NEXT/LAST rows.",listTeamWidth:"Sets team-name width in NEXT/LAST rows.",listScoreWidth:"Sets the center score/time width in NEXT/LAST rows.",tableTeamWidth:"Sets the width of the left TEAM column in standings.",wideWidth:"Sets the base width of the first 4 statistics columns.",narrowWidth:"Sets the base width of the last 3 statistics columns.",headerFont:"Changes statistics header size, e.g. P, W, D, L.",tableFont:"Changes numbers/statistics text size in standings rows.",tableTeamFont:"Changes team-name size in standings.",tableAlign:"Controls number alignment inside statistics columns."},\nde:{range:"Bereich",teamWidth:"Legt die Breite für ein Team in der Hauptkarte fest.",scoreWidth:"Legt die Breite des Ergebnisfelds zwischen den Teams fest.",teamFont:"Ändert die Schriftgröße der Teamnamen in der Hauptkarte.",scoreFont:"Ändert die Schriftgröße des Ergebnisses in der Hauptkarte.",logoSize:"Ändert die Größe der Teamlogos in der Hauptkarte.",logoGap:"Ändert den Abstand zwischen Logo und Teamname.",cardPaddingX:"Ändert den linken und rechten Innenabstand der Hauptkarte.",teamAlign:"Bestimmt die Ausrichtung des Teamnamens in seinem Bereich.",dateWidth:"Legt die Datumsbreite in NÄCHSTE/LETZTE-Zeilen fest.",listTeamWidth:"Legt die Teamnamenbreite in NÄCHSTE/LETZTE-Zeilen fest.",listScoreWidth:"Legt die Ergebnis-/Zeitbreite in NÄCHSTE/LETZTE-Zeilen fest.",tableTeamWidth:"Legt die Breite der linken TEAM-Spalte fest.",wideWidth:"Legt die Grundbreite der ersten 4 Statistikspalten fest.",narrowWidth:"Legt die Grundbreite der letzten 3 Statistikspalten fest.",headerFont:"Ändert die Schriftgröße der Statistik-Kopfzeile.",tableFont:"Ändert die Schriftgröße der Zahlen in der Tabelle.",tableTeamFont:"Ändert die Schriftgröße der Teamnamen in der Tabelle.",tableAlign:"Bestimmt die Ausrichtung der Zahlen in Statistikspalten."},\nes:{range:"Rango",teamWidth:"Define el ancho reservado para un equipo en la tarjeta principal.",scoreWidth:"Define el ancho del área central del marcador.",teamFont:"Cambia el tamaño de los nombres de equipo en la tarjeta principal.",scoreFont:"Cambia el tamaño del marcador en la tarjeta principal.",logoSize:"Cambia el tamaño de los logos en la tarjeta principal.",logoGap:"Cambia el espacio entre logo y nombre de equipo.",cardPaddingX:"Cambia el margen interior izquierdo y derecho de la tarjeta principal.",teamAlign:"Controla la alineación del nombre dentro de su área.",dateWidth:"Define el ancho de la fecha en filas SIGUIENTE/ÚLTIMO.",listTeamWidth:"Define el ancho del nombre de equipo en filas SIGUIENTE/ÚLTIMO.",listScoreWidth:"Define el ancho central de marcador/hora en filas SIGUIENTE/ÚLTIMO.",tableTeamWidth:"Define el ancho de la columna EQUIPO en la tabla.",wideWidth:"Define el ancho base de las primeras 4 columnas estadísticas.",narrowWidth:"Define el ancho base de las últimas 3 columnas estadísticas.",headerFont:"Cambia el tamaño de las cabeceras estadísticas.",tableFont:"Cambia el tamaño de números y estadísticas de la tabla.",tableTeamFont:"Cambia el tamaño de los nombres de equipo en la tabla.",tableAlign:"Controla la alineación de los números en columnas estadísticas."}\n};\nfunction lh(s,k){const l=s.language||"en";return(LAYOUT_HELP[l]||LAYOUT_HELP.en)[k]||LAYOUT_HELP.en[k]||k}\nfunction layoutRangeDetail(s,min,max,key){return `${lh(s,"range")}: ${min}–${max} · ${lh(s,key)}`}\nfunction layoutField(s,id,label,value,min,max,key){return field(id,label,value,"number",`min="${min}" max="${max}"`,layoutRangeDetail(s,min,max,key))}\n'''
+          s=s.replace(marker,marker+help_block,1)
+
+          old='function selectField(id,label,value,items){return `<div class="field"><label for="${id}">${esc(label)}</label><select id="${id}">${items.map(([v,t])=>`<option value="${esc(v)}" ${v===value?"selected":""}>${esc(t)}</option>`).join("")}</select></div>`}'
+          new='function selectField(id,label,value,items,detail=""){return `<div class="field"><label for="${id}">${esc(label)}</label>${detail?`<div class="rowDetail" style="margin:-2px 0 9px">${esc(detail)}</div>`:""}<select id="${id}">${items.map(([v,t])=>`<option value="${esc(v)}" ${v===value?"selected":""}>${esc(t)}</option>`).join("")}</select></div>`}'
+          assert old in s
+          s=s.replace(old,new,1)
+
+          reps={
+          '${field("layoutSmallTeamWidth",lt(s,"teamWidth"),s.layout.small.teamWidth,"number",\'min="48" max="150"\')}':'${layoutField(s,"layoutSmallTeamWidth",lt(s,"teamWidth"),s.layout.small.teamWidth,48,150,"teamWidth")}',
+          '${field("layoutSmallScoreWidth",lt(s,"scoreWidth"),s.layout.small.scoreWidth,"number",\'min="14" max="70"\')}':'${layoutField(s,"layoutSmallScoreWidth",lt(s,"scoreWidth"),s.layout.small.scoreWidth,14,70,"scoreWidth")}',
+          '${field("layoutSmallTeamFont",lt(s,"teamFont"),s.layout.small.teamFont,"number",\'min="7" max="15"\')}':'${layoutField(s,"layoutSmallTeamFont",lt(s,"teamFont"),s.layout.small.teamFont,7,15,"teamFont")}',
+          '${field("layoutSmallScoreFont",lt(s,"scoreFont"),s.layout.small.scoreFont,"number",\'min="10" max="26"\')}':'${layoutField(s,"layoutSmallScoreFont",lt(s,"scoreFont"),s.layout.small.scoreFont,10,26,"scoreFont")}',
+          '${field("layoutSmallLogoSize",lt(s,"logoSize"),s.layout.small.logoSize,"number",\'min="8" max="24"\')}':'${layoutField(s,"layoutSmallLogoSize",lt(s,"logoSize"),s.layout.small.logoSize,8,24,"logoSize")}',
+          '${field("layoutSmallLogoGap",lt(s,"logoGap"),s.layout.small.logoGap,"number",\'min="0" max="10"\')}':'${layoutField(s,"layoutSmallLogoGap",lt(s,"logoGap"),s.layout.small.logoGap,0,10,"logoGap")}',
+          '${field("layoutSmallCardPaddingX",lt(s,"cardPaddingX"),s.layout.small.cardPaddingX,"number",\'min="0" max="18"\')}':'${layoutField(s,"layoutSmallCardPaddingX",lt(s,"cardPaddingX"),s.layout.small.cardPaddingX,0,18,"cardPaddingX")}',
+          '${selectField("layoutSmallTeamAlign",lt(s,"teamAlign"),s.layout.small.teamAlign,[["edge",lt(s,"edge")],["center",lt(s,"center")],["left",lt(s,"left")],["right",lt(s,"right")]])}':'${selectField("layoutSmallTeamAlign",lt(s,"teamAlign"),s.layout.small.teamAlign,[["edge",lt(s,"edge")],["center",lt(s,"center")],["left",lt(s,"left")],["right",lt(s,"right")]],lh(s,"teamAlign"))}',
+          '${field("layoutMediumTeamWidth",lt(s,"teamWidth"),s.layout.medium.teamWidth,"number",\'min="48" max="150"\')}':'${layoutField(s,"layoutMediumTeamWidth",lt(s,"teamWidth"),s.layout.medium.teamWidth,48,150,"teamWidth")}',
+          '${field("layoutMediumScoreWidth",lt(s,"scoreWidth"),s.layout.medium.scoreWidth,"number",\'min="14" max="70"\')}':'${layoutField(s,"layoutMediumScoreWidth",lt(s,"scoreWidth"),s.layout.medium.scoreWidth,14,70,"scoreWidth")}',
+          '${field("layoutMediumTeamFont",lt(s,"teamFont"),s.layout.medium.teamFont,"number",\'min="7" max="15"\')}':'${layoutField(s,"layoutMediumTeamFont",lt(s,"teamFont"),s.layout.medium.teamFont,7,15,"teamFont")}',
+          '${field("layoutMediumScoreFont",lt(s,"scoreFont"),s.layout.medium.scoreFont,"number",\'min="10" max="26"\')}':'${layoutField(s,"layoutMediumScoreFont",lt(s,"scoreFont"),s.layout.medium.scoreFont,10,26,"scoreFont")}',
+          '${field("layoutMediumLogoSize",lt(s,"logoSize"),s.layout.medium.logoSize,"number",\'min="8" max="24"\')}':'${layoutField(s,"layoutMediumLogoSize",lt(s,"logoSize"),s.layout.medium.logoSize,8,24,"logoSize")}',
+          '${field("layoutMediumLogoGap",lt(s,"logoGap"),s.layout.medium.logoGap,"number",\'min="0" max="10"\')}':'${layoutField(s,"layoutMediumLogoGap",lt(s,"logoGap"),s.layout.medium.logoGap,0,10,"logoGap")}',
+          '${field("layoutMediumCardPaddingX",lt(s,"cardPaddingX"),s.layout.medium.cardPaddingX,"number",\'min="0" max="18"\')}':'${layoutField(s,"layoutMediumCardPaddingX",lt(s,"cardPaddingX"),s.layout.medium.cardPaddingX,0,18,"cardPaddingX")}',
+          '${field("layoutMediumListDateWidth",lt(s,"dateWidth"),s.layout.medium.listDateWidth,"number",\'min="30" max="60"\')}':'${layoutField(s,"layoutMediumListDateWidth",lt(s,"dateWidth"),s.layout.medium.listDateWidth,30,60,"dateWidth")}',
+          '${field("layoutMediumListTeamWidth",lt(s,"listTeamWidth"),s.layout.medium.listTeamWidth,"number",\'min="72" max="135"\')}':'${layoutField(s,"layoutMediumListTeamWidth",lt(s,"listTeamWidth"),s.layout.medium.listTeamWidth,72,135,"listTeamWidth")}',
+          '${field("layoutMediumListScoreWidth",lt(s,"listScoreWidth"),s.layout.medium.listScoreWidth,"number",\'min="36" max="70"\')}':'${layoutField(s,"layoutMediumListScoreWidth",lt(s,"listScoreWidth"),s.layout.medium.listScoreWidth,36,70,"listScoreWidth")}',
+          '${selectField("layoutMediumTeamAlign",lt(s,"teamAlign"),s.layout.medium.teamAlign,[["edge",lt(s,"edge")],["center",lt(s,"center")],["left",lt(s,"left")],["right",lt(s,"right")]])}':'${selectField("layoutMediumTeamAlign",lt(s,"teamAlign"),s.layout.medium.teamAlign,[["edge",lt(s,"edge")],["center",lt(s,"center")],["left",lt(s,"left")],["right",lt(s,"right")]],lh(s,"teamAlign"))}',
+          '${field("layoutLargeTeamWidth",lt(s,"teamWidth"),s.layout.large.teamWidth,"number",\'min="48" max="150"\')}':'${layoutField(s,"layoutLargeTeamWidth",lt(s,"teamWidth"),s.layout.large.teamWidth,48,150,"teamWidth")}',
+          '${field("layoutLargeScoreWidth",lt(s,"scoreWidth"),s.layout.large.scoreWidth,"number",\'min="14" max="70"\')}':'${layoutField(s,"layoutLargeScoreWidth",lt(s,"scoreWidth"),s.layout.large.scoreWidth,14,70,"scoreWidth")}',
+          '${field("layoutLargeTeamFont",lt(s,"teamFont"),s.layout.large.teamFont,"number",\'min="7" max="15"\')}':'${layoutField(s,"layoutLargeTeamFont",lt(s,"teamFont"),s.layout.large.teamFont,7,15,"teamFont")}',
+          '${field("layoutLargeScoreFont",lt(s,"scoreFont"),s.layout.large.scoreFont,"number",\'min="10" max="26"\')}':'${layoutField(s,"layoutLargeScoreFont",lt(s,"scoreFont"),s.layout.large.scoreFont,10,26,"scoreFont")}',
+          '${field("layoutLargeLogoSize",lt(s,"logoSize"),s.layout.large.logoSize,"number",\'min="8" max="24"\')}':'${layoutField(s,"layoutLargeLogoSize",lt(s,"logoSize"),s.layout.large.logoSize,8,24,"logoSize")}',
+          '${field("layoutLargeLogoGap",lt(s,"logoGap"),s.layout.large.logoGap,"number",\'min="0" max="10"\')}':'${layoutField(s,"layoutLargeLogoGap",lt(s,"logoGap"),s.layout.large.logoGap,0,10,"logoGap")}',
+          '${field("layoutLargeCardPaddingX",lt(s,"cardPaddingX"),s.layout.large.cardPaddingX,"number",\'min="0" max="18"\')}':'${layoutField(s,"layoutLargeCardPaddingX",lt(s,"cardPaddingX"),s.layout.large.cardPaddingX,0,18,"cardPaddingX")}',
+          '${selectField("layoutLargeTeamAlign",lt(s,"teamAlign"),s.layout.large.teamAlign,[["edge",lt(s,"edge")],["center",lt(s,"center")],["left",lt(s,"left")],["right",lt(s,"right")]])}':'${selectField("layoutLargeTeamAlign",lt(s,"teamAlign"),s.layout.large.teamAlign,[["edge",lt(s,"edge")],["center",lt(s,"center")],["left",lt(s,"left")],["right",lt(s,"right")]],lh(s,"teamAlign"))}',
+          '${field("layoutLargeTableTeamWidth",lt(s,"tableTeamWidth"),s.layout.large.tableTeamWidth,"number",\'min="82" max="135"\')}':'${layoutField(s,"layoutLargeTableTeamWidth",lt(s,"tableTeamWidth"),s.layout.large.tableTeamWidth,82,135,"tableTeamWidth")}',
+          '${field("layoutLargeTableWideWidth",lt(s,"wideWidth"),s.layout.large.tableWideWidth,"number",\'min="24" max="38"\')}':'${layoutField(s,"layoutLargeTableWideWidth",lt(s,"wideWidth"),s.layout.large.tableWideWidth,24,38,"wideWidth")}',
+          '${field("layoutLargeTableNarrowWidth",lt(s,"narrowWidth"),s.layout.large.tableNarrowWidth,"number",\'min="18" max="32"\')}':'${layoutField(s,"layoutLargeTableNarrowWidth",lt(s,"narrowWidth"),s.layout.large.tableNarrowWidth,18,32,"narrowWidth")}',
+          '${field("layoutLargeTableHeaderFont",lt(s,"headerFont"),s.layout.large.tableHeaderFont,"number",\'min="7" max="12"\')}':'${layoutField(s,"layoutLargeTableHeaderFont",lt(s,"headerFont"),s.layout.large.tableHeaderFont,7,12,"headerFont")}',
+          '${field("layoutLargeTableFont",lt(s,"tableFont"),s.layout.large.tableFont,"number",\'min="8" max="14"\')}':'${layoutField(s,"layoutLargeTableFont",lt(s,"tableFont"),s.layout.large.tableFont,8,14,"tableFont")}',
+          '${field("layoutLargeTableTeamFont",lt(s,"tableTeamFont"),s.layout.large.tableTeamFont,"number",\'min="9" max="14"\')}':'${layoutField(s,"layoutLargeTableTeamFont",lt(s,"tableTeamFont"),s.layout.large.tableTeamFont,9,14,"tableTeamFont")}',
+          '${selectField("layoutLargeTableAlign",lt(s,"tableAlign"),s.layout.large.tableAlign,[["center",lt(s,"center")],["right",lt(s,"right")]])}':'${selectField("layoutLargeTableAlign",lt(s,"tableAlign"),s.layout.large.tableAlign,[["center",lt(s,"center")],["right",lt(s,"right")]],lh(s,"tableAlign"))}',
+          '${field("layoutLargeListDateWidth",lt(s,"dateWidth"),s.layout.large.listDateWidth,"number",\'min="30" max="60"\')}':'${layoutField(s,"layoutLargeListDateWidth",lt(s,"dateWidth"),s.layout.large.listDateWidth,30,60,"dateWidth")}',
+          '${field("layoutLargeListTeamWidth",lt(s,"listTeamWidth"),s.layout.large.listTeamWidth,"number",\'min="72" max="135"\')}':'${layoutField(s,"layoutLargeListTeamWidth",lt(s,"listTeamWidth"),s.layout.large.listTeamWidth,72,135,"listTeamWidth")}',
+          '${field("layoutLargeListScoreWidth",lt(s,"listScoreWidth"),s.layout.large.listScoreWidth,"number",\'min="36" max="70"\')}':'${layoutField(s,"layoutLargeListScoreWidth",lt(s,"listScoreWidth"),s.layout.large.listScoreWidth,36,70,"listScoreWidth")}'
+          }
+          for old,new in reps.items():
+              if old not in s:
+                  raise SystemExit(f'missing layout field pattern: {old[:80]}')
+              s=s.replace(old,new,1)
+
+          assert 'const APP_VERSION = "2.5.18";' in s
+          assert 'function layoutRangeDetail' in s
+          assert 'Rozsah' in s
+          assert 'layoutField(s,"layoutSmallScoreWidth"' in s
+          assert 'layoutField(s,"layoutLargeTableWideWidth"' in s
+          assert 'lh(s,"tableAlign")' in s
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Validate JavaScript and build release
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+          python .github/scripts/build_sports_info_package.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          app=Path('apps/Sports-Info')
+          src=(app/'Sports Info.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Info.scriptable').read_text(encoding='utf-8'))
+          app_readme=(app/'README.md').read_text(encoding='utf-8')
+          root=Path('README.md').read_text(encoding='utf-8')
+          site=Path('index.html').read_text(encoding='utf-8')
+          assert 'const APP_VERSION = "2.5.18";' in src
+          assert pkg['script']==src
+          assert 'function layoutRangeDetail' in src
+          assert 'Určuje šířku prostředního pole se skóre' in src
+          assert 'Rozsah' in src and 'Range' in src and 'Bereich' in src and 'Rango' in src
+          assert '**Sports Info v2.5.18 — Production**' in app_readme
+          assert '| 🏆 **Sports Info** | ✅ v2.5.18 |' in root
+          assert "{name:'Sports Info',version:'2.5.18'" in site
+          print('Sports Info 2.5.18 layout help validated')
+          PY
+
+      - name: Commit release
+        run: |
+          git config user.name "CaseyCZ automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            'apps/Sports-Info/Sports Info.js' \
+            'apps/Sports-Info/Sports Info.scriptable' \
+            'apps/Sports-Info/README.md' \
+            'README.md' \
+            'index.html'
+          git commit -m "Improve Sports Info layout settings help in 2.5.18"
+          git push origin HEAD:Master
