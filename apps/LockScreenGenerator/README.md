@@ -120,7 +120,7 @@ Stavy: 🟢 **V pořádku** · ⚪ **Vypnuto** · 🔴 **Chyba** · 🟡 **Kontr
 
 ### ⚙️ Automatizace přes Apple Zkratky
 
-Skript uloží `LockScreenWallpaper.png` a vrátí cestu k výsledku. Ve Zkratkách pak stačí přibližně: **Spustit Scriptable skript → získat obrázek → Nastavit tapetu Lock Screenu**.
+Pro Zkratky použij parametr `overlay`. Skript vrátí průhledné PNG jako **Base64 text** (stejný princip jako původní LSWeather), takže nejsme závislí na předávání cesty k souboru. Ve Zkratkách použij: **Spustit Scriptable skript (`overlay`) → Base64: Dekódovat → Získat obrázek ze vstupu → Překrýt původní fotku → Nastavit tapetu Lock Screenu**.
 
 ---
 
