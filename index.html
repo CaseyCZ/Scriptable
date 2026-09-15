@@ -63,9 +63,10 @@
       </section>
     </main>
 
-    <footer><span data-cs="Výběr komunitních projektů byl inspirován seznamem Awesome Scriptable." data-en="The community selection was inspired by the Awesome Scriptable list.">Výběr komunitních projektů byl inspirován seznamem Awesome Scriptable.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a></footer>
+    <footer><span data-cs="Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity." data-en="The community catalog is curated from public Scriptable projects and community recommendations.">Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a> · <a class="mutedLink" href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a> · <a class="mutedLink" href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a></footer>
   </div>
 
+  <script src="./community-extra.js"></script>
   <script>
     const PAGE_SIZE=6;
     const ourApps=[
@@ -94,6 +95,7 @@
       {name:'Lichess Widget',category:'sport',author:'bestmacfly',icon:'♟️',file:'https://raw.githubusercontent.com/bestmacfly/Scriptable-lichess-Widget/main/Lichess.js',filename:'Lichess.js',source:'https://github.com/bestmacfly/Scriptable-lichess-Widget',preview:'https://raw.githubusercontent.com/bestmacfly/Scriptable-lichess-Widget/main/Screenshot.png',tags:['Chess','Lichess','Stats'],description:{cs:'Widget se statistikami hráče z Lichess.',en:'Widget showing player statistics from Lichess.'},features:{cs:['Lichess statistiky','Hráčský profil','Ratingy','Rychlý přehled'],en:['Lichess statistics','Player profile','Ratings','Quick overview']}}
 
     ];
+    communityApps.push(...(window.communityExtraApps||[]));
 
     const savedLang=localStorage.getItem('siteLang');
     let lang=['cs','en'].includes(savedLang)?savedLang:((navigator.language||'').toLowerCase().startsWith('cs')?'cs':'en');
@@ -101,8 +103,8 @@
     let layout=localStorage.getItem('siteLayout')||'grid';
     let communityPage=0;
     let communityCategory='all';
-    const CATEGORY_ORDER=['all','sport','weather','news','calendar','finance','space','tools','reading'];
-    const CATEGORY_LABELS={all:{cs:'Vše',en:'All'},sport:{cs:'Sport',en:'Sport'},weather:{cs:'Počasí',en:'Weather'},news:{cs:'Zprávy',en:'News'},calendar:{cs:'Kalendář',en:'Calendar'},finance:{cs:'Finance',en:'Finance'},space:{cs:'Vesmír',en:'Space'},tools:{cs:'Nástroje',en:'Tools'},reading:{cs:'Čtení',en:'Reading'}};
+    const CATEGORY_ORDER=['all','sport','weather','news','calendar','finance','space','tools','reading','cars','gaming','music','social','mobile','health','travel','art'];
+    const CATEGORY_LABELS={all:{cs:'Vše',en:'All'},sport:{cs:'Sport',en:'Sport'},weather:{cs:'Počasí',en:'Weather'},news:{cs:'Zprávy',en:'News'},calendar:{cs:'Kalendář',en:'Calendar'},finance:{cs:'Finance',en:'Finance'},space:{cs:'Vesmír',en:'Space'},tools:{cs:'Nástroje',en:'Tools'},reading:{cs:'Čtení',en:'Reading'},cars:{cs:'Auta',en:'Cars'},gaming:{cs:'Hry',en:'Gaming'},music:{cs:'Hudba',en:'Music'},social:{cs:'Sociální',en:'Social'},mobile:{cs:'Mobil',en:'Mobile'},health:{cs:'Zdraví',en:'Health'},travel:{cs:'Cestování',en:'Travel'},art:{cs:'Design',en:'Design'}};
     const tr=(cs,en)=>lang==='cs'?cs:en;
 
     function applyTheme(next){theme=next==='light'?'light':'dark';localStorage.setItem('siteTheme',theme);document.documentElement.dataset.theme=theme;document.getElementById('themeDark').classList.toggle('active',theme==='dark');document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeColor').content=theme==='dark'?'#0b1020':'#f8fafc'}
@@ -119,7 +121,7 @@
     function renderCategoryFilter(){const select=document.getElementById('categoryFilter');const present=new Set(communityApps.map(app=>app.category));const options=CATEGORY_ORDER.filter(x=>x==='all'||present.has(x));select.innerHTML=options.map(x=>`<option value="${x}">${categoryLabel(x)}</option>`).join('');select.value=communityCategory}
     function setCategory(category){communityCategory=CATEGORY_ORDER.includes(category)?category:'all';communityPage=0;renderCommunity()}
     function setCommunityPage(page){const rows=filteredCommunityApps();const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));communityPage=Math.max(0,Math.min(pages-1,page));renderCommunity();document.getElementById('community').scrollIntoView({behavior:'smooth',block:'start'})}
-    function renderPagination(){const rows=filteredCommunityApps();const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(communityPage>=pages)communityPage=pages-1;const p=document.getElementById('pagination');let html=`<button class="pageBtn" ${communityPage===0?'disabled':''} onclick="setCommunityPage(${communityPage-1})">‹</button>`;for(let i=0;i<pages;i++)html+=`<button class="pageBtn ${i===communityPage?'active':''}" onclick="setCommunityPage(${i})">${i+1}</button>`;html+=`<button class="pageBtn" ${communityPage===pages-1?'disabled':''} onclick="setCommunityPage(${communityPage+1})">›</button>`;p.innerHTML=html;document.getElementById('pageInfo').textContent=tr(`Stránka ${communityPage+1} z ${pages} · ${rows.length} vybraných`,`Page ${communityPage+1} of ${pages} · ${rows.length} selected`)}
+    function renderPagination(){const rows=filteredCommunityApps();const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(communityPage>=pages)communityPage=pages-1;const p=document.getElementById('pagination');let html=`<button class="pageBtn" ${communityPage===0?'disabled':''} onclick="setCommunityPage(${communityPage-1})">‹</button>`;const wanted=new Set([0,pages-1,communityPage-1,communityPage,communityPage+1].filter(x=>x>=0&&x<pages));let last=-2;for(const i of [...wanted].sort((a,b)=>a-b)){if(i-last>1)html+=`<span class="pageInfo">…</span>`;html+=`<button class="pageBtn ${i===communityPage?'active':''}" onclick="setCommunityPage(${i})">${i+1}</button>`;last=i}html+=`<button class="pageBtn" ${communityPage===pages-1?'disabled':''} onclick="setCommunityPage(${communityPage+1})">›</button>`;p.innerHTML=html;document.getElementById('pageInfo').textContent=tr(`Stránka ${communityPage+1} z ${pages} · ${rows.length} vybraných`,`Page ${communityPage+1} of ${pages} · ${rows.length} selected`)}
     function renderCommunity(){const filtered=filteredCommunityApps();const start=communityPage*PAGE_SIZE;const rows=filtered.slice(start,start+PAGE_SIZE);document.getElementById('communityGrid').innerHTML=rows.map((app,i)=>cardHtml(app,start+i,true)).join('');renderPagination()}
     function renderAll(){document.getElementById('ourCount').textContent=ourApps.length+' '+tr(ourApps.length===1?'aplikace':'aplikací',ourApps.length===1?'app':'apps');const filtered=filteredCommunityApps().length;document.getElementById('communityCount').textContent=(communityCategory==='all'?communityApps.length:`${filtered} / ${communityApps.length}`)+' '+tr('projektů','projects');document.getElementById('ourGrid').innerHTML=ourApps.map((app,i)=>cardHtml(app,i,false)).join('');renderCategoryFilter();renderCommunity()}
 
