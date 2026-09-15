@@ -7,6 +7,7 @@ on:
       - 'apps/Sports-Info/Sports Info.js'
       - '.github/scripts/build_sports_info_package.py'
       - '.github/scripts/audit_sports_info_ui.py'
+      - '.github/scripts/test_sports_info_layout.cjs'
       - '.github/workflows/build-sports-info-package.yml'
   workflow_dispatch:
 
@@ -50,6 +51,9 @@ jobs:
 
       - name: Audit settings UI wiring
         run: python .github/scripts/audit_sports_info_ui.py
+
+      - name: Test iPhone table geometry and settings regressions
+        run: node .github/scripts/test_sports_info_layout.cjs
 
       - name: Validate one-source-of-truth release
         run: |
@@ -116,15 +120,15 @@ jobs:
           assert 'function automaticTableSlotLayout' in src, 'dynamic standings width calculation missing'
           assert 'function textWidthUnits' in src and 'function tableTextWidth' in src, 'weighted text width estimator missing'
           assert 'tableSlotLayout(s,cols,rows)' in src, 'AUTO layout does not use visible standings rows'
-          assert 'max=key==="score"?80:(key==="pct"?50:56)' in src, 'score/pct AUTO max widths regressed'
+          assert 'function tableStatWidth' in src, 'fixed-pitch statistic measurement missing'
           assert 'function setTableAuto()' in src and 'function markTableManual()' in src, 'AUTO/MANUAL UI switching missing'
           assert "state.tableAutoBySport[layoutSportId]=!!auto" in src, 'AUTO/MANUAL state not scoped to sport'
           assert 'id="tableModeBadge"' in src and 'id="autoTableInfo"' in src, 'AUTO/MANUAL status UI missing'
           assert "!['left','center','right'].includes(L.tableAlign)" in src, 'left/center/right table alignment normalization missing'
           assert '[["left",lt(s,"left")],["center",lt(s,"center")],["right",lt(s,"right")]]' in src, 'left/center/right table alignment UI missing'
-          assert "document.querySelectorAll('#layoutLargeTable input[type=number]')" in src, 'alignment change incorrectly forces MANUAL mode'
-          assert 'let slack=target-(teamWidth+4+statsWidth)' in src and 'while(slack>0)' in src, 'AUTO layout does not fill available table width'
-          assert 'teamMin=96,teamMax=150' in src, 'AUTO team width bounds missing'
+          assert "document.querySelectorAll('#layoutLargeTable input[id$=Width]')" in src, 'non-width change incorrectly forces MANUAL mode'
+          assert 'target=tableAvailableWidth(s)' in src, 'AUTO does not use iPhone width budget'
+          assert 'tableStatCell' in src, 'bounded numeric cell renderer missing'
           assert 'resetLayoutSection' in src, 'focused Large reset missing'
 
           # Persistence, iPhone touch behavior and preview bridge.

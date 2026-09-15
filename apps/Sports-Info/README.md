@@ -1,6 +1,6 @@
 # 🏆 Sports Info
 
-**Sports Info v2.5.23 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
+**Sports Info v2.5.24 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
 
 ## Sporty
 
@@ -25,6 +25,15 @@ Widget požádá iOS o další obnovu podle situace:
 Cache slouží pouze jako nouzová záloha při výpadku internetu nebo datového zdroje.
 
 ## Template a funkce
+
+### Oprava AUTO tabulky v2.5.24
+
+- Rozpočet šířky podle standardních rozměrů widgetu iPhonu a bočního odsazení; pro neznámé/zoomované rozměry konzervativní odhad. Scriptable neposkytuje skutečnou změřenou šířku hostitelského widgetu.
+- Společné šířky hlavičky a všech zobrazených řádků, vyhrazené místo pro celé skóre, procenta a body.
+- V AUTO mají statistiky neproporcionální písmo. Při nedostatku místa se přizpůsobí velikost písma, nikoli počet sloupců. Výjimečně dlouhé hodnoty mohou využít nativní zmenšení textu.
+- Změna písma nebo zarovnání nevypíná AUTO; do MANUAL přepíná pouze úprava číselné šířky.
+- Offline regresní test: `node .github/scripts/test_sports_info_layout.cjs`. Testy geometrie a mockovaných nativních prvků nenahrazují kontrolu na skutečném iPhonu.
+- Aktualizátor, identita skriptu a vstupní widgetová větev zůstávají beze změny.
 
 - Small widget: loga zůstávají zachovaná a název týmu se může zalomit až na 2 řádky
 - Large widget: tabulka dynamicky využívá volné místo a přitom drží bezpečný limit řádků

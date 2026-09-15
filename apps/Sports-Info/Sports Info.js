@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.23
+// Sports Info v2.5.24
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.23";
+const APP_VERSION = "2.5.24";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -314,22 +314,48 @@ let LAST_AUTO_TABLE_LAYOUT=null;
 function tableAutoEnabled(s){return s.tableAutoBySport?.[s.sportId]!==false}
 function textWidthUnits(v){let u=0;for(const ch of String(v??"")){if(" 1Il|.,:'".includes(ch))u+=.36;else if("MW@%#".includes(ch))u+=.92;else if(/[0-9]/.test(ch))u+=.61;else if(/[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/.test(ch))u+=.69;else u+=.56}return u}
 function tableTextWidth(v,font,bold=false){return Math.ceil(textWidthUnits(v)*font*(bold?1.06:1)+6)}
+// Scriptable exposes screen size, not the host widget's measured bounds.
+// Standard iPhone widget widths in points; unknown/zoomed sizes use a conservative fallback.
+function tableAvailableWidth(s){
+  let width=329;
+  try{const screen=Device.screenSize(),short=Math.min(screen.width,screen.height),long=Math.max(screen.width,screen.height);
+    const widths={320:292,375:329,390:338,393:338,414:360,428:364,430:364};
+    width=short===414&&long===736?348:(widths[short]||Math.floor(short*.82));
+  }catch(_){}
+  return Math.max(240,Math.floor(width-2*(s.compact?10:12)));
+}
+// Fixed-pitch statistics: reserve a conservative glyph advance plus 8pt breathing room.
+function tableStatWidth(value,font){return Math.ceil(Array.from(String(value??"–")).length*font*.68+8)}
 function automaticTableSlotLayout(s,cols,rows=[]){
-  const L=layoutFor(s,"large"),stats=cols.slice(1,8),target=303,teamValues=[cols[0]?.[1]||"TÝM",...rows.map(x=>standingValue(x,"team"))],teamMin=96,teamMax=150;
-  let teamWidth=clamp(Math.max(...teamValues.map(v=>tableTextWidth(v,L.tableTeamFont,true)))+(s.showLogos?18:0),teamMin,teamMax);
-  const limits={};
-  const statCols=stats.map(([key,label])=>{const vals=[label,...rows.map(x=>standingValue(x,key))],need=Math.max(tableTextWidth(label,L.tableHeaderFont,true),...vals.map(v=>tableTextWidth(v,L.tableFont,key==="points"))),min=key==="score"?30:(key==="pct"?28:20),max=key==="score"?80:(key==="pct"?50:56);limits[key]={min,max};return[key,label,clamp(need,min,max)]});
-  let statsWidth=statCols.reduce((a,c)=>a+c[2],0),overflow=teamWidth+4+statsWidth-target;
-  if(overflow>0){const take=Math.min(overflow,teamWidth-teamMin);teamWidth-=take;overflow-=take}
-  while(overflow>0){let changed=false;for(const c of [...statCols].sort((a,b)=>b[2]-a[2])){const min=limits[c[0]].min;if(c[2]>min){c[2]--;overflow--;changed=true;if(overflow<=0)break}}if(!changed)break}
-  statsWidth=statCols.reduce((a,c)=>a+c[2],0);
-  let slack=target-(teamWidth+4+statsWidth);
-  while(slack>0){let changed=false;for(const c of statCols){const max=limits[c[0]].max;if(c[2]<max){c[2]++;slack--;changed=true;if(slack<=0)break}}if(!changed)break}
-  if(slack>0){const add=Math.min(slack,teamMax-teamWidth);teamWidth+=add;slack-=add}
-  if(slack>0&&statCols.length){let i=0;while(slack>0){statCols[i%statCols.length][2]++;slack--;i++}}
-  statsWidth=statCols.reduce((a,c)=>a+c[2],0);
-  LAST_AUTO_TABLE_LAYOUT={teamWidth,statsWidth,totalWidth:teamWidth+4+statsWidth,columns:Object.fromEntries(statCols.map(c=>[c[0],c[2]]))};
-  return {teamCol:[cols[0][0],cols[0][1],teamWidth],statCols,statsWidth,auto:true}
+  const L=layoutFor(s,"large"),stats=cols.slice(1),target=tableAvailableWidth(s),teamMin=80;
+  let font=L.tableFont,headerFont=L.tableHeaderFont;
+  const measure=()=>stats.map(([key,label])=>[key,label,Math.max(20,tableStatWidth(label,headerFont),...rows.map(x=>tableStatWidth(standingValue(x,key),font)))]);
+  let statCols=measure(),sum=()=>statCols.reduce((a,c)=>a+c[2],0);
+  // Reduce a shared font before reducing data columns. Never delete a statistic.
+  while(sum()>target-teamMin-4&&(font>7||headerFont>7)){
+    font=Math.max(7,font-.25);headerFont=Math.max(7,headerFont-.25);statCols=measure();
+  }
+  // Exceptionally long provider values still get bounded cells and native text scaling.
+  if(sum()>target-teamMin-4){const ratio=(target-teamMin-4)/sum();statCols=statCols.map(([k,l,w])=>[k,l,Math.floor(w*ratio)])}
+  const names=[cols[0][1],...rows.map(x=>standingValue(x,"team"))];
+  const wanted=Math.max(...names.map(v=>tableTextWidth(v,L.tableTeamFont,true)))+(s.showLogos?18:0);
+  let teamWidth=Math.min(Math.max(teamMin,wanted),Math.floor(target*.52),target-4-sum());
+  let slack=target-(teamWidth+4+sum());
+  for(let i=0;slack>0&&statCols.length;i++,slack--)statCols[i%statCols.length][2]++;
+  if(!statCols.length)teamWidth+=slack;
+  const statsWidth=sum();
+  LAST_AUTO_TABLE_LAYOUT={teamWidth,statsWidth,totalWidth:teamWidth+4+statsWidth,font,headerFont,columns:Object.fromEntries(statCols.map(c=>[c[0],c[2]]))};
+  return {teamCol:[cols[0][0],cols[0][1],teamWidth],statCols,statsWidth,font,headerFont,auto:true}
+}
+function tableStatCell(parent,value,width,color,align,bold,font){
+  const cell=parent.addStack();cell.layoutHorizontally();cell.centerAlignContent();
+  cell.spacing=0;cell.setPadding(0,0,0,0);cell.size=new Size(width,0);
+  if(align!=="left")cell.addSpacer();
+  const text=txt(cell,value,font,color,bold);
+  text.font=bold?Font.boldMonospacedSystemFont(font):Font.regularMonospacedSystemFont(font);
+  text.minimumScaleFactor=.5;
+  if(align!=="right")cell.addSpacer();
+  return text;
 }
 function tableSlotLayout(s,cols,rows=[]){
   if(tableAutoEnabled(s))return automaticTableSlotLayout(s,cols,rows);
@@ -360,27 +386,29 @@ async function table(parent,s,d,p){
   let capacity=d.current?14:17;if(shownUpcoming>1)capacity-=shownUpcoming-1;if(shownLast)capacity-=shownLast+1;if(s.showForm&&(s.teamId||s.teamName)&&d.form.length)capacity-=1;
   const maxRows=Math.min(all.length,clamp(capacity,6,17));
   let rows;if(hasFav&&favIndex>=0&&maxRows<all.length){const start=Math.max(0,Math.min(favIndex-Math.floor(maxRows/2),all.length-maxRows));rows=all.slice(start,start+maxRows)}else rows=all.slice(0,maxRows);
-  const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football,{teamCol,statCols,statsWidth}=tableSlotLayout(s,cols,rows),TL=layoutFor(s,"large");
+  const cols=TABLE_PROFILES[s.sportId]||TABLE_PROFILES.football,slots=tableSlotLayout(s,cols,rows),{teamCol,statCols,statsWidth}=slots,TL=layoutFor(s,"large");
+  const statCell=slots.auto?tableStatCell:lineCell,statFont=slots.font??TL.tableFont,headerFont=slots.headerFont??TL.tableHeaderFont;
   title(parent,tx(s,"standings"),p);parent.addSpacer(3);
-  const h=parent.addStack();h.layoutHorizontally();
+  const h=parent.addStack();h.layoutHorizontally();h.spacing=0;h.setPadding(0,0,0,0);
   {
     const [,label,width]=teamCol,c=h.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
-    const t=txt(c,label,TL.tableHeaderFont,p.muted,true);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer()
+    c.spacing=0;c.setPadding(0,0,0,0);
+    const t=txt(c,label,headerFont,p.muted,true);t.lineLimit=1;t.minimumScaleFactor=1;c.addSpacer()
   }
   h.addSpacer(4);
-  const hs=h.addStack();hs.layoutHorizontally();hs.size=new Size(statsWidth,0);
-  for(const [key,label,width] of statCols)lineCell(hs,label,width,p.muted,TL.tableAlign,true,TL.tableHeaderFont,1);
+  const hs=h.addStack();hs.layoutHorizontally();hs.spacing=0;hs.setPadding(0,0,0,0);hs.size=new Size(statsWidth,0);
+  for(const [key,label,width] of statCols)statCell(hs,label,width,p.muted,TL.tableAlign,true,headerFont,1);
   parent.addSpacer(3);
   for(const x of rows){
-    const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();
+    const fav=hasFav&&teamMatches(x,s),r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();r.spacing=0;r.setPadding(0,0,0,0);
     {
-      const [key,,width]=teamCol,color=fav?p.accent:p.text,c=r.addStack();c.layoutHorizontally();c.centerAlignContent();c.size=new Size(width,0);
+      const [key,,width]=teamCol,color=fav?p.accent:p.text,c=r.addStack();c.layoutHorizontally();c.centerAlignContent();c.spacing=0;c.setPadding(0,0,0,0);c.size=new Size(width,0);
       if(s.showLogos&&x.logo){const img=await logo(x.logo,x.id||x.name);if(img){const im=c.addImage(img);im.imageSize=new Size(13,13);c.addSpacer(4)}}
       const t=txt(c,standingValue(x,key),TL.tableTeamFont,color,fav);t.lineLimit=1;t.minimumScaleFactor=.8;c.addSpacer()
     }
     r.addSpacer(4);
-    const rs=r.addStack();rs.layoutHorizontally();rs.size=new Size(statsWidth,0);
-    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;lineCell(rs,standingValue(x,key),width,color,TL.tableAlign,fav||key==="points",TL.tableFont,1)}
+    const rs=r.addStack();rs.layoutHorizontally();rs.spacing=0;rs.setPadding(0,0,0,0);rs.size=new Size(statsWidth,0);
+    for(const [key,,width] of statCols){const color=fav?p.accent:p.muted;statCell(rs,standingValue(x,key),width,color,TL.tableAlign,fav||key==="points",statFont,1)}
     parent.addSpacer(1)
   }
 }
@@ -441,7 +469,7 @@ function setTableMode(auto,commit=true){state.tableAutoBySport=state.tableAutoBy
 function setTableAuto(){setTableMode(true,true);const x=document.getElementById('autoTableInfo');if(x)x.textContent='AUTO aktivní · skutečné šířky se zobrazí po Náhledu.'}
 function markTableManual(){if(tableAutoUI())setTableMode(false,false);updateTableModeUI()}
 function switchLayoutSport(id){state.sportLayouts=state.sportLayouts||{};state.sportLayouts[layoutSportId]=readLayoutProfile(state.sportLayouts[layoutSportId]||state.layout||LAYOUT_DEFAULTS);layoutSportId=id;const next=cloneProfile(state.sportLayouts[id]||LAYOUT_DEFAULTS);state.sportLayouts[id]=next;state.layout=cloneProfile(next);writeLayoutProfile(next);updateLayoutSportBadges(id)}
-function collect(){const z={...state};z.sportId=document.getElementById('sportId')?.value||z.sportId;z.leagueId=document.getElementById('leagueId')?.value||z.leagueId;const t=document.getElementById('teamId');if(t){z.teamId=t.value;z.teamName=t.value?(t.options[t.selectedIndex]?.text||''):''}['showLive','showLast','showNext','showTable','showForm','showLogos','compact'].forEach(k=>{const e=document.getElementById(k);if(e)z[k]=e.checked});for(const k of['maxMatches','refreshMinutes']){const e=document.getElementById(k);if(e)z[k]=Number(e.value)};z.sportLayouts=JSON.parse(JSON.stringify(state.sportLayouts||{}));z.sportLayouts[layoutSportId]=readLayoutProfile(z.sportLayouts[layoutSportId]||state.layout||LAYOUT_DEFAULTS);z.layout=cloneProfile(z.sportLayouts[z.sportId]||LAYOUT_DEFAULTS);for(const k of['theme','accent','background','panelColor','textColor','mutedColor','liveColor','winColor','apiEspnBase','apiFotmobBase','apiOneFootballFeedBase','apiOneFootballScoresBase','apiSofaBase','apiSportsApiBase','sportsApiKey']){const e=document.getElementById(k);if(e)z[k]=e.value}return z}let timer;function commitNow(){clearTimeout(timer);state=collect();emit('save',{settings:state});return state}function save(){clearTimeout(timer);timer=setTimeout(commitNow,180)}function resetTeam(){const t=document.getElementById('teamId');if(t)t.innerHTML='<option value="">'+UI.allTeams+'</option>';state.teamId='';state.teamName=''}function fillLeagues(){const sid=document.getElementById('sportId').value,l=document.getElementById('leagueId'),items=leagues(sid);state=collect();switchLayoutSport(sid);state.sportId=sid;l.innerHTML='';items.forEach((x,i)=>{const o=document.createElement('option');o.value=x.id;o.textContent=(x.flag||'')+' '+(x[initial.language]||x.en||x.id);l.appendChild(o)});resetTeam();save()}document.getElementById('sportId').addEventListener('change',fillLeagues);document.getElementById('leagueId').addEventListener('change',()=>{resetTeam();save()});document.querySelectorAll('input,select').forEach(x=>{if(['sportId','leagueId','teamId'].includes(x.id))return;x.addEventListener('change',save);if(x.type==='number'||x.type==='color')x.addEventListener('input',save)});document.getElementById('teamId').addEventListener('change',save);document.querySelectorAll('input[type=number]').forEach(e=>e.setAttribute('inputmode','numeric'));document.querySelectorAll('#layoutLargeTable input[type=number]').forEach(e=>{e.addEventListener('input',markTableManual);e.addEventListener('change',markTableManual)});document.addEventListener('touchstart',e=>{const x=e.target.closest('button,.navRow');if(x)x.classList.add('pressed')},{passive:true});for(const ev of['touchend','touchcancel'])document.addEventListener(ev,e=>{const x=e.target.closest('button,.navRow');if(x)x.classList.remove('pressed')},{passive:true});state.sportLayouts=state.sportLayouts||{};state.sportLayouts[layoutSportId]=cloneProfile(state.sportLayouts[layoutSportId]||state.layout||LAYOUT_DEFAULTS);state.layout=cloneProfile(state.sportLayouts[layoutSportId]);writeLayoutProfile(state.layout);updateLayoutSportBadges(layoutSportId);function toggleCustomColors(){const box=document.getElementById('customColors'),theme=document.getElementById('theme');if(box&&theme)box.style.display=theme.value==='custom'?'block':'none'}document.getElementById('theme')?.addEventListener('change',toggleCustomColors);['background','panelColor','textColor','mutedColor','liveColor','winColor','accent'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',()=>{const c=e.parentElement?.querySelector('code');if(c)c.textContent=e.value})});function loadTeams(){document.getElementById('sourceStatus').textContent=UI.loading;emit('teams',{settings:collect()})}function preview(f){state=commitNow();const e=document.getElementById('previewMeta');if(e)e.textContent=UI.loading;document.querySelectorAll('.previewAction[data-preview="'+f+'"]').forEach(b=>{b.disabled=true;if(!b.dataset.label)b.dataset.label=b.textContent;b.textContent='⏳ '+UI.loading});emit('preview',{family:f,settings:state})}function runDiagnostics(){const e=document.getElementById('diagList');e.innerHTML='<div class="diagRow"><div class="diagTitle">'+UI.checking+'</div><span class="diagState checking">⏳</span></div>';emit('diagnostics',{settings:collect()})}function exportJSON(){emit('export',{settings:collect()})}function importJSON(){emit('import',{raw:document.getElementById('jsonBox').value})}function resetPart(part){emit('reset',{part,settings:collect()})}function resetLayout(family){clearTimeout(timer);const current=collect(),sid=layoutSportId||current.sportId;current.sportLayouts=current.sportLayouts||{};const profile=cloneProfile(current.sportLayouts[sid]||LAYOUT_DEFAULTS);profile[family]=cloneProfile(LAYOUT_DEFAULTS)[family];current.sportLayouts[sid]=profile;if(current.sportId===sid)current.layout=cloneProfile(profile);state=current;writeLayoutProfile(profile);emit('save',{settings:state})}
+function collect(){const z={...state};z.sportId=document.getElementById('sportId')?.value||z.sportId;z.leagueId=document.getElementById('leagueId')?.value||z.leagueId;const t=document.getElementById('teamId');if(t){z.teamId=t.value;z.teamName=t.value?(t.options[t.selectedIndex]?.text||''):''}['showLive','showLast','showNext','showTable','showForm','showLogos','compact'].forEach(k=>{const e=document.getElementById(k);if(e)z[k]=e.checked});for(const k of['maxMatches','refreshMinutes']){const e=document.getElementById(k);if(e)z[k]=Number(e.value)};z.sportLayouts=JSON.parse(JSON.stringify(state.sportLayouts||{}));z.sportLayouts[layoutSportId]=readLayoutProfile(z.sportLayouts[layoutSportId]||state.layout||LAYOUT_DEFAULTS);z.layout=cloneProfile(z.sportLayouts[z.sportId]||LAYOUT_DEFAULTS);for(const k of['theme','accent','background','panelColor','textColor','mutedColor','liveColor','winColor','apiEspnBase','apiFotmobBase','apiOneFootballFeedBase','apiOneFootballScoresBase','apiSofaBase','apiSportsApiBase','sportsApiKey']){const e=document.getElementById(k);if(e)z[k]=e.value}return z}let timer;function commitNow(){clearTimeout(timer);state=collect();emit('save',{settings:state});return state}function save(){clearTimeout(timer);timer=setTimeout(commitNow,180)}function resetTeam(){const t=document.getElementById('teamId');if(t)t.innerHTML='<option value="">'+UI.allTeams+'</option>';state.teamId='';state.teamName=''}function fillLeagues(){const sid=document.getElementById('sportId').value,l=document.getElementById('leagueId'),items=leagues(sid);state=collect();switchLayoutSport(sid);state.sportId=sid;l.innerHTML='';items.forEach((x,i)=>{const o=document.createElement('option');o.value=x.id;o.textContent=(x.flag||'')+' '+(x[initial.language]||x.en||x.id);l.appendChild(o)});resetTeam();save()}document.getElementById('sportId').addEventListener('change',fillLeagues);document.getElementById('leagueId').addEventListener('change',()=>{resetTeam();save()});document.querySelectorAll('input,select').forEach(x=>{if(['sportId','leagueId','teamId'].includes(x.id))return;x.addEventListener('change',save);if(x.type==='number'||x.type==='color')x.addEventListener('input',save)});document.getElementById('teamId').addEventListener('change',save);document.querySelectorAll('input[type=number]').forEach(e=>e.setAttribute('inputmode','numeric'));document.querySelectorAll('#layoutLargeTable input[id$=Width]').forEach(e=>{e.addEventListener('input',markTableManual);e.addEventListener('change',markTableManual)});document.addEventListener('touchstart',e=>{const x=e.target.closest('button,.navRow');if(x)x.classList.add('pressed')},{passive:true});for(const ev of['touchend','touchcancel'])document.addEventListener(ev,e=>{const x=e.target.closest('button,.navRow');if(x)x.classList.remove('pressed')},{passive:true});state.sportLayouts=state.sportLayouts||{};state.sportLayouts[layoutSportId]=cloneProfile(state.sportLayouts[layoutSportId]||state.layout||LAYOUT_DEFAULTS);state.layout=cloneProfile(state.sportLayouts[layoutSportId]);writeLayoutProfile(state.layout);updateLayoutSportBadges(layoutSportId);function toggleCustomColors(){const box=document.getElementById('customColors'),theme=document.getElementById('theme');if(box&&theme)box.style.display=theme.value==='custom'?'block':'none'}document.getElementById('theme')?.addEventListener('change',toggleCustomColors);['background','panelColor','textColor','mutedColor','liveColor','winColor','accent'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',()=>{const c=e.parentElement?.querySelector('code');if(c)c.textContent=e.value})});function loadTeams(){document.getElementById('sourceStatus').textContent=UI.loading;emit('teams',{settings:collect()})}function preview(f){state=commitNow();const e=document.getElementById('previewMeta');if(e)e.textContent=UI.loading;document.querySelectorAll('.previewAction[data-preview="'+f+'"]').forEach(b=>{b.disabled=true;if(!b.dataset.label)b.dataset.label=b.textContent;b.textContent='⏳ '+UI.loading});emit('preview',{family:f,settings:state})}function runDiagnostics(){const e=document.getElementById('diagList');e.innerHTML='<div class="diagRow"><div class="diagTitle">'+UI.checking+'</div><span class="diagState checking">⏳</span></div>';emit('diagnostics',{settings:collect()})}function exportJSON(){emit('export',{settings:collect()})}function importJSON(){emit('import',{raw:document.getElementById('jsonBox').value})}function resetPart(part){emit('reset',{part,settings:collect()})}function resetLayout(family){clearTimeout(timer);const current=collect(),sid=layoutSportId||current.sportId;current.sportLayouts=current.sportLayouts||{};const profile=cloneProfile(current.sportLayouts[sid]||LAYOUT_DEFAULTS);profile[family]=cloneProfile(LAYOUT_DEFAULTS)[family];current.sportLayouts[sid]=profile;if(current.sportId===sid)current.layout=cloneProfile(profile);state=current;writeLayoutProfile(profile);emit('save',{settings:state})}
 function resetLayoutSection(section){const keys={match:['teamWidth','scoreWidth','teamFont','scoreFont','logoSize','logoGap','cardPaddingX','teamAlign'],table:['tableTeamWidth','tableWideWidth','tableNarrowWidth','tableHeaderFont','tableFont','tableTeamFont','tableAlign'],lists:['listDateWidth','listTeamWidth','listScoreWidth']}[section]||[];const current=collect(),sid=layoutSportId||current.sportId,profile=cloneProfile(current.sportLayouts?.[sid]||LAYOUT_DEFAULTS),d=LAYOUT_DEFAULTS.large;for(const k of keys)profile.large[k]=d[k];current.sportLayouts=current.sportLayouts||{};current.sportLayouts[sid]=profile;if(current.sportId===sid)current.layout=cloneProfile(profile);state=current;writeLayoutProfile(profile);if(section==='table'){state.tableAutoBySport=state.tableAutoBySport||{};state.tableAutoBySport[sid]=true;updateTableModeUI()}commitNow()}function clearCache(){emit('clearCache',{})}function recommendedWidget(){const checks={showLive:true,showNext:true,showLast:true,showTable:true,showForm:true,showLogos:true};for(const [k,v] of Object.entries(checks)){const e=document.getElementById(k);if(e)e.checked=v}const n=document.getElementById('maxMatches');if(n)n.value=4;commitNow();const st=document.getElementById('widgetPresetStatus');if(st)st.textContent=HELP.recommendedDone||'OK'}function requestUpdate(){document.getElementById('updateStatus').textContent=UI.checking;emit('update',{settings:collect()})}function renderDiag(rows){const e=document.getElementById('diagList');e.innerHTML='';(rows||[]).forEach(d=>{const r=document.createElement('div');r.className='diagRow';const left=document.createElement('div'),t=document.createElement('div'),q=document.createElement('div'),st=document.createElement('span');t.className='diagTitle';t.textContent=d.label||'';q.className='diagDetail';q.textContent=d.detail||'';left.append(t,q);st.className='diagState '+(d.state||'error');st.textContent=d.state==='checking'?'⏳':d.state==='ok'?'● '+UI.ok:d.state==='off'?'● OFF':d.state==='idle'?'●':'● '+UI.error;r.append(left,st);e.appendChild(r)})}window.__native=function(m){if(!m)return;if(m.action==='teams'){const sel=document.getElementById('teamId'),old=state.teamId||'';sel.innerHTML='<option value="">'+UI.allTeams+'</option>';let matched=null;(m.teams||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.name;if(t.id===old||((state.teamName||'').trim().toLowerCase()===String(t.name||'').trim().toLowerCase())){o.selected=true;matched=t}sel.appendChild(o)});if(matched&&matched.id!==state.teamId){state.teamId=matched.id;state.teamName=matched.name;save()}const e=document.getElementById('sourceStatus');e.textContent=m.ok?UI.teamsLoaded:UI.teamsFail;e.style.color=m.ok?'var(--ok)':'var(--danger)'}if(m.action==='diagnostics')renderDiag(m.rows);if(m.action==='status'){const e=document.getElementById('toolStatus');e.textContent=m.text||'';e.style.color=m.ok?'var(--ok)':'var(--danger)'}if(m.action==='update'){const e=document.getElementById('updateStatus');e.textContent=m.text||'';e.className='updateStatus '+(m.ok?'ok':'error')}if(m.action==='previewDone'){document.querySelectorAll('.previewAction[data-preview="'+m.family+'"]').forEach(b=>{b.disabled=false;if(b.dataset.label)b.textContent=b.dataset.label});const e=document.getElementById('previewMeta');if(e)e.textContent=''}if(m.action==='autoTableInfo'){const e=document.getElementById('autoTableInfo'),q=m.info;if(e&&q)e.textContent='AUTO · TÝM '+q.teamWidth+' pt · statistiky '+Object.values(q.columns||{}).join(' / ')+' pt'}if(m.action==='replace'){state=m.settings;location.reload()}};
 </script></body></html>`}
 async function send(web,o){try{await web.evaluateJavaScript(`window.__native(${JSON.stringify(o)})`,false)}catch(_){}}
