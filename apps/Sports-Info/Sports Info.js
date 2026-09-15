@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.20
+// Sports Info v2.5.21
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.20";
+const APP_VERSION = "2.5.21";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -273,7 +273,8 @@ function day(s,iso){const d=new Date(iso),n=new Date(),t=new Date(n),y=new Date(
 function time(s,iso){return new Date(iso).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}
 function state(s,e){if(e.state==="in")return `${tx(s,"liveNow")} · ${e.status||""}`;if(e.completed||e.state==="post")return e.status||day(s,e.date);return `${day(s,e.date)} · ${time(s,e.date)}`}
 function score(e){return(e.state==="in"||e.completed||e.state==="post")?`${e.home.score||"0"} : ${e.away.score||"0"}`:"–"}
-async function logo(url,key){if(!url)return null;const p=fm.joinPath(fm.cacheDirectory(),`SportsInfo_${String(key).replace(/[^a-zA-Z0-9_-]/g,"_")}.png`);try{if(fm.fileExists(p))return fm.readImage(p);const r=new Request(url);r.timeoutInterval=API_TIMEOUT;const i=await r.loadImage();fm.writeImage(p,i);return i}catch(_){try{return fm.fileExists(p)?fm.readImage(p):null}catch(__){return null}}}
+function logoCachePath(url,key){const safe=(String(key||"logo").replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,48)||"logo");let h=2166136261,raw=String(url||"");for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}return fm.joinPath(fm.cacheDirectory(),`SportsInfo_${safe}_${(h>>>0).toString(36)}.png`)}
+async function logo(url,key){if(!url)return null;const p=logoCachePath(url,key);try{if(fm.fileExists(p)){try{return fm.readImage(p)}catch(_){try{fm.remove(p)}catch(__){}}}const r=new Request(url);r.timeoutInterval=API_TIMEOUT;const i=await r.loadImage();fm.writeImage(p,i);return i}catch(_){return null}}
 function layoutFor(s,family){return s.sportLayouts?.[s.sportId]?.[family]||s.layout?.[family]||LAYOUT_DEFAULTS[family]||LAYOUT_DEFAULTS.medium}
 function teamLabel(t,family,width=0,font=10,withLogo=false){
   const full=t.name||t.short||t.abbr||"",short=t.short&&t.short!==full?t.short:(t.abbr||full);
