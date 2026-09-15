@@ -1,0 +1,49 @@
+name: Audit Sports Info 2.5.21 UI once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/audit-sports-info-ui-2521-once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate outer Scriptable JavaScript
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Render settings HTML with Scriptable mocks
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const src=fs.readFileSync('apps/Sports-Info/Sports Info.js','utf8');
+          const marker='let SETTINGS=await firstLanguage(loadSettings());';
+          const i=src.indexOf(marker);
+          if(i<0)throw new Error('main marker missing');
+          const prefix=src.slice(0,i);
+          const fm={documentsDirectory:()=>'/tmp',cacheDirectory:()=>'/tmp',joinPath:(a,b)=>a+'/'+b,fileExists:()=>false,readString:()=>'',writeString:()=>{},remove:()=>{},readImage:()=>null,writeImage:()=>{}};
+          const ctx={console,FileManager:{local:()=>fm,iCloud:()=>fm},Device:{locale:()=> 'cs-CZ',isUsingDarkAppearance:()=>true},config:{runsInWidget:false},args:{queryParameters:{}},module:{filename:'/tmp/Sports Info.js'}};
+          vm.createContext(ctx);
+          vm.runInContext(prefix+'\nglobalThis.__AUDIT_HTML=html(merge({...DEFAULTS,language:"cs"}));',ctx,{filename:'SportsInfo-prefix.js'});
+          fs.writeFileSync('/tmp/sports-settings.html',ctx.__AUDIT_HTML);
+          const m=ctx.__AUDIT_HTML.match(/<script>([\s\S]*?)<\/script>/);
+          if(!m)throw new Error('settings script missing');
+          fs.writeFileSync('/tmp/sports-settings-ui.js',m[1]);
+          NODE
+
+      - name: Validate rendered settings JavaScript syntax
+        run: node --check /tmp/sports-settings-ui.js
+
+      - name: Audit buttons, navigation and message actions
+        run: python .github/scripts/audit_sports_info_ui_2521.py
