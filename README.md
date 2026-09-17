@@ -1,112 +1,49 @@
-<div align="center">
+<p align="center">
+  <img src="readme-header.svg" alt="Scriptable Apps by CaseyCZ" width="100%" />
+</p>
 
-# ⚡ Scriptable Apps
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Čeština" /></a>
+  <a href="README_EN.md"><img src="https://img.shields.io/badge/EN-English-172033?style=for-the-badge&labelColor=111827" alt="English" /></a>
+</p>
 
-### Scriptable aplikace + veřejný katalog
+<p align="center">
+  Kolekce vlastních <strong>Scriptable</strong> aplikací a widgetů pro iPhone doplněná veřejným katalogem.
+</p>
 
-[![Website](https://img.shields.io/badge/WEB-caseycz.github.io%2FScriptable-0284c7?style=for-the-badge&logo=githubpages&logoColor=white)](https://caseycz.github.io/Scriptable/)
-[![Report issue](https://img.shields.io/badge/%F0%9F%90%9E-Nahl%C3%A1sit%20probl%C3%A9m-dc2626?style=for-the-badge)](https://github.com/CaseyCZ/Scriptable/issues/new/choose)
-[![Pages](https://github.com/CaseyCZ/Scriptable/actions/workflows/pages.yml/badge.svg)](https://github.com/CaseyCZ/Scriptable/actions/workflows/pages.yml)
-[![Scriptable](https://img.shields.io/badge/Scriptable-iPhone-111827?style=for-the-badge)](https://apps.apple.com/app/scriptable/id1405459188)
-[![License: MIT](https://img.shields.io/badge/License-MIT-16a34a?style=for-the-badge)](./LICENSE)
+<p align="center">
+  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Scriptable%20Catalog-OTEV%C5%98%C3%8DT-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Otevřít Scriptable katalog" /></a>
+  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable%20pro%20iPhone-App%20Store-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Scriptable pro iPhone" /></a>
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Podpo%C5%99it%20CaseyCZ-OTEV%C5%98%C3%8DT-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Podpořit CaseyCZ" /></a>
+</p>
 
-**[🌐 Otevřít katalog aplikací](https://caseycz.github.io/Scriptable/)** · **[ Scriptable pro iPhone](https://apps.apple.com/app/scriptable/id1405459188)** · **[🐞 Nahlásit problém](https://github.com/CaseyCZ/Scriptable/issues/new/choose)**
+## Aplikace
 
-</div>
+<table>
+  <thead><tr><th>Aplikace</th><th>Verze</th><th>Info</th><th>Odkaz</th></tr></thead>
+  <tbody>
+    <tr><td><strong>LockScreen Generator</strong></td><td><code>v2.10.0</code></td><td>Nástroj pro tvorbu vlastního vzhledu zamykací obrazovky.</td><td><a href="./apps/LockScreenGenerator/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="LockScreen Generator" /></a></td></tr>
+    <tr><td><strong>Sports Info</strong></td><td><code>v2.5.30</code></td><td>Univerzální sportovní widget pro více sportů a soutěží.</td><td><a href="./apps/Sports-Info/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Info" /></a></td></tr>
+    <tr><td><strong>Sports Live</strong></td><td><code>připravujeme</code></td><td>Widget zaměřený na rychlé živé výsledky napříč sporty.</td><td><a href="./apps/Sports-Live/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Live" /></a></td></tr>
+  </tbody>
+</table>
 
----
+## O projektu
 
-## 📦 Naše aplikace
+Scriptable Apps vznikají jako praktické nástroje pro každodenní použití na iPhonu. Každá aplikace má vlastní stránku, instalační balíček a informace k použití.
 
-| Aplikace | Stav | Projekt |
-|---|---|---|
-| 🪄 **LockScreen Generator** | ✅ v2.10.0 | [`apps/LockScreenGenerator/`](./apps/LockScreenGenerator/) |
-| 🏆 **Sports Info** | ✅ v2.5.30 | [`apps/Sports-Info/`](./apps/Sports-Info/) |
-| 🔴 **Sports Live** | 🧪 připravujeme | [`apps/Sports-Live/`](./apps/Sports-Live/) |
+Veřejný katalog obsahuje také vybrané komunitní Scriptable projekty dalších autorů. U nich zůstává zachovaný původní autor i odkaz na původní repozitář.
 
-### 🪄 LockScreen Generator
+## Hlavní odkazy
 
-Kompletní aplikace je pohromadě ve vlastní složce:
+<p>
+  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog%20aplikac%C3%AD-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Katalog aplikací" /></a>
+  <a href="https://github.com/CaseyCZ/Scriptable/issues/new/choose"><img src="https://img.shields.io/badge/GitHub-Nahl%C3%A1sit%20probl%C3%A9m-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="Nahlásit problém" /></a>
+</p>
 
-**[`apps/LockScreenGenerator/`](./apps/LockScreenGenerator/)**
+## CaseyCZ
 
-Obsahuje zdrojový `.js`, instalační `.scriptable` balíček, README i obrázky. Aktualizace aplikace i webové odkazy používají tuto kanonickou cestu.
-
-**[📲 Instalovat `.scriptable`](./apps/LockScreenGenerator/LockScreenGenerator.scriptable)** · **[⬇️ Stáhnout `.js`](./apps/LockScreenGenerator/LockScreenGenerator.js)** · **[📖 Dokumentace](./apps/LockScreenGenerator/README.md)**
-
-### 🏆 Sports Info
-
-Univerzální sportovní widget podle stejného template jako LockScreen Generator: moderní nastavení, náhledy, API/zdroje, diagnostika, údržba, cache/fail-open a aktualizace přímo z aplikace. Podporuje fotbal, hokej, basketbal, florbal a baseball. Od v2.5.30 si každá zobrazovaná sekce počítá AUTO zarovnání samostatně, takže hlavní zápas, PŘÍŠTÍ, POSLEDNÍ a TABULKA si navzájem nemění šířky.
-
-**[`apps/Sports-Info/`](./apps/Sports-Info/)**
-
-**[📲 Instalovat `.scriptable`](./apps/Sports-Info/Sports%20Info.scriptable)** · **[⬇️ Stáhnout `.js`](./apps/Sports-Info/Sports%20Info.js)** · **[📖 Dokumentace](./apps/Sports-Info/README.md)**
-
-### 🔴 Sports Live
-
-Připravovaná aplikace pro rychlé živé výsledky napříč sporty.
-
-**[`apps/Sports-Live/`](./apps/Sports-Live/)**
-
-## 🌐 Webový katalog
-
-Veřejný katalog je určený pro uživatele, kteří nechtějí procházet GitHub:
-
-### **https://caseycz.github.io/Scriptable/**
-
-Na webu jsou naše aplikace ke stažení a také kurátorovaný výběr projektů dalších Scriptable vývojářů. U komunitních projektů zachováváme původního autora a odkazujeme na původní repozitář; cizí skripty nepřebalujeme.
-
-## 🗂️ Struktura repozitáře
-
-```text
-Scriptable/
-├── apps/
-│   ├── LockScreenGenerator/
-│   ├── Sports-Info/
-│   └── Sports-Live/
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   ├── scripts/
-│   ├── workflows/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── .gitignore
-├── CONTRIBUTING.md
-├── index.html
-├── LICENSE
-└── README.md
-```
-
-- `apps/` — každá naše aplikace má vlastní složku.
-- `index.html` — veřejný katalog pro GitHub Pages.
-- `.github/workflows/` — automatické publikování webu a generování instalačních balíčků.
-- `.github/ISSUE_TEMPLATE/` — formuláře pro chyby a návrhy funkcí.
-- `CONTRIBUTING.md` — pravidla pro Issues a pull requesty.
-- `LICENSE` — MIT licence pro naše vlastní zdrojové soubory a obsah repozitáře.
-
-## 🌍 Ostatní vývojáři
-
-Katalog obsahuje i vybrané veřejné Scriptable projekty dalších autorů — sport, počasí, zprávy, finance, kalendář, nástroje a další kategorie. Zdroj i autor jsou vždy uvedeni přímo u aplikace.
-
-Výběr je inspirován projektem [Awesome Scriptable](https://github.com/dersvenhesse/awesome-scriptable).
-
-## 🤝 Přispívání a hlášení chyb
-
-Chyby a návrhy lze posílat přes **[GitHub Issues](https://github.com/CaseyCZ/Scriptable/issues/new/choose)**. Připravené formuláře se zeptají na aplikaci, verzi a potřebné informace, aby se problém dal reprodukovat.
-
-Pravidla pro pull requesty a přidávání komunitních aplikací jsou v [`CONTRIBUTING.md`](./CONTRIBUTING.md).
-
-> Do Issues ani pull requestů nikdy nevkládej API klíče, tokeny, osobní údaje nebo jiná tajemství.
-
-## 📄 Licence
-
-Naše vlastní zdrojové soubory v tomto repozitáři jsou zveřejněné pod **MIT License**. Podrobnosti jsou v souboru [`LICENSE`](./LICENSE).
-
-Komunitní projekty ostatních vývojářů mají své vlastní licence a podmínky v původních repozitářích. V našem katalogu na ně pouze odkazujeme a jejich kód nepřebalujeme.
-
----
-
-<div align="center">
-
-**Scriptable Apps by CaseyCZ** · [Web](https://caseycz.github.io/Scriptable/) · [Issues](https://github.com/CaseyCZ/Scriptable/issues/new/choose) · [GitHub Pages](https://github.com/CaseyCZ/Scriptable/actions/workflows/pages.yml) · [MIT License](./LICENSE)
-
-</div>
+<p align="center">
+  <a href="https://caseycz.github.io/"><img src="https://img.shields.io/badge/CaseyCZ%20Website-OTEV%C5%98%C3%8DT-38BDF8?style=for-the-badge&labelColor=0284C7" alt="CaseyCZ Website" /></a>
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Podpo%C5%99it%20CaseyCZ-Buy%20Me%20a%20Coffee-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Podpořit CaseyCZ" /></a>
+</p>
