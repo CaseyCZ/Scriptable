@@ -1,197 +1,62 @@
-<div align="center">
-
-<img src="./LockScreenPreview.png" alt="LockScreen Generator preview" width="250">
-
-# 🪄 LockScreen Generator
-
-### Moderní dynamická tapeta pro iPhone vytvořená v Scriptable
-### A modern dynamic iPhone Lock Screen wallpaper generator for Scriptable
-
-[![Version](https://img.shields.io/badge/version-2.10.0-0284c7?style=for-the-badge)](./LockScreenGenerator.js)
-[![Scriptable](https://img.shields.io/badge/Scriptable-iPhone-172033?style=for-the-badge)](https://apps.apple.com/app/scriptable/id1405459188)
-[![Languages](https://img.shields.io/badge/CZ%20%7C%20EN%20%7C%20DE%20%7C%20ES-4%20languages-172033?style=for-the-badge)](#jazyky--languages)
-
-**[📲 Instalovat do Scriptable](./LockScreenGenerator.scriptable)** · **[🌐 Scriptable Apps web](https://caseycz.github.io/Scriptable/)** · **[⬇️ Stáhnout .js](./LockScreenGenerator.js)** · **[ Scriptable pro iPhone](https://apps.apple.com/app/scriptable/id1405459188)**
-
-</div>
-
----
-
-## 🇨🇿 Čeština
-
-### ✨ Co to je
-
-`LockScreenGenerator.js` vytváří vlastní tapetu pro zamykací obrazovku iPhonu podle toho, co chceš opravdu vidět. Moduly lze zapínat, vypínat, přesouvat a upravovat přímo v moderním nastavení.
-
-> **Jeden JavaScript soubor. Žádné další moduly. Žádná povinná placená API.**
-
-### 🚀 Hlavní funkce
-
-| | Funkce | Co umí |
-|---|---|---|
-| 🎛️ | **Moderní nastavení** | tmavý dashboard, rychlé presety, kompaktní layout |
-| 👁️ | **Živý náhled** | tapetu zobrazí ještě před uložením |
-| 📐 | **Auto Fit** | automaticky zmenší obsah, když se nevejde |
-| 📱 | **Různé iPhony** | rozložení se přepočítává podle skutečného rozlišení |
-| 🔄 | **Aktualizace v aplikaci** | kontrola a instalace nové verze bez dalšího updater skriptu |
-| 🛟 | **Fail-open API** | výpadek jednoho zdroje nezablokuje nastavení ani ostatní moduly |
-| 🔐 | **Soukromé nastavení** | kalendáře, připomínky a API klíče zůstávají lokálně u uživatele |
-| 🌍 | **4 jazyky** | Čeština, English, Deutsch, Español |
-
-### 🧩 Moduly
-
-| Osobní | Online | Systém a další |
-|---|---|---|
-| 📅 Kalendář | 🌤 Počasí | 🔋 Baterie |
-| ✅ Připomínky | ⛅ Předpověď | ⚙️ Informace o zařízení |
-| 📝 Poznámka | 🏎 Formula 1 | 🌙 Fáze Měsíce |
-| ⏳ Odpočet | 🏆 Sport | 🌐 Světový čas |
-| 🏃 Kroky / aktivita | 📈 Akcie | 💬 Citát |
-|  | 🪙 Kryptoměny | 🎂 Jmeniny |
-|  | 💱 Kurzy měn | 📰 RSS zprávy |
-
-### ⚡ Rychlá instalace
-
-1. Nainstaluj **[Scriptable z App Storu](https://apps.apple.com/app/scriptable/id1405459188)** a jednou ho spusť.
-2. Na iPhonu zkus **[📲 Instalovat do Scriptable](./LockScreenGenerator.scriptable)**. Pokud iOS soubor jen stáhne, otevři `LockScreenGenerator.scriptable` ze Stažených / aplikace Soubory. Alternativně stáhni **[`LockScreenGenerator.js`](./LockScreenGenerator.js)**.
-3. Ulož soubor do složky **Scriptable** v iCloud Drive nebo zkopíruj jeho obsah do nového skriptu.
-4. Spusť skript.
-5. Při úplně prvním spuštění vyber jazyk.
-6. Nastav moduly a klepni na **👁 Náhled tapety**.
-
-### 📅 Kalendáře a připomínky
-
-Aplikace neobsahuje žádné přednastavené osobní kalendáře ani seznamy.
-
-V sekci **Kalendář a připomínky** použij **🔄 Načíst z tohoto iPhonu**. Scriptable načte kalendáře a seznamy Připomínek dostupné právě na daném telefonu a uživatel si zaškrtne pouze ty, které chce zobrazovat. Bez výběru se automaticky nezobrazuje všechno.
-
-### 🌤 API a zdroje
-
-Základní funkce jsou navržené tak, aby fungovaly **bez vlastních API klíčů**, pokud existuje bezplatný veřejný zdroj.
-
-| Modul | Výchozí zdroj | Vlastní API |
-|---|---|---|
-| 🌤 Počasí | Open-Meteo, bez klíče | volitelně OpenWeatherMap |
-| 🏎 Formula 1 | Jolpica / Ergast kompatibilní | není nutné |
-| 🏆 Sport | ESPN | není nutné |
-| 📈 Akcie | Yahoo Finance | volitelně Alpha Vantage |
-| 🪙 Krypto | Coinbase | není nutné |
-| 💱 Kurzy | free exchange-rate zdroj | volitelně ExchangeRate-API |
-| 📰 Zprávy | vlastní RSS URL | bez API klíče |
-
-V **🔑 API a zdroje** lze u podporovaných modulů vložit vlastní klíč. Klíče nejsou součástí veřejného JS, ukládají se jen do `LockScreenGenerator_settings.json` a při exportu nastavení do JSON se záměrně vynechávají.
-
-### 🛟 Fail-open chování
-
-Nefunkční API nesmí shodit aplikaci. Když některý zdroj neodpovídá, nastavení se pořád otevře, ostatní moduly fungují dál, použije se cache, pokud existuje, a jinak se daný blok přeskočí. Diagnostika zobrazí chybu místo pádu aplikace.
-
-### 👁️ Živý náhled + Auto Fit
-
-**Náhled tapety** používá aktuální rozepsané nastavení a ukáže výsledek ještě před zavřením dashboardu.
-
-**Auto Fit** při přetečení obsahu provede kontrolní render, změří výslednou výšku, podle potřeby zmenší obsah a respektuje minimální povolené měřítko.
-
-### 🏎 Formula 1
-
-F1 je samostatný modul. Lze nezávisle zapnout tréninky, kvalifikaci, sprint a závod.
-
-### 🔄 Aktualizace přímo z aplikace
-
-Vedle verze v horní části nastavení je tlačítko **↻ Aktualizace**. První klepnutí zkontroluje novou verzi. Pokud existuje, zobrazí se **⬇️ Aktualizovat na vX.Y.Z**. Před přepsáním se vytvoří `LockScreenGenerator_backup.js`, aktualizuje se pouze skript a `LockScreenGenerator_settings.json` zůstává zachovaný.
-
-Kontrola aktualizace se nespouští automaticky při startu, takže nedostupný GitHub nemůže zablokovat otevření aplikace.
-
-### 🧪 Diagnostika
-
-Diagnostika kontroluje například `Kalendář` · `Připomínky` · `Počasí` · `F1` · `ESPN` · `Yahoo Finance` · `Coinbase` · `Kurzy` · `RSS`.
-
-Stavy: 🟢 **V pořádku** · ⚪ **Vypnuto** · 🔴 **Chyba** · 🟡 **Kontroluji…**
-
-### 💾 Nastavení a soubory
-
-| Soubor | Účel |
-|---|---|
-| `LockScreenGenerator.js` | hlavní aplikace |
-| `LockScreenGenerator_settings.json` | lokální nastavení uživatele |
-| `LockScreenWallpaper.png` | výsledná tapeta |
-| `LockScreenPreview.png` | ořezaný náhled pro README a web |
-| `LockScreenGenerator_backup.js` | záloha před samoaktualizací |
-| `LockScreenGenerator_steps.txt` | volitelný vstup kroků ze Zkratek |
-
-### ⚙️ Automatizace přes Apple Zkratky
-
-Pro Zkratky použij parametr `overlay`. Skript vrátí průhledné PNG jako **Base64 text** (stejný princip jako původní LSWeather), takže nejsme závislí na předávání cesty k souboru. Ve Zkratkách použij: **Spustit Scriptable skript (`overlay`) → Base64: Dekódovat → Získat obrázek ze vstupu → Překrýt původní fotku → Nastavit tapetu Lock Screenu**.
-
----
-
-<a id="jazyky--languages"></a>
-## 🇬🇧 English
-
-### ✨ What it is
-
-`LockScreenGenerator.js` builds a configurable iPhone Lock Screen wallpaper from the modules you actually want. Everything is controlled from a modern settings dashboard.
-
-> **One JavaScript file. No extra modules. No mandatory paid APIs.**
-
-### 🚀 Highlights
-
-| | Feature | What it does |
-|---|---|---|
-| 🎛️ | **Modern settings** | dashboard UI, quick presets, compact layout |
-| 👁️ | **Live preview** | preview the wallpaper before saving |
-| 📐 | **Auto Fit** | automatically scales overflowing content |
-| 📱 | **Responsive iPhone layout** | uses the device's real screen resolution |
-| 🔄 | **In-app updates** | check and install a new version without a separate updater |
-| 🛟 | **Fail-open APIs** | one broken service never blocks settings or unrelated modules |
-| 🔐 | **Private configuration** | calendars, reminders and API keys stay local |
-| 🌍 | **4 languages** | Czech, English, German and Spanish |
-
-### ⚡ Quick install
-
-1. Install **[Scriptable from the App Store](https://apps.apple.com/app/scriptable/id1405459188)** and open it once.
-2. On iPhone, try **[📲 Install in Scriptable](./LockScreenGenerator.scriptable)**. If iOS only downloads the file, open `LockScreenGenerator.scriptable` from Downloads / Files. Alternatively download **[`LockScreenGenerator.js`](./LockScreenGenerator.js)**.
-3. Save it into Scriptable's iCloud Drive folder or paste the code into a new Scriptable script.
-4. Run it and choose your language on the first launch.
-5. Configure modules and use **👁 Wallpaper preview**.
-
-### 📅 Calendars and reminders
-
-Use **🔄 Load from this iPhone**. The script discovers calendars and Reminder lists available on that device and lets each user select only the sources they want. Nothing personal is bundled in the public script.
-
-### 🌤 APIs and data sources
-
-The default configuration works without personal API keys whenever a free public source exists: Open-Meteo for weather, Jolpica for Formula 1, ESPN for sports, Yahoo Finance for stocks, Coinbase for crypto, a free exchange-rate endpoint, and custom RSS feeds. Optional personal API providers are available for supported modules.
-
-Private API keys are stored only in the user's settings file and are intentionally removed from exported settings JSON.
-
-### 🛟 Fail-open behavior
-
-If a data source fails, settings still open, unrelated modules keep working, cached data may be used and the failed block is skipped if no cache exists.
-
-### 🔄 In-app self update
-
-The **↻ Update** button next to the version checks GitHub only after the user taps it. When a new version is available, the current script is backed up to `LockScreenGenerator_backup.js` before replacement. User settings are not overwritten.
-
----
-
-<div align="center">
-
-### 📱 Scriptable Apps
-
-Naše aplikace i vybrané projekty dalších vývojářů najdeš na našem webu.  
-Our apps and selected community projects are available on our website.
-
-**https://caseycz.github.io/Scriptable/**
-
-Built for **Scriptable + iPhone + Shortcuts**
-
-</div>
-
-## 🖼 Zdroje tapety (v2.10.0)
-
-LockScreen Generator má dva režimy základní fotografie:
-
-- **Fotka uložená v generátoru** – v Nastavení → Tapeta jednou vyber fotografii. Při spuštění ze Zkratek není potřeba žádný vstupní obrázek; skript vytvoří hotovou tapetu.
-- **Fotka ze Zkratek** – Zkratka může vybrat libovolnou nebo náhodnou fotografii z alba a předat ji do pole **Images** akce **Run Script**. Generátor fotografii sám ořízne na poměr displeje a spojí s překrytím.
-
-Pokud je dostupná základní fotka, skript uloží hotový výsledek do `LockScreenWallpaper.png` a vrátí jeho iCloud cestu. Starý režim `overlay`/Base64 zůstává jako kompatibilní fallback, když není předaná ani uložená fotka.
+<p align="center">
+  <img src="../../readme-header.svg" alt="Scriptable Apps by CaseyCZ" width="100%" />
+</p>
+
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Čeština" /></a>
+  <a href="README_EN.md"><img src="https://img.shields.io/badge/EN-English-172033?style=for-the-badge&labelColor=111827" alt="English" /></a>
+</p>
+
+<h1 align="center">🪄 LockScreen Generator</h1>
+
+<p align="center">
+  Nástroj pro <strong>Scriptable</strong>, který vytváří vlastní dynamickou tapetu zamykací obrazovky iPhonu.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/VERZE-v2.10.0-38BDF8?style=for-the-badge&labelColor=0284C7" alt="LockScreen Generator verze 2.10.0" />
+</p>
+
+<p align="center">
+  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable katalog" /></a>
+  <a href="https://github.com/CaseyCZ/Scriptable/tree/Master/apps/LockScreenGenerator"><img src="https://img.shields.io/badge/GitHub-Projekt-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="LockScreen Generator GitHub" /></a>
+  <a href="./LockScreenGenerator.scriptable"><img src="https://img.shields.io/badge/Instalovat-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Instalovat LockScreen Generator" /></a>
+</p>
+
+## O aplikaci
+
+**LockScreen Generator** umožňuje sestavit tapetu podle toho, co chceš na Lock Screenu opravdu vidět. Obsah, pořadí, vzhled i jednotlivé moduly lze upravit přímo v aplikaci.
+
+## Hlavní funkce
+
+- 📅 kalendář a připomínky
+- 🌤️ počasí a předpověď
+- 🏎️ Formula 1 a sport
+- 📈 finance, krypto a kurzy
+- 🌙 další informační moduly včetně světového času a fází Měsíce
+- 👁️ živý náhled tapety
+- 📐 automatické přizpůsobení různým iPhonům
+- 🌍 čeština, angličtina, němčina a španělština
+- 🔄 aktualizace přímo z aplikace
+
+<p align="center">
+  <img src="./LockScreenPreview.png" alt="LockScreen Generator preview" width="250" />
+</p>
+
+## Odkazy
+
+<p>
+  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable App Store" /></a>
+  <a href="./LockScreenGenerator.js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout JavaScript" /></a>
+</p>
+
+## Podpora
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Podpo%C5%99it%20CaseyCZ-Buy%20Me%20a%20Coffee-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Podpořit CaseyCZ" /></a>
+</p>
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://caseycz.github.io/support-qr.svg" width="150" alt="QR kód Buy Me a Coffee CaseyCZ" /></a><br>
+  <sub>Naskenuj QR kód nebo klikni na tlačítko.</sub>
+</p>
