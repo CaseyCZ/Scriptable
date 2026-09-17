@@ -1,78 +1,70 @@
-# 🏆 Sports Info
+<p align="center">
+  <img src="../../readme-header.svg" alt="Scriptable Apps by CaseyCZ" width="100%" />
+</p>
 
-**Sports Info v2.5.30 — Production** je univerzální sportovní widget pro Scriptable se zachovaným původním rozhraním a online sportovními daty.
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Čeština" /></a>
+  <a href="README_EN.md"><img src="https://img.shields.io/badge/EN-English-172033?style=for-the-badge&labelColor=111827" alt="English" /></a>
+</p>
 
-## Sporty
+<h1 align="center">🏆 Sports Info</h1>
 
-- ⚽ Fotbal — Chance Liga, Premier League, LaLiga, Bundesliga, Serie A, Ligue 1, Liga mistrů a Evropská liga
-- 🏒 Hokej — NHL, Tipsport Extraliga, SHL, Liiga, National League, CHL, MS a NCAA
-- 🏀 Basketbal — NBA, WNBA, EuroLeague, EuroCup, NBL, ACB, BBL, LNB a NCAA
-- 🥅 Florbal — česká, švédská, finská a švýcarská liga + MS IFF
-- ⚾ Baseball — MLB, česká Extraliga, NPB, KBO, LMB a NCAA
+<p align="center">
+  Univerzální sportovní widget pro <strong>Scriptable</strong> s výsledky, dalšími zápasy a tabulkami více sportů a soutěží.
+</p>
 
-## Online data a automatická obnova
+<p align="center">
+  <img src="https://img.shields.io/badge/VERZE-v2.5.30-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Info verze 2.5.30" />
+</p>
 
-Sports Info načítá při spuštění widgetu aktuální online data. Ruční tlačítko **Update** není určeno pro výsledky nebo tabulky — aktualizuje pouze samotný kód aplikace.
+<p align="center">
+  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable katalog" /></a>
+  <a href="https://github.com/CaseyCZ/Scriptable/tree/Master/apps/Sports-Info"><img src="https://img.shields.io/badge/GitHub-Projekt-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="Sports Info GitHub" /></a>
+  <a href="./Sports%20Info.scriptable"><img src="https://img.shields.io/badge/Instalovat-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Instalovat Sports Info" /></a>
+</p>
 
-Widget požádá iOS o další obnovu podle situace:
+## O aplikaci
 
-- 🔴 **LIVE zápas:** za 2 minuty
-- ⏱️ **zápas začíná do 30 minut:** za 5 minut
-- 🕒 **běžný stav:** podle intervalu nastaveného uživatelem
+**Sports Info** zobrazuje sportovní data v jednom widgetu a umožňuje vybrat sport, soutěž a oblíbený tým. Rozložení se automaticky přizpůsobuje velikosti widgetu a jednotlivým sekcím.
 
-`refreshAfterDate` určuje nejdřívější požadovaný čas obnovy; skutečný okamžik spuštění widgetu řídí iOS.
+## Podporované sporty
 
-Cache slouží pouze jako nouzová záloha při výpadku internetu nebo datového zdroje.
+- ⚽ fotbal
+- 🏒 hokej
+- 🏀 basketbal
+- 🥅 florbal
+- ⚾ baseball
 
-## Template a funkce
+## Hlavní funkce
 
-### Samostatné AUTO zarovnání sekcí v2.5.30
+- 🔴 live stav zápasu
+- ⏭️ příští zápasy a ⏮️ poslední výsledky
+- 📊 tabulky a forma týmů
+- 🎯 výběr sportu, soutěže a oblíbeného týmu
+- 📱 Small / Medium / Large widgety
+- 📐 automatické i ruční zarovnání
+- 👁️ náhled widgetu přímo z nastavení
+- 🌍 čeština, angličtina, němčina a španělština
+- 🔄 aktualizace aplikace přímo ze Scriptable
 
-- AUTO layout se počítá **pro každou sekci samostatně**, nikoli jednou pro celý widget.
-- `PŘÍŠTÍ` používá pouze svoje zápasy a `POSLEDNÍ` pouze svoje výsledky, takže obsah jedné sekce už nemění šířky druhé.
-- Hlavní zápas, seznamy zápasů a tabulka mají vlastní layout logiku. Tabulka dál používá sportovní profil sloupců podle typu sportu.
-- Stejný princip platí napříč podporovanými sporty a pro Small / Medium / Large všude, kde se daná sekce zobrazuje.
-- Skóre, čas a statistické hodnoty mají konzervativnější rezervu šířky a při krajním nedostatku místa mohou využít nativní zmenšení textu místo ořezu na `…`.
-- MANUAL režim zůstává zachovaný pro ruční šířky a zarovnání. AUTO změny nepřepisují uložené manuální profily.
-- Release obsahuje synchronizovaný `Sports Info.js` a `Sports Info.scriptable`; automatické testy kontrolují syntaxi, geometrii, AUTO/MANUAL režimy a shodu instalačního balíčku.
+<p align="center">
+  <img src="./Sports%20Info.jpg" alt="Sports Info preview" width="420" />
+</p>
 
-### Oprava AUTO tabulky v2.5.24
+## Odkazy
 
-- Rozpočet šířky podle standardních rozměrů widgetu iPhonu a bočního odsazení; pro neznámé/zoomované rozměry konzervativní odhad. Scriptable neposkytuje skutečnou změřenou šířku hostitelského widgetu.
-- Společné šířky hlavičky a všech zobrazených řádků, vyhrazené místo pro celé skóre, procenta a body.
-- V AUTO mají statistiky neproporcionální písmo. Při nedostatku místa se přizpůsobí velikost písma, nikoli počet sloupců. Výjimečně dlouhé hodnoty mohou využít nativní zmenšení textu.
-- Změna písma nebo zarovnání nevypíná AUTO; do MANUAL přepíná pouze úprava číselné šířky.
-- Offline regresní test: `node .github/scripts/test_sports_info_layout.cjs`. Testy geometrie a mockovaných nativních prvků nenahrazují kontrolu na skutečném iPhonu.
-- Aktualizátor, identita skriptu a vstupní widgetová větev zůstávají beze změny.
+<p>
+  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable App Store" /></a>
+  <a href="./Sports%20Info.js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout JavaScript" /></a>
+</p>
 
-- Small widget: loga zůstávají zachovaná a název týmu se může zalomit až na 2 řádky
-- Large widget: tabulka dynamicky využívá volné místo a přitom drží bezpečný limit řádků
+## Podpora
 
-- původní moderní tmavé nastavení ve stylu LockScreen Generatoru
-- Small / Medium / Large náhled přímo z nastavení
-- výběr sportu, soutěže a oblíbeného týmu
-- přehledné **Nastavení widgetu** s vysvětlením každé volby a doporučeným presetem
-- automatické přizpůsobení obsahu pro Small / Medium / Large
-- live stav, poslední a příští zápasy, tabulka a forma
-- samostatná sekce **API a zdroje**
-- samostatná **Diagnostika** zdroje, týmů, tabulky a cache
-- **Záloha a údržba** — export/import, vymazání cache, částečný i úplný reset
-- fail-open: nastavení se otevře i bez internetu; widget použije cache pouze při výpadku online zdroje
-- migrace starého `FootballInfo_settings.json` při prvním spuštění Sports Info
-- CZ / EN / DE / ES
-- aktualizace kódu přímo ze Scriptable
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Podpo%C5%99it%20CaseyCZ-Buy%20Me%20a%20Coffee-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Podpořit CaseyCZ" /></a>
+</p>
 
-## Datové zdroje
-
-Sports Info používá veřejné zdroje bez osobního API klíče. Fotbal používá OneFootball s ESPN a FotMob fallbackem. NHL, WNBA/NBA, NCAA a MLB používají ESPN. Evropské a další vybrané hokejové, basketbalové, florbalové a baseballové soutěže používají veřejná data z Livesportu.
-
-Livesport integrace nevyužívá oficiální veřejné API; čte veřejná data vložená do stránky soutěže. Proto zůstává zapnutá cache/fail-open logika. Pokud zdroj neposkytne tabulku ve stejném veřejném feedu, diagnostika to zobrazí informativně jako `0 rows`, nikoli jako chybu zdroje.
-
-Ve výchozím stavu není potřeba žádný API klíč. SportsAPI Pro zůstává v pokročilém nastavení jako volitelný zdroj s vlastním klíčem.
-
-## Instalace
-
-- [`Sports Info.scriptable`](./Sports%20Info.scriptable)
-- [`Sports Info.js`](./Sports%20Info.js)
-
-> Runtime zůstává v jednom souboru `Sports Info.js`.
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://caseycz.github.io/support-qr.svg" width="150" alt="QR kód Buy Me a Coffee CaseyCZ" /></a><br>
+  <sub>Naskenuj QR kód nebo klikni na tlačítko.</sub>
+</p>
