@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="README.md"><img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-172033?style=for-the-badge&labelColor=111827" alt="Czech" /></a>
-  <a href="README_EN.md"><img src="https://img.shields.io/badge/EN-English-38BDF8?style=for-the-badge&labelColor=0284C7" alt="English" /></a>
+  <img src="https://img.shields.io/badge/EN-English-38BDF8?style=for-the-badge&labelColor=0284C7" alt="English" />
 </p>
 
 <h1 align="center">🏆 Sports Info</h1>
@@ -19,7 +19,6 @@
 
 <p align="center">
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Website-Catalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable catalog" /></a>
-  <a href="https://github.com/CaseyCZ/Scriptable/tree/Master/apps/Sports-Info"><img src="https://img.shields.io/badge/GitHub-Project-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="Sports Info GitHub" /></a>
   <a href="./Sports%20Info.scriptable"><img src="https://img.shields.io/badge/Install-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Install Sports Info" /></a>
 </p>
 
