@@ -12,9 +12,8 @@
 </p>
 
 <p align="center">
-  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Scriptable%20Catalog-OTEV%C5%98%C3%8DT-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Otevřít Scriptable katalog" /></a>
-  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable%20pro%20iPhone-App%20Store-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Scriptable pro iPhone" /></a>
-  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Podpo%C5%99it%20CaseyCZ-OTEV%C5%98%C3%8DT-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Podpořit CaseyCZ" /></a>
+  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog%20aplikac%C3%AD-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable katalog" /></a>
+  <a href="https://github.com/CaseyCZ/Scriptable"><img src="https://img.shields.io/badge/GitHub-Repozit%C3%A1%C5%99-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="Scriptable GitHub" /></a>
 </p>
 
 ## Aplikace
@@ -30,20 +29,24 @@
 
 ## O projektu
 
-Scriptable Apps vznikají jako praktické nástroje pro každodenní použití na iPhonu. Každá aplikace má vlastní stránku, instalační balíček a informace k použití.
-
-Veřejný katalog obsahuje také vybrané komunitní Scriptable projekty dalších autorů. U nich zůstává zachovaný původní autor i odkaz na původní repozitář.
-
-## Hlavní odkazy
+Scriptable Apps jsou praktické nástroje pro každodenní použití na iPhonu. Každá aplikace má vlastní README, instalační soubor a přehled hlavních funkcí.
 
 <p>
-  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog%20aplikac%C3%AD-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Katalog aplikací" /></a>
-  <a href="https://github.com/CaseyCZ/Scriptable/issues/new/choose"><img src="https://img.shields.io/badge/GitHub-Nahl%C3%A1sit%20probl%C3%A9m-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="Nahlásit problém" /></a>
+  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable pro iPhone" /></a>
+  <a href="https://github.com/CaseyCZ/Scriptable/issues/new/choose"><img src="https://img.shields.io/badge/GitHub-Nahl%C3%A1sit%20probl%C3%A9m-172033?style=for-the-badge&labelColor=111827&logo=github&logoColor=white" alt="Nahlásit problém" /></a>
 </p>
 
-## CaseyCZ
+## Podpora
 
 <p align="center">
-  <a href="https://caseycz.github.io/"><img src="https://img.shields.io/badge/CaseyCZ%20Website-OTEV%C5%98%C3%8DT-38BDF8?style=for-the-badge&labelColor=0284C7" alt="CaseyCZ Website" /></a>
   <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Podpo%C5%99it%20CaseyCZ-Buy%20Me%20a%20Coffee-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Podpořit CaseyCZ" /></a>
+</p>
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://caseycz.github.io/support-qr.svg" width="150" alt="QR kód Buy Me a Coffee CaseyCZ" /></a><br>
+  <sub>Naskenuj QR kód nebo klikni na tlačítko.</sub>
+</p>
+
+<p align="center">
+  <a href="https://caseycz.github.io/"><img src="https://img.shields.io/badge/CaseyCZ%20Website-Otev%C5%99%C3%ADt-172033?style=flat-square&labelColor=111827" alt="CaseyCZ Website" /></a>
 </p>
