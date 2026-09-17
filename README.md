@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md"><img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Čeština" /></a>
+  <img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Čeština" />
   <a href="README_EN.md"><img src="https://img.shields.io/badge/EN-English-172033?style=for-the-badge&labelColor=111827" alt="English" /></a>
 </p>
 
@@ -13,7 +13,6 @@
 
 <p align="center">
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog%20aplikac%C3%AD-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable katalog" /></a>
-  <a href="https://github.com/CaseyCZ/Scriptable"><img src="https://img.shields.io/badge/GitHub-Repozit%C3%A1%C5%99-38BDF8?style=for-the-badge&labelColor=0284C7&logo=github&logoColor=white" alt="Scriptable GitHub" /></a>
 </p>
 
 ## Aplikace
