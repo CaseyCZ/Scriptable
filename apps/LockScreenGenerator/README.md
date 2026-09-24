@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/VERZE-v2.10.1-38BDF8?style=for-the-badge&labelColor=0284C7" alt="LockScreen Generator verze 2.10.1" />
+  <img src="https://img.shields.io/badge/VERZE-v2.10.2-38BDF8?style=for-the-badge&labelColor=0284C7" alt="LockScreen Generator verze 2.10.2" />
 </p>
 
 <p align="center">
