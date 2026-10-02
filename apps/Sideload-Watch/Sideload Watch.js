@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.3.1
+// Sideload Watch v0.3.2
 // CaseyCZ Scriptable Apps
 // Watches selected apps from selected iOS-Hub sources.
 // Settings UI follows the LockScreen Generator / Sports Info style.
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.3.1";
+const APP_VERSION = "0.3.2";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -27,10 +27,10 @@ const DEFAULTS = {
   refreshMinutes: 30,
   widgetTitle: "Sideload Watch",
   footerLabel: "",
-  showHeaderIcon: true,
-  showTitle: true,
   showNewBadge: true,
   showVersion: true,
+  showHeaderIcon: true,
+  showTitle: true,
   showUpdateCount: true,
   showCheckedTime: true,
   useCustomColors: false,
@@ -58,7 +58,7 @@ const UI = {
     sourcesDetail: "Vyber source, které chceš sledovat.",
     appsDetail: "V každém vybraném source zvol konkrétní aplikace.",
     preview: "Náhled widgetu", previewSub: "Vzhled widgetu zůstává stejný; tady ho můžeš jen otestovat.",
-    real: "Reálný", demo: "Demo · 7 NEW", settings: "Nastavení", language: "Jazyk", appearance: "Vzhled widgetu", appearanceDetail: "Název, popisek, viditelnost prvků a barvy.", widgetTitle: "Název widgetu", footerLabel: "Vlastní spodní popisek", footerLabelDetail: "Nech prázdné pro automatický text podle jazyka.", showHeaderIcon: "Zobrazit ikonu", showTitle: "Zobrazit název", showNewBadge: "Zobrazit NEW", showVersion: "Zobrazit verzi", showUpdateCount: "Zobrazit počet aktualizací", showCheckedTime: "Zobrazit čas kontroly", useCustomColors: "Použít vlastní barvy", colors: "Barvy", backgroundColor: "Pozadí", textColor: "Hlavní text", secondaryTextColor: "Vedlejší text / verze", iconColor: "Ikona", newTextColor: "Text NEW", newBackgroundColor: "Pozadí NEW", countColor: "Počet aktualizací", errorColor: "Offline / chyba", resetAppearance: "Obnovit výchozí vzhled",
+    real: "Reálný", demo: "Demo · 7 NEW", settings: "Nastavení", language: "Jazyk", appearance: "Vzhled widgetu", appearanceDetail: "Uprav vzhled bez změny rozložení widgetu.", widgetTitle: "Název widgetu", footerLabel: "Spodní popisek", footerLabelDetail: "Nech prázdné pro automatický text podle jazyka.", showNewBadge: "Zobrazit NEW", showVersion: "Zobrazit verzi", showHeaderIcon: "Zobrazit ikonu", showTitle: "Zobrazit název", showUpdateCount: "Zobrazit počet aktualizací", showCheckedTime: "Zobrazit čas kontroly", useCustomColors: "Použít vlastní barvy", colors: "Barvy", backgroundColor: "Pozadí", textColor: "Hlavní text", secondaryTextColor: "Vedlejší text / verze", iconColor: "Ikona", newTextColor: "Text NEW", newBackgroundColor: "Pozadí NEW", countColor: "Počet aktualizací", errorColor: "Offline / chyba", resetAppearance: "Obnovit výchozí vzhled",
     refresh: "Obnova widgetu", minutes: "min", tools: "Nástroje",
     markSeen: "Označit vše jako přečtené", markSeenDetail: "Aktuální verze se uloží jako výchozí stav.",
     resetVersions: "Reset historie verzí", resetVersionsDetail: "Při další kontrole se vytvoří nový výchozí stav.",
@@ -79,7 +79,7 @@ const UI = {
     sources: "Sources", apps: "Apps", tracking: "Tracking",
     sourcesDetail: "Choose the sources you want to watch.", appsDetail: "Choose specific apps inside each selected source.",
     preview: "Widget preview", previewSub: "The widget design stays unchanged; preview it here.",
-    real: "Real", demo: "Demo · 7 NEW", settings: "Settings", language: "Language", appearance: "Widget appearance", appearanceDetail: "Title, label, element visibility and colors.", widgetTitle: "Widget title", footerLabel: "Custom footer label", footerLabelDetail: "Leave empty for the automatic localized text.", showHeaderIcon: "Show icon", showTitle: "Show title", showNewBadge: "Show NEW", showVersion: "Show version", showUpdateCount: "Show update count", showCheckedTime: "Show checked time", useCustomColors: "Use custom colors", colors: "Colors", backgroundColor: "Background", textColor: "Primary text", secondaryTextColor: "Secondary text / version", iconColor: "Icon", newTextColor: "NEW text", newBackgroundColor: "NEW background", countColor: "Update count", errorColor: "Offline / error", resetAppearance: "Reset default appearance",
+    real: "Real", demo: "Demo · 7 NEW", settings: "Settings", language: "Language", appearance: "Widget appearance", appearanceDetail: "Customize the look without changing the widget layout.", widgetTitle: "Widget title", footerLabel: "Footer label", footerLabelDetail: "Leave empty for the automatic localized text.", showNewBadge: "Show NEW", showVersion: "Show version", showHeaderIcon: "Show icon", showTitle: "Show title", showUpdateCount: "Show update count", showCheckedTime: "Show checked time", useCustomColors: "Use custom colors", colors: "Colors", backgroundColor: "Background", textColor: "Primary text", secondaryTextColor: "Secondary text / version", iconColor: "Icon", newTextColor: "NEW text", newBackgroundColor: "NEW background", countColor: "Update count", errorColor: "Offline / error", resetAppearance: "Reset appearance",
     refresh: "Widget refresh", minutes: "min", tools: "Tools",
     markSeen: "Mark all as seen", markSeenDetail: "Current versions become the new baseline.",
     resetVersions: "Reset version history", resetVersionsDetail: "A new baseline will be created on the next check.",
@@ -95,7 +95,7 @@ const UI = {
   de: {
     subtitle: "Neue App-Versionen aus ausgewählten iOS-Hub-Quellen überwachen.",
     sources: "Sources", apps: "Apps", tracking: "Überwachung", sourcesDetail: "Wähle die Sources, die du überwachen möchtest.", appsDetail: "Wähle in jeder Source die gewünschten Apps.",
-    preview: "Widget-Vorschau", previewSub: "Das Widget-Design bleibt unverändert; hier kannst du es testen.", real: "Echt", demo: "Demo · 7 NEW", settings: "Einstellungen", language: "Sprache", appearance: "Widget-Aussehen", appearanceDetail: "Titel, Beschriftung, sichtbare Elemente und Farben.", widgetTitle: "Widget-Titel", footerLabel: "Eigene Fußzeile", footerLabelDetail: "Leer lassen für den automatisch lokalisierten Text.", showHeaderIcon: "Symbol anzeigen", showTitle: "Titel anzeigen", showNewBadge: "NEW anzeigen", showVersion: "Version anzeigen", showUpdateCount: "Update-Anzahl anzeigen", showCheckedTime: "Prüfzeit anzeigen", useCustomColors: "Eigene Farben verwenden", colors: "Farben", backgroundColor: "Hintergrund", textColor: "Haupttext", secondaryTextColor: "Sekundärtext / Version", iconColor: "Symbol", newTextColor: "NEW-Text", newBackgroundColor: "NEW-Hintergrund", countColor: "Update-Anzahl", errorColor: "Offline / Fehler", resetAppearance: "Standard-Aussehen wiederherstellen",
+    preview: "Widget-Vorschau", previewSub: "Das Widget-Design bleibt unverändert; hier kannst du es testen.", real: "Echt", demo: "Demo · 7 NEW", settings: "Einstellungen", language: "Sprache", appearance: "Widget-Aussehen", appearanceDetail: "Aussehen anpassen, ohne das Layout zu ändern.", widgetTitle: "Widget-Titel", footerLabel: "Fußzeile", footerLabelDetail: "Leer lassen für den automatisch lokalisierten Text.", showNewBadge: "NEW anzeigen", showVersion: "Version anzeigen", showHeaderIcon: "Symbol anzeigen", showTitle: "Titel anzeigen", showUpdateCount: "Update-Anzahl anzeigen", showCheckedTime: "Prüfzeit anzeigen", useCustomColors: "Eigene Farben verwenden", colors: "Farben", backgroundColor: "Hintergrund", textColor: "Haupttext", secondaryTextColor: "Sekundärtext / Version", iconColor: "Symbol", newTextColor: "NEW-Text", newBackgroundColor: "NEW-Hintergrund", countColor: "Update-Anzahl", errorColor: "Offline / Fehler", resetAppearance: "Aussehen zurücksetzen",
     refresh: "Widget-Aktualisierung", minutes: "Min", tools: "Werkzeuge", markSeen: "Alles als gesehen markieren", markSeenDetail: "Aktuelle Versionen werden als Ausgangsstand gespeichert.",
     resetVersions: "Versionsverlauf zurücksetzen", resetVersionsDetail: "Beim nächsten Prüfen wird ein neuer Ausgangsstand erstellt.", update: "Update", current: "Aktuell", available: "Verfügbare Version", apply: "Aktualisieren", cancel: "Abbrechen",
     updateTest: "Updates werden aktiviert, sobald Sideload Watch im Repository liegt.", updateFail: "Update-Prüfung fehlgeschlagen.", updatedOk: "Update installiert. Skript erneut starten.", back: "Zurück",
@@ -107,7 +107,7 @@ const UI = {
   es: {
     subtitle: "Controla nuevas versiones de apps de las fuentes elegidas de iOS-Hub.",
     sources: "Sources", apps: "Apps", tracking: "Seguimiento", sourcesDetail: "Elige las sources que quieres seguir.", appsDetail: "Elige aplicaciones concretas dentro de cada source.",
-    preview: "Vista previa", previewSub: "El diseño del widget no cambia; puedes probarlo aquí.", real: "Real", demo: "Demo · 7 NEW", settings: "Ajustes", language: "Idioma", appearance: "Apariencia del widget", appearanceDetail: "Título, etiqueta, visibilidad de elementos y colores.", widgetTitle: "Título del widget", footerLabel: "Etiqueta inferior personalizada", footerLabelDetail: "Déjalo vacío para usar el texto automático según el idioma.", showHeaderIcon: "Mostrar icono", showTitle: "Mostrar título", showNewBadge: "Mostrar NEW", showVersion: "Mostrar versión", showUpdateCount: "Mostrar número de actualizaciones", showCheckedTime: "Mostrar hora de comprobación", useCustomColors: "Usar colores personalizados", colors: "Colores", backgroundColor: "Fondo", textColor: "Texto principal", secondaryTextColor: "Texto secundario / versión", iconColor: "Icono", newTextColor: "Texto NEW", newBackgroundColor: "Fondo NEW", countColor: "Número de actualizaciones", errorColor: "Offline / error", resetAppearance: "Restablecer apariencia",
+    preview: "Vista previa", previewSub: "El diseño del widget no cambia; puedes probarlo aquí.", real: "Real", demo: "Demo · 7 NEW", settings: "Ajustes", language: "Idioma", appearance: "Apariencia del widget", appearanceDetail: "Personaliza el aspecto sin cambiar el diseño.", widgetTitle: "Título del widget", footerLabel: "Etiqueta inferior", footerLabelDetail: "Déjalo vacío para usar el texto automático según el idioma.", showNewBadge: "Mostrar NEW", showVersion: "Mostrar versión", showHeaderIcon: "Mostrar icono", showTitle: "Mostrar título", showUpdateCount: "Mostrar número de actualizaciones", showCheckedTime: "Mostrar hora de comprobación", useCustomColors: "Usar colores personalizados", colors: "Colores", backgroundColor: "Fondo", textColor: "Texto principal", secondaryTextColor: "Texto secundario / versión", iconColor: "Icono", newTextColor: "Texto NEW", newBackgroundColor: "Fondo NEW", countColor: "Número de actualizaciones", errorColor: "Offline / error", resetAppearance: "Restablecer apariencia",
     refresh: "Actualización del widget", minutes: "min", tools: "Herramientas", markSeen: "Marcar todo como visto", markSeenDetail: "Las versiones actuales se guardarán como referencia.",
     resetVersions: "Restablecer historial", resetVersionsDetail: "En la próxima comprobación se creará una nueva referencia.", update: "Actualización", current: "Actual", available: "Versión disponible", apply: "Actualizar", cancel: "Cancelar",
     updateTest: "Las actualizaciones se activarán cuando Sideload Watch esté en el repositorio.", updateFail: "Falló la comprobación de actualización.", updatedOk: "Actualización instalada. Ejecuta el script de nuevo.", back: "Atrás",
@@ -144,7 +144,9 @@ function mergeSettings(raw) {
   s.refreshMinutes = Math.max(15, Math.min(120, Number(s.refreshMinutes) || 30));
   s.widgetTitle = String(s.widgetTitle ?? DEFAULTS.widgetTitle).slice(0, 40);
   s.footerLabel = String(s.footerLabel ?? "").slice(0, 40);
-  for (const k of ["showHeaderIcon","showTitle","showNewBadge","showVersion","showUpdateCount","showCheckedTime","useCustomColors"]) s[k] = s[k] === true || (s[k] !== false && DEFAULTS[k] === true);
+  for (const k of ["showNewBadge","showVersion","showHeaderIcon","showTitle","showUpdateCount","showCheckedTime","useCustomColors"]) {
+    if (typeof s[k] !== "boolean") s[k] = DEFAULTS[k];
+  }
   for (const k of ["backgroundColor","textColor","secondaryTextColor","iconColor","newTextColor","newBackgroundColor","countColor","errorColor"]) {
     if (!/^#[0-9a-fA-F]{6}$/.test(String(s[k] || ""))) s[k] = DEFAULTS[k];
   }
@@ -271,10 +273,10 @@ function widgetColors(settings) {
     };
   }
   return {
-    bg: new Color(settings.backgroundColor), panel: new Color(settings.backgroundColor),
-    text: new Color(settings.textColor), muted: new Color(settings.secondaryTextColor),
-    border: new Color(settings.secondaryTextColor), green: new Color(settings.newTextColor), greenSoft: new Color(settings.newBackgroundColor),
-    count: new Color(settings.countColor), red: new Color(settings.errorColor), blue: new Color(settings.iconColor),
+    bg:new Color(settings.backgroundColor),panel:new Color(settings.backgroundColor),
+    text:new Color(settings.textColor),muted:new Color(settings.secondaryTextColor),
+    border:new Color(settings.secondaryTextColor),green:new Color(settings.newTextColor),greenSoft:new Color(settings.newBackgroundColor),
+    count:new Color(settings.countColor),red:new Color(settings.errorColor),blue:new Color(settings.iconColor),
   };
 }
 function layoutForFamily(family) {
@@ -363,7 +365,7 @@ function settingsHTML(settings, catalogModel, catalogMode) {
   <div class="previewGrid"><button class="previewBtn" onclick="preview('small',false)">Small</button><button class="previewBtn" onclick="preview('medium',false)">Medium</button><button class="previewBtn" onclick="preview('large',false)">Large</button></div>
   <button class="actionBtn secondary" style="width:100%;margin-bottom:13px" onclick="preview('medium',true)">${esc(L.demo)}</button>
   <div class="sectionTitle">${esc(L.settings)}</div>
-  <div class="card"><div class="navRow" onclick="showScreen('appearance')"><div class="navLeft"><span class="navIcon">🎨</span><span>${esc(L.appearance)}</span></div><div class="navRight"><span class="chevron">›</span></div></div><div class="field"><label>${esc(L.language)}</label><select id="language" onchange="setLanguage(this.value)">${langOptions}</select></div><div class="field"><label>${esc(L.refresh)}</label><select id="refreshMinutes" onchange="saveBasic()">${refreshOptions}</select></div></div>
+  <div class="card"><div class="field"><label>${esc(L.language)}</label><select id="language" onchange="setLanguage(this.value)">${langOptions}</select></div><div class="field"><label>${esc(L.refresh)}</label><select id="refreshMinutes" onchange="saveBasic()">${refreshOptions}</select></div><div class="navRow" onclick="showScreen('appearance')"><div class="navLeft"><span class="navIcon">🎨</span><span>${esc(L.appearance)}</span></div><div class="navRight"><span class="chevron">›</span></div></div></div>
   <div class="sectionTitle">${esc(L.diagnostics)}</div>
   <div class="card"><div class="diag"><div><strong>iOS-Hub catalog</strong><div class="rowDetail">data/catalog.json</div></div><span class="${catalogMode === "online" ? "ok" : catalogMode === "cache" ? "warn" : "bad"}">${catalogMode === "online" ? "● ONLINE" : catalogMode === "cache" ? "● CACHE" : "● ERROR"}</span></div></div>
   <div class="sectionTitle">${esc(L.tools)}</div>
@@ -377,10 +379,10 @@ function settingsHTML(settings, catalogModel, catalogMode) {
   <div class="card">
     <div class="field"><label>${esc(L.widgetTitle)}</label><input id="widgetTitle" type="text" maxlength="40" value="${esc(settings.widgetTitle)}" oninput="saveAppearance()"></div>
     <div class="field"><label>${esc(L.footerLabel)}</label><div class="rowDetail" style="margin:-2px 0 9px">${esc(L.footerLabelDetail)}</div><input id="footerLabel" type="text" maxlength="40" value="${esc(settings.footerLabel)}" oninput="saveAppearance()"></div>
-    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showHeaderIcon)}</div></div><span class="switch"><input id="showHeaderIcon" type="checkbox" ${settings.showHeaderIcon?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
-    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showTitle)}</div></div><span class="switch"><input id="showTitle" type="checkbox" ${settings.showTitle?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
     <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showNewBadge)}</div></div><span class="switch"><input id="showNewBadge" type="checkbox" ${settings.showNewBadge?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
     <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showVersion)}</div></div><span class="switch"><input id="showVersion" type="checkbox" ${settings.showVersion?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showHeaderIcon)}</div></div><span class="switch"><input id="showHeaderIcon" type="checkbox" ${settings.showHeaderIcon?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showTitle)}</div></div><span class="switch"><input id="showTitle" type="checkbox" ${settings.showTitle?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
     <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showUpdateCount)}</div></div><span class="switch"><input id="showUpdateCount" type="checkbox" ${settings.showUpdateCount?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
     <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showCheckedTime)}</div></div><span class="switch"><input id="showCheckedTime" type="checkbox" ${settings.showCheckedTime?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
   </div>
@@ -410,9 +412,9 @@ function updateCounts(){document.getElementById('sourceCount').textContent=state
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='sources')renderSources();if(id==='apps')renderSelectedSources();window.scrollTo(0,0)}
 function save(){native({action:'save',settings:state});updateCounts()}
 function saveBasic(){state.refreshMinutes=Number(document.getElementById('refreshMinutes').value)||30;save()}
-function saveAppearance(){const textIds=['widgetTitle','footerLabel'],boolIds=['showHeaderIcon','showTitle','showNewBadge','showVersion','showUpdateCount','showCheckedTime','useCustomColors'],colorIds=['backgroundColor','textColor','secondaryTextColor','iconColor','newTextColor','newBackgroundColor','countColor','errorColor'];for(const id of textIds){const e=document.getElementById(id);if(e)state[id]=e.value}for(const id of boolIds){const e=document.getElementById(id);if(e)state[id]=!!e.checked}for(const id of colorIds){const e=document.getElementById(id);if(e){state[id]=e.value.toUpperCase();const code=document.getElementById(id+'Code');if(code)code.textContent=state[id]}}save()}
+function saveAppearance(){const textIds=['widgetTitle','footerLabel'],boolIds=['showNewBadge','showVersion','showHeaderIcon','showTitle','showUpdateCount','showCheckedTime','useCustomColors'],colorIds=['backgroundColor','textColor','secondaryTextColor','iconColor','newTextColor','newBackgroundColor','countColor','errorColor'];for(const id of textIds){const e=document.getElementById(id);if(e)state[id]=e.value}for(const id of boolIds){const e=document.getElementById(id);if(e)state[id]=!!e.checked}for(const id of colorIds){const e=document.getElementById(id);if(e){state[id]=e.value.toUpperCase();const code=document.getElementById(id+'Code');if(code)code.textContent=state[id]}}save()}
 function colorChanged(id){const e=document.getElementById(id),toggle=document.getElementById('useCustomColors');if(e){state[id]=e.value.toUpperCase();const code=document.getElementById(id+'Code');if(code)code.textContent=state[id]}if(toggle){toggle.checked=true;state.useCustomColors=true}save()}
-function resetAppearance(){Object.assign(state,{widgetTitle:'Sideload Watch',footerLabel:'',showHeaderIcon:true,showTitle:true,showNewBadge:true,showVersion:true,showUpdateCount:true,showCheckedTime:true,useCustomColors:false,backgroundColor:'#0B1020',textColor:'#F8FAFC',secondaryTextColor:'#94A3B8',iconColor:'#0A84FF',newTextColor:'#34C759',newBackgroundColor:'#12351E',countColor:'#34C759',errorColor:'#FF453A'});save();native({action:'reload',settings:state})}
+function resetAppearance(){Object.assign(state,{widgetTitle:'Sideload Watch',footerLabel:'',showNewBadge:true,showVersion:true,showHeaderIcon:true,showTitle:true,showUpdateCount:true,showCheckedTime:true,useCustomColors:false,backgroundColor:'#0B1020',textColor:'#F8FAFC',secondaryTextColor:'#94A3B8',iconColor:'#0A84FF',newTextColor:'#34C759',newBackgroundColor:'#12351E',countColor:'#34C759',errorColor:'#FF453A'});save();native({action:'reload',settings:state})}
 function setLanguage(v){state.language=v;save();native({action:'reload',settings:state})}
 function renderSources(){const q=norm(document.getElementById('sourceSearch').value),root=document.getElementById('sourceList');const rows=CATALOG.filter(s=>!q||norm(s.name).includes(q));root.innerHTML=rows.length?'':'';if(!rows.length){root.innerHTML='<div class="empty">—</div>';return}rows.forEach(src=>{const on=state.selectedSources.includes(src.id),r=document.createElement('label');r.className='settingRow';r.innerHTML='<div class="rowText"><div class="rowTitle">'+escapeHtml(src.name)+'</div><div class="rowDetail">'+src.apps.length+' apps</div></div><span class="switch"><input type="checkbox" '+(on?'checked':'')+'><span class="slider"></span></span>';const input=r.querySelector('input');input.addEventListener('change',()=>{if(input.checked){if(!state.selectedSources.includes(src.id))state.selectedSources.push(src.id)}else{state.selectedSources=state.selectedSources.filter(x=>x!==src.id);state.watchedApps=state.watchedApps.filter(x=>x.sourceId!==src.id)}save()});root.appendChild(r)})}
 function renderSelectedSources(){const root=document.getElementById('selectedSourceList'),rows=state.selectedSources.map(sourceById).filter(Boolean);root.innerHTML='';if(!rows.length){root.innerHTML='<div class="empty">${esc(L.noSources)}</div>';return}rows.forEach(src=>{const n=state.watchedApps.filter(x=>x.sourceId===src.id).length,r=document.createElement('div');r.className='navRow';r.innerHTML='<div class="navLeft"><span class="navIcon">📦</span><span>'+escapeHtml(src.name)+'</span></div><div class="navRight"><span class="navDetail">'+n+' / '+src.apps.length+'</span><span class="chevron">›</span></div>';r.onclick=()=>openSourceApps(src.id);root.appendChild(r)})}
