@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.8
+// Sideload Watch v0.2.9
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.8";
+const APP_VERSION = "0.2.9";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -711,7 +711,7 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
 .switch{position:relative;width:50px;height:30px;flex:0 0 50px}.switch input{display:none}.slider{position:absolute;inset:0;background:#243149;border:1px solid var(--border);border-radius:999px}.slider:before{content:"";position:absolute;width:24px;height:24px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.18s}.switch input:checked+.slider{background:var(--accent2);border-color:var(--accent)}.switch input:checked+.slider:before{transform:translateX(20px)}
 .previewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}.actionGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}.previewBtn,.actionBtn{min-height:48px;border:1px solid #1d4ed8;border-radius:13px;background:linear-gradient(135deg,#0369a1,#0284c7);color:#fff;font:inherit;font-weight:800;font-size:13px;touch-action:manipulation}.actionBtn.secondary{background:#243149;border-color:var(--border)}.actionBtn.danger{background:#3a1720;border-color:#6b2738;color:#fecdd3}.actionBtn.full{grid-column:1/-1}
 .info{margin:14px 0;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);color:#cbd5e1;font-size:.86rem;line-height:1.45}.status{min-height:20px;color:var(--ok);font-size:12px;padding:0 14px 12px}.footer{color:#64748b;text-align:center;font-size:.76rem;margin:16px 4px 0}
-.searchBox{margin:0 0 11px}.countPill{font-size:11px;font-weight:800;color:#bfdbfe;background:#0f1f46;border:1px solid #1d4ed8;padding:5px 8px;border-radius:999px;white-space:nowrap}.sourceIcon{width:34px;height:34px;border-radius:9px;background:#0f1f46;display:grid;place-items:center;flex:0 0 34px;font-size:17px}.empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
+.searchBox{margin:0 0 11px}.countPill{font-size:11px;font-weight:800;color:#bfdbfe;background:#0f1f46;border:1px solid #1d4ed8;padding:5px 8px;border-radius:999px;white-space:nowrap}.topbarActions{display:flex;align-items:center;gap:8px}.catalogRefreshBtn{width:32px;height:32px;border:1px solid #1d4ed8;border-radius:999px;background:#0f1f46;color:#38bdf8;font:inherit;font-size:20px;font-weight:700;line-height:1;padding:0;display:grid;place-items:center;touch-action:manipulation}.catalogRefreshBtn:disabled{opacity:.55}.catalogRefreshBtn.spinning{animation:catalogSpin .7s linear infinite}@keyframes catalogSpin{to{transform:rotate(360deg)}}.sourceIcon{width:34px;height:34px;border-radius:9px;background:#0f1f46;display:grid;place-items:center;flex:0 0 34px;font-size:17px}.empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
 .langGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}.langBtn{min-height:48px;border:1px solid var(--border);border-radius:13px;background:#243149;color:#fff;font:inherit;font-weight:750}.langBtn.active{border-color:var(--accent);background:#0f1f46;color:#bfdbfe}
 @media(max-width:430px){.hero{padding:18px}.navDetail{max-width:128px}.previewGrid{grid-template-columns:1fr}.actionGrid{grid-template-columns:1fr}.actionBtn.full{grid-column:auto}}
 </style></head><body>
@@ -735,7 +735,7 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
 </div>
 
 <div id="sources" class="screen">
-  <div class="topbar"><button class="back" onclick="showScreen('home')">‹ ${esc(L.back)}</button><span id="watchedPill" class="countPill">${watchedCount} ${esc(L.selected)}</span></div>
+  <div class="topbar"><button class="back" onclick="showScreen('home')">‹ ${esc(L.back)}</button><div class="topbarActions"><button id="catalogRefreshBtn" class="catalogRefreshBtn" type="button" title="${esc(L.refreshCatalog)}" aria-label="${esc(L.refreshCatalog)}" onclick="refreshCatalogTop()">↻</button><span id="watchedPill" class="countPill">${watchedCount} ${esc(L.selected)}</span></div></div>
   <div class="screenTitle">${esc(L.sources)}</div><div class="screenSub">${esc(L.sourcesSub)}</div>
   <input id="sourceSearch" class="searchBox" type="search" placeholder="${esc(L.searchSource)}" oninput="renderSources()">
   <div id="sourceList" class="card"></div>
@@ -953,10 +953,19 @@ function resetAppearance(){
 }
 function setLanguage(l){state.language=l;document.querySelectorAll('.langBtn').forEach(b=>b.classList.remove('active'));const map={cs:0,en:1,de:2,es:3},buttons=document.querySelectorAll('.langBtn');if(buttons[map[l]])buttons[map[l]].classList.add('active');saveState();post({action:'language',language:l})}
 function preview(family,demo){document.getElementById('previewStatus').textContent='…';post({action:'preview',family,demo,settings:state})}
+function refreshCatalogTop(){
+  const b=document.getElementById('catalogRefreshBtn');
+  if(b){b.disabled=true;b.classList.add('spinning')}
+  post({action:'refreshCatalog'})
+}
+function finishCatalogRefresh(){
+  const b=document.getElementById('catalogRefreshBtn');
+  if(b){b.disabled=false;b.classList.remove('spinning')}
+}
 window.__native=function(m){
   if(!m)return;
-  if(m.action==='catalog'){catalog=m.catalog||{sources:[]};document.getElementById('catalogMode').textContent=m.online?${JSON.stringify(L.online)}:${JSON.stringify(L.cached)};document.getElementById('catalogCount').textContent=(catalog.sources||[]).length;renderSources();if(currentSourceId&&sourceObj(currentSourceId))renderApps();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
-  if(m.action==='status'){const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
+  if(m.action==='catalog'){catalog=m.catalog||{sources:[]};document.getElementById('catalogMode').textContent=m.online?${JSON.stringify(L.online)}:${JSON.stringify(L.cached)};document.getElementById('catalogCount').textContent=(catalog.sources||[]).length;renderSources();if(currentSourceId&&sourceObj(currentSourceId))renderApps();finishCatalogRefresh();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
+  if(m.action==='status'){finishCatalogRefresh();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
   if(m.action==='previewDone'){document.getElementById('previewStatus').textContent=''}
   if(m.action==='update'){const e=document.getElementById('updateStatus');e.textContent=m.text||'';e.className='updateStatus '+(m.ok?'ok':'error')}
   if(m.action==='replace'){state=m.settings||state;document.getElementById('jsonBox').value=JSON.stringify(state,null,2);location.reload()}
@@ -993,6 +1002,7 @@ async function settings(s){
       }else if(m.action==="refreshCatalog"){
         try{
           const r=await fetchCatalog(true);catalogResult=r;
+          cur=enrichWatchedSources(cur,r.data);saveSettings(cur);
           await send(web,{action:"catalog",catalog:r.data,online:r.online,text:tx(cur,"catalogUpdated")})
         }catch(e){await send(web,{action:"status",text:tx(cur,"catalogFail")})}
       }else if(m.action==="markSeen"){
