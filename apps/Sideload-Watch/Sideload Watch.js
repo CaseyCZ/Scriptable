@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.2
+// Sideload Watch v0.2.3
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,11 +16,13 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.2";
+const APP_VERSION = "0.2.3";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
+const CATALOG_META_FILE = "SideloadWatch_catalog_meta.json";
 const CATALOG_URL = "https://raw.githubusercontent.com/CaseyCZ/iOS-Hub/main/data/catalog.json";
+const CATALOG_META_URL = "https://api.github.com/repos/CaseyCZ/iOS-Hub/contents/data/catalog.json?ref=main";
 const HUB_URL = "https://caseycz.github.io/iOS-Hub/";
 const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sideload-Watch/Sideload%20Watch.js";
 const UPDATE_MIN_BYTES = 12000;
@@ -171,6 +173,7 @@ const fm = FileManager.local();
 const settingsPath = fm.joinPath(fm.documentsDirectory(), SETTINGS_FILE);
 const statePath = fm.joinPath(fm.documentsDirectory(), STATE_FILE);
 const catalogCachePath = fm.joinPath(fm.cacheDirectory(), CATALOG_CACHE_FILE);
+const catalogMetaPath = fm.joinPath(fm.cacheDirectory(), CATALOG_META_FILE);
 
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function lang(){const l=(Device.locale()||"en").slice(0,2).toLowerCase();return["cs","en","de","es"].includes(l)?l:"en"}
@@ -251,15 +254,77 @@ function readCachedCatalog(){
     return normalizeCatalog(JSON.parse(fm.readString(catalogCachePath)));
   }catch(_){return null}
 }
-async function fetchCatalog(force=false){
+function readCatalogMeta(){
   try{
-    const data=normalizeCatalog(await requestJSON(CATALOG_URL));
-    if(data.sources.length)fm.writeString(catalogCachePath,JSON.stringify(data));
-    return {data,online:true,cached:false};
+    if(!fm.fileExists(catalogMetaPath))return {sha:""};
+    const p=JSON.parse(fm.readString(catalogMetaPath));
+    return {sha:String(p?.sha||""),checkedAt:String(p?.checkedAt||"")};
+  }catch(_){return {sha:""}}
+}
+function saveCatalogMeta(sha){
+  try{
+    fm.writeString(catalogMetaPath,JSON.stringify({
+      sha:String(sha||""),
+      checkedAt:new Date().toISOString()
+    }))
+  }catch(_){}
+}
+async function fetchCatalogMeta(){
+  const r=new Request(CATALOG_META_URL);
+  r.timeoutInterval=API_TIMEOUT;
+  r.headers={
+    "Accept":"application/vnd.github+json",
+    "X-GitHub-Api-Version":"2022-11-28",
+    "User-Agent":"Sideload-Watch"
+  };
+  const p=await r.loadJSON();
+  const sha=String(p?.sha||"");
+  if(!sha)throw new Error("Catalog SHA unavailable");
+  return sha
+}
+async function downloadCatalog(remoteSha=""){
+  const data=normalizeCatalog(await requestJSON(CATALOG_URL));
+  if(!data.sources.length)throw new Error("Empty catalog");
+  fm.writeString(catalogCachePath,JSON.stringify(data));
+  if(remoteSha)saveCatalogMeta(remoteSha);
+  return data
+}
+async function fetchCatalog(force=false){
+  const cached=readCachedCatalog();
+
+  if(force){
+    try{
+      let remoteSha="";
+      try{remoteSha=await fetchCatalogMeta()}catch(_){}
+      const data=await downloadCatalog(remoteSha);
+      return {data,online:true,cached:false,updated:true,sha:remoteSha}
+    }catch(e){
+      if(cached)return {data:cached,online:false,cached:true,error:String(e)};
+      throw e
+    }
+  }
+
+  if(!cached){
+    try{
+      let remoteSha="";
+      try{remoteSha=await fetchCatalogMeta()}catch(_){}
+      const data=await downloadCatalog(remoteSha);
+      return {data,online:true,cached:false,updated:true,sha:remoteSha}
+    }catch(e){throw e}
+  }
+
+  try{
+    const remoteSha=await fetchCatalogMeta();
+    const localSha=readCatalogMeta().sha;
+
+    if(localSha&&remoteSha===localSha){
+      return {data:cached,online:true,cached:true,updated:false,sha:remoteSha}
+    }
+
+    const data=await downloadCatalog(remoteSha);
+    return {data,online:true,cached:false,updated:true,sha:remoteSha}
   }catch(e){
-    const cached=readCachedCatalog();
-    if(cached)return {data:cached,online:false,cached:true,error:String(e)};
-    throw e;
+    return {data:cached,online:false,cached:true,updated:false,error:String(e)}
   }
 }
 function sourceById(catalog,id){return(catalog?.sources||[]).find(x=>x.id===id)||null}
