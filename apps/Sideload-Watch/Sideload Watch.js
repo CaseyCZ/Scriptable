@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.7
+// Sideload Watch v0.2.8
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.7";
+const APP_VERSION = "0.2.8";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -190,7 +190,8 @@ function normalizeWatched(list){
     const x={
       sourceId:String(raw?.sourceId||"").trim(),
       bundleIdentifier:String(raw?.bundleIdentifier||"").trim(),
-      name:String(raw?.name||"").trim()
+      name:String(raw?.name||"").trim(),
+      sourceURL:String(raw?.sourceURL||"").trim()
     };
     if(!x.sourceId||!x.name)continue;
     const k=watchKey(x);if(seen.has(k))continue;seen.add(k);out.push(x);
@@ -239,6 +240,7 @@ function normalizeCatalog(data){
       id:String(src?.id||""),
       name:String(src?.name||src?.id||""),
       iconURL:String(src?.iconURL||""),
+      sourceURL:String(src?.sourceURL||""),
       apps:(Array.isArray(src?.apps)?src.apps:[]).map(app=>({
         name:String(app?.name||""),
         bundleIdentifier:String(app?.bundleIdentifier||""),
@@ -335,12 +337,25 @@ function resolveWatched(catalog,settings){
       ||(src.apps||[]).find(a=>a.name===item.name);
     if(!app)continue;
     out.push({
-      key:watchKey(item),sourceId:item.sourceId,sourceName:src.name,
+      key:watchKey(item),sourceId:item.sourceId,sourceName:src.name,sourceURL:item.sourceURL||src.sourceURL||"",
       name:item.name||app.name,version:String(app.version||"—"),
       iconURL:app.iconURL||src.iconURL||""
     });
   }
   return out;
+}
+function enrichWatchedSources(settings,catalog){
+  const s=merge(settings),map=new Map((catalog?.sources||[]).map(src=>[src.id,src]));
+  let changed=false;
+  s.watched=s.watched.map(item=>{
+    if(item.sourceURL)return item;
+    const src=map.get(item.sourceId);
+    if(!src?.sourceURL)return item;
+    changed=true;
+    return {...item,sourceURL:String(src.sourceURL)}
+  });
+  if(changed)saveSettings(s);
+  return s
 }
 
 function loadState(){
@@ -371,54 +386,105 @@ function cachedStatus(settings,error=null){
 function timeoutAfter(ms,label="Widget"){
   return new Promise((_,reject)=>Timer.schedule(ms,false,()=>reject(new Error(label+" timeout"))))
 }
-async function getRealStatus(settings){
-  const state=loadState();
-  try{
-    const catalogResult=await fetchCatalog();
-    const current=resolveWatched(catalogResult.data,settings);
-    let changed=false;
-    for(const app of current){
-      if(!state.seen[app.key]){state.seen[app.key]=app.version;changed=true}
-      state.lastCurrent[app.key]={name:app.name,version:app.version,iconURL:app.iconURL,sourceName:app.sourceName};
-    }
-    state.updatedAt=new Date().toISOString();
-    if(changed||current.length)saveState(state);
-    const updates=current.filter(app=>state.seen[app.key]!==app.version);
-    return{updates,total:updates.length,current,checkedAt:new Date(),offline:!catalogResult.online,cached:catalogResult.cached}
-  }catch(error){
-    return cachedStatus(settings,error)
+function sourceVersion(app){
+  const versions=Array.isArray(app?.versions)?app.versions.filter(x=>x&&typeof x==="object"):[];
+  if(versions.length){
+    versions.sort((a,b)=>{
+      const da=Date.parse(a?.date||a?.versionDate||"")||0;
+      const db=Date.parse(b?.date||b?.versionDate||"")||0;
+      return db-da
+    });
+    if(versions[0]?.version)return String(versions[0].version)
   }
+  return String(app?.version||app?.absoluteVersion||"—")
 }
-function instantStatus(settings){
+function sourceAppMatch(app,item){
+  const bundle=String(app?.bundleIdentifier||app?.bundleID||"");
+  if(item.bundleIdentifier&&bundle===item.bundleIdentifier)return true;
+  return String(app?.name||"")===item.name
+}
+async function requestSourceJSON(url,timeout=3.5){
+  const r=new Request(url);
+  r.timeoutInterval=timeout;
+  return await r.loadJSON()
+}
+async function getLiveStatus(settings){
   const state=loadState();
-  const catalog=readCachedCatalog();
-  let current=catalog?resolveWatched(catalog,settings):[];
-  if(!current.length){
-    current=[];
-    for(const item of settings.watched){
-      const key=watchKey(item),now=state.lastCurrent[key];
-      if(!now)continue;
+  const groups=new Map();
+  for(const item of settings.watched){
+    const url=String(item.sourceURL||"").trim();
+    if(!url)continue;
+    if(!groups.has(url))groups.set(url,[]);
+    groups.get(url).push(item)
+  }
+
+  if(!groups.size)return cachedStatus(settings);
+
+  const results=await Promise.allSettled([...groups.entries()].map(async([url,items])=>{
+    const payload=await requestSourceJSON(url,3.5);
+    const apps=Array.isArray(payload?.apps)?payload.apps:[];
+    return{url,items,apps,sourceName:String(payload?.name||"")}
+  }));
+
+  const current=[],failedSourceIds=new Set();
+  for(const result of results){
+    if(result.status!=="fulfilled"){
+      continue
+    }
+    const {items,apps,sourceName}=result.value;
+    for(const item of items){
+      const app=apps.find(a=>sourceAppMatch(a,item));
+      if(!app)continue;
       current.push({
-        key,
+        key:watchKey(item),
         sourceId:item.sourceId,
-        sourceName:now.sourceName||"",
-        name:now.name||item.name,
-        version:now.version||"—",
-        iconURL:now.iconURL||""
+        sourceName:sourceName||item.sourceId,
+        sourceURL:item.sourceURL,
+        name:item.name||String(app?.name||""),
+        version:sourceVersion(app),
+        iconURL:String(app?.iconURL||"")
       })
     }
   }
-  const updates=current.filter(app=>state.seen[app.key]&&state.seen[app.key]!==app.version);
-  return{
-    updates,total:updates.length,current,
-    checkedAt:state.updatedAt?new Date(state.updatedAt):null,
-    offline:true,cached:true
+
+  // For a failed/missing live result, keep the last known value so the widget
+  // remains complete instead of disappearing.
+  const have=new Set(current.map(x=>x.key));
+  for(const item of settings.watched){
+    const key=watchKey(item);
+    if(have.has(key))continue;
+    const now=state.lastCurrent[key];
+    if(!now)continue;
+    current.push({
+      key,
+      sourceId:item.sourceId,
+      sourceName:now.sourceName||item.sourceId,
+      sourceURL:item.sourceURL||"",
+      name:now.name||item.name,
+      version:now.version||"—",
+      iconURL:now.iconURL||""
+    })
   }
+
+  let changed=false;
+  for(const app of current){
+    if(!state.seen[app.key]){state.seen[app.key]=app.version;changed=true}
+    state.lastCurrent[app.key]={
+      name:app.name,version:app.version,iconURL:app.iconURL,
+      sourceName:app.sourceName,sourceURL:app.sourceURL||""
+    }
+  }
+  state.updatedAt=new Date().toISOString();
+  if(changed||current.length)saveState(state);
+
+  const updates=current.filter(app=>state.seen[app.key]&&state.seen[app.key]!==app.version);
+  const offline=results.some(r=>r.status!=="fulfilled");
+  return{updates,total:updates.length,current,checkedAt:new Date(),offline,cached:offline}
 }
-async function getRealStatusWithBudget(settings,ms){
+async function getLiveStatusWithBudget(settings,ms){
   try{
     return await Promise.race([
-      getRealStatus(settings),
+      getLiveStatus(settings),
       timeoutAfter(ms,"Widget data")
     ])
   }catch(error){
@@ -427,10 +493,10 @@ async function getRealStatusWithBudget(settings,ms){
   }
 }
 async function markAllSeen(settings){
-  const r=await fetchCatalog(true),current=resolveWatched(r.data,settings),state=loadState();
+  const r=await getLiveStatus(settings),current=r.current||[],state=loadState();
   for(const app of current){
     state.seen[app.key]=app.version;
-    state.lastCurrent[app.key]={name:app.name,version:app.version,iconURL:app.iconURL,sourceName:app.sourceName};
+    state.lastCurrent[app.key]={name:app.name,version:app.version,iconURL:app.iconURL,sourceName:app.sourceName,sourceURL:app.sourceURL||""};
   }
   state.updatedAt=new Date().toISOString();saveState(state);return current.length
 }
@@ -574,25 +640,9 @@ function buildErrorWidget(settings,error){
 }
 async function widget(settings,family){
   const fam=family||config.widgetFamily||"medium";
-
-  // Home-screen widget: always provide content immediately from local data.
-  // Network refresh happens only after Scriptable already has a widget snapshot.
-  if(config.runsInWidget){
-    const initial=await buildWidget(instantStatus(settings),settings,fam);
-    Script.setWidget(initial);
-
-    try{
-      const fresh=await getRealStatusWithBudget(settings,4500);
-      const updated=await buildWidget(fresh,settings,fam);
-      Script.setWidget(updated);
-      return updated
-    }catch(e){
-      console.log("Widget refresh failed: "+e);
-      return initial
-    }
-  }
-
-  const status=await getRealStatus(settings);
+  const status=config.runsInWidget
+    ? await getLiveStatusWithBudget(settings,6000)
+    : await getLiveStatus(settings);
   const w=await buildWidget(status,settings,fam);
   Script.setWidget(w);
   return w
@@ -821,7 +871,7 @@ function renderApps(){
   root.innerHTML='';document.getElementById('appsPill').textContent=watchedForSource(src.id).length+' '+${JSON.stringify(L.selected)};
   if(!rows.length){root.innerHTML='<div class="empty">'+${JSON.stringify(L.none)}+'</div>';return}
   for(const app of rows){
-    const item={sourceId:src.id,bundleIdentifier:app.bundleIdentifier||'',name:app.name},k=key(item);
+    const item={sourceId:src.id,bundleIdentifier:app.bundleIdentifier||'',name:app.name,sourceURL:src.sourceURL||''},k=key(item);
     const row=document.createElement('label');row.className='appRow';
     const text=document.createElement('div');text.className='rowText';
     const title=document.createElement('div');title.className='rowTitle';title.textContent=app.name;
@@ -840,7 +890,7 @@ function toggleApp(item,on){
 function selectCurrentSource(on){
   const src=sourceObj(currentSourceId);if(!src)return;
   const other=(state.watched||[]).filter(x=>x.sourceId!==src.id);
-  state.watched=on?other.concat((src.apps||[]).map(a=>({sourceId:src.id,bundleIdentifier:a.bundleIdentifier||'',name:a.name}))):other;
+  state.watched=on?other.concat((src.apps||[]).map(a=>({sourceId:src.id,bundleIdentifier:a.bundleIdentifier||'',name:a.name,sourceURL:src.sourceURL||''}))):other;
   saveState();renderSources();renderApps()
 }
 function saveBehavior(){state.refreshMinutes=Number(document.getElementById('refreshMinutes').value)||30;saveState()}
@@ -919,6 +969,8 @@ async function send(web,o){try{await web.evaluateJavaScript(`window.__native(${J
 async function settings(s){
   let catalogResult;
   try{catalogResult=await fetchCatalog()}catch(e){catalogResult={data:{sources:[]},online:false,cached:false,error:String(e)}}
+  s=enrichWatchedSources(s,catalogResult.data);
+  saveSettings(s);
   const web=new WebView();await web.loadHTML(settingsHTML(s,catalogResult));
   let dismissed=false,cur=merge(s);
   const presentPromise=web.present(false).then(()=>{dismissed=true});
@@ -936,7 +988,7 @@ async function settings(s){
       }else if(m.action==="preview"){
         cur=merge(m.settings||cur);saveSettings(cur);
         const family=["small","medium","large"].includes(m.family)?m.family:"medium";
-        const status=m.demo?demoStatus():await getRealStatus(cur),w=await buildWidget(status,cur,family);
+        const status=m.demo?demoStatus():await getLiveStatus(cur),w=await buildWidget(status,cur,family);
         try{await presentWidget(w,family)}finally{await send(web,{action:"previewDone"})}
       }else if(m.action==="refreshCatalog"){
         try{
