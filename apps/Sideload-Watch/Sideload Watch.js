@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.1
+// Sideload Watch v0.2.2
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.1";
+const APP_VERSION = "0.2.2";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -504,6 +504,7 @@ html{background:#070b14}body{padding:calc(14px + env(safe-area-inset-top)) 14px 
 .navLeft{display:flex;gap:11px;align-items:center;font-size:15px;font-weight:700;min-width:0}.navIcon{width:26px;text-align:center;flex:0 0 26px}.navRight{display:flex;align-items:center;gap:8px}.navDetail,.rowDetail{font-size:12px;color:var(--muted)}.navDetail{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chevron{font-size:23px;color:#64748b}.rowText{min-width:0;padding-right:11px}.rowTitle{font-size:15px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rowDetail{margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .field{padding:12px 14px;border-bottom:1px solid rgba(42,56,80,.85)}.field:last-child{border-bottom:0}.field label{display:block;margin-bottom:7px;color:#dbeafe;font-size:.82rem;font-weight:650}
 input[type=text],input[type=search],input[type=number],select,textarea{width:100%;min-height:46px;border:1px solid var(--border);border-radius:12px;background:#0b1220;color:var(--text);padding:0 13px;font:inherit;font-size:15px;outline:none}textarea{min-height:165px;padding:12px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.4}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
+.colorControl{display:grid;grid-template-columns:58px 1fr;gap:10px;align-items:center}.colorPicker{width:58px;height:46px;border:1px solid var(--border);border-radius:12px;background:#0b1220;padding:4px;overflow:hidden}.colorPicker::-webkit-color-swatch-wrapper{padding:0}.colorPicker::-webkit-color-swatch{border:0;border-radius:8px}.colorCode{text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .switch{position:relative;width:50px;height:30px;flex:0 0 50px}.switch input{display:none}.slider{position:absolute;inset:0;background:#243149;border:1px solid var(--border);border-radius:999px}.slider:before{content:"";position:absolute;width:24px;height:24px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.18s}.switch input:checked+.slider{background:var(--accent2);border-color:var(--accent)}.switch input:checked+.slider:before{transform:translateX(20px)}
 .previewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}.actionGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}.previewBtn,.actionBtn{min-height:48px;border:1px solid #1d4ed8;border-radius:13px;background:linear-gradient(135deg,#0369a1,#0284c7);color:#fff;font:inherit;font-weight:800;font-size:13px;touch-action:manipulation}.actionBtn.secondary{background:#243149;border-color:var(--border)}.actionBtn.danger{background:#3a1720;border-color:#6b2738;color:#fecdd3}.actionBtn.full{grid-column:1/-1}
 .info{margin:14px 0;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);color:#cbd5e1;font-size:.86rem;line-height:1.45}.status{min-height:20px;color:var(--ok);font-size:12px;padding:0 14px 12px}.footer{color:#64748b;text-align:center;font-size:.76rem;margin:16px 4px 0}
@@ -575,12 +576,12 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
   <div class="sectionTitle">${esc(L.customColors)}</div>
   <div class="card">
     <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.useCustomColors)}</div></div><span class="switch"><input id="useCustomColors" type="checkbox" ${s.useCustomColors?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
-    <div class="field"><label>${esc(L.backgroundColor)}</label><input id="backgroundColor" type="text" value="${esc(s.backgroundColor||"#0B1020")}" oninput="saveAppearance()"></div>
-    <div class="field"><label>${esc(L.textColor)}</label><input id="textColor" type="text" value="${esc(s.textColor||"#F8FAFC")}" oninput="saveAppearance()"></div>
-    <div class="field"><label>${esc(L.mutedColor)}</label><input id="mutedColor" type="text" value="${esc(s.mutedColor||"#94A3B8")}" oninput="saveAppearance()"></div>
-    <div class="field"><label>${esc(L.newColor)}</label><input id="newColor" type="text" value="${esc(s.newColor||"#34C759")}" oninput="saveAppearance()"></div>
-    <div class="field"><label>${esc(L.newBgColor)}</label><input id="newBgColor" type="text" value="${esc(s.newBgColor||"#12351E")}" oninput="saveAppearance()"></div>
-    <div class="field"><label>${esc(L.countColor)}</label><input id="countColor" type="text" value="${esc(s.countColor||"#34C759")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.backgroundColor)}</label><div class="colorControl"><input id="backgroundColorPicker" class="colorPicker" type="color" value="${esc(s.backgroundColor||"#0B1020")}" oninput="syncColorFromPicker('backgroundColor')"><input id="backgroundColor" class="colorCode" type="text" maxlength="7" value="${esc(s.backgroundColor||"#0B1020")}" oninput="syncColorFromText('backgroundColor')"></div></div>
+    <div class="field"><label>${esc(L.textColor)}</label><div class="colorControl"><input id="textColorPicker" class="colorPicker" type="color" value="${esc(s.textColor||"#F8FAFC")}" oninput="syncColorFromPicker('textColor')"><input id="textColor" class="colorCode" type="text" maxlength="7" value="${esc(s.textColor||"#F8FAFC")}" oninput="syncColorFromText('textColor')"></div></div>
+    <div class="field"><label>${esc(L.mutedColor)}</label><div class="colorControl"><input id="mutedColorPicker" class="colorPicker" type="color" value="${esc(s.mutedColor||"#94A3B8")}" oninput="syncColorFromPicker('mutedColor')"><input id="mutedColor" class="colorCode" type="text" maxlength="7" value="${esc(s.mutedColor||"#94A3B8")}" oninput="syncColorFromText('mutedColor')"></div></div>
+    <div class="field"><label>${esc(L.newColor)}</label><div class="colorControl"><input id="newColorPicker" class="colorPicker" type="color" value="${esc(s.newColor||"#34C759")}" oninput="syncColorFromPicker('newColor')"><input id="newColor" class="colorCode" type="text" maxlength="7" value="${esc(s.newColor||"#34C759")}" oninput="syncColorFromText('newColor')"></div></div>
+    <div class="field"><label>${esc(L.newBgColor)}</label><div class="colorControl"><input id="newBgColorPicker" class="colorPicker" type="color" value="${esc(s.newBgColor||"#12351E")}" oninput="syncColorFromPicker('newBgColor')"><input id="newBgColor" class="colorCode" type="text" maxlength="7" value="${esc(s.newBgColor||"#12351E")}" oninput="syncColorFromText('newBgColor')"></div></div>
+    <div class="field"><label>${esc(L.countColor)}</label><div class="colorControl"><input id="countColorPicker" class="colorPicker" type="color" value="${esc(s.countColor||"#34C759")}" oninput="syncColorFromPicker('countColor')"><input id="countColor" class="colorCode" type="text" maxlength="7" value="${esc(s.countColor||"#34C759")}" oninput="syncColorFromText('countColor')"></div></div>
   </div>
 
   <div class="actionGrid">
@@ -690,6 +691,29 @@ function selectCurrentSource(on){
   saveState();renderSources();renderApps()
 }
 function saveBehavior(){state.refreshMinutes=Number(document.getElementById('refreshMinutes').value)||30;saveState()}
+function enableCustomColors(){
+  const toggle=document.getElementById('useCustomColors');
+  if(toggle){toggle.checked=true;state.useCustomColors=true}
+}
+function syncColorFromPicker(id){
+  const picker=document.getElementById(id+'Picker'),text=document.getElementById(id);
+  if(!picker||!text)return;
+  text.value=picker.value.toUpperCase();
+  enableCustomColors();
+  saveAppearance()
+}
+function syncColorFromText(id){
+  const text=document.getElementById(id),picker=document.getElementById(id+'Picker');
+  if(!text||!picker)return;
+  let v=String(text.value||"").trim().toUpperCase();
+  if(v&&!v.startsWith('#'))v='#'+v;
+  text.value=v;
+  if(/^#[0-9A-F]{6}$/.test(v)){
+    picker.value=v;
+    enableCustomColors();
+    saveAppearance()
+  }
+}
 function saveAppearance(){
   state.widgetTitle=document.getElementById('widgetTitle').value||"Sideload Watch";
   state.footerLabel=document.getElementById('footerLabel').value||"";
@@ -698,12 +722,13 @@ function saveAppearance(){
   state.showCount=document.getElementById('showCount').checked;
   state.showTime=document.getElementById('showTime').checked;
   state.useCustomColors=document.getElementById('useCustomColors').checked;
-  state.backgroundColor=document.getElementById('backgroundColor').value||"#0B1020";
-  state.textColor=document.getElementById('textColor').value||"#F8FAFC";
-  state.mutedColor=document.getElementById('mutedColor').value||"#94A3B8";
-  state.newColor=document.getElementById('newColor').value||"#34C759";
-  state.newBgColor=document.getElementById('newBgColor').value||"#12351E";
-  state.countColor=document.getElementById('countColor').value||"#34C759";
+  const colorDefaults={backgroundColor:"#0B1020",textColor:"#F8FAFC",mutedColor:"#94A3B8",newColor:"#34C759",newBgColor:"#12351E",countColor:"#34C759"};
+  for(const id of Object.keys(colorDefaults)){
+    let v=String(document.getElementById(id).value||"").trim().toUpperCase();
+    if(v&&!v.startsWith("#"))v="#"+v;
+    if(/^#[0-9A-F]{6}$/.test(v))state[id]=v;
+    else if(!state[id])state[id]=colorDefaults[id]
+  }
   saveState()
 }
 function resetAppearance(){
