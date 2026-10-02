@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.5
+// Sideload Watch v0.2.6
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.5";
+const APP_VERSION = "0.2.6";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -353,6 +353,24 @@ function loadState(){
 function saveState(s){fm.writeString(statePath,JSON.stringify(s,null,2))}
 function resetState(){try{if(fm.fileExists(statePath))fm.remove(statePath)}catch(_){}}
 
+function cachedStatus(settings,error=null){
+  const state=loadState(),updates=[],current=[];
+  for(const item of settings.watched){
+    const key=watchKey(item),now=state.lastCurrent[key];
+    if(!now)continue;
+    const app={key,name:now.name||item.name,version:now.version||"—",iconURL:now.iconURL||"",sourceName:now.sourceName||""};
+    current.push(app);
+    if(state.seen[key]&&app.version!==state.seen[key])updates.push(app)
+  }
+  return{
+    updates,total:updates.length,current,
+    checkedAt:state.updatedAt?new Date(state.updatedAt):null,
+    offline:true,cached:true,error:error?String(error):null
+  }
+}
+function timeoutAfter(ms,label="Widget"){
+  return new Promise((_,reject)=>Timer.schedule(ms,false,()=>reject(new Error(label+" timeout")))
+}
 async function getRealStatus(settings){
   const state=loadState();
   try{
@@ -368,13 +386,18 @@ async function getRealStatus(settings){
     const updates=current.filter(app=>state.seen[app.key]!==app.version);
     return{updates,total:updates.length,current,checkedAt:new Date(),offline:!catalogResult.online,cached:catalogResult.cached}
   }catch(error){
-    const cached=[];
-    for(const item of settings.watched){
-      const key=watchKey(item),now=state.lastCurrent[key];
-      if(!now||!state.seen[key])continue;
-      if(now.version!==state.seen[key])cached.push({key,name:now.name||item.name,version:now.version,iconURL:now.iconURL||""});
-    }
-    return{updates:cached,total:cached.length,current:[],checkedAt:state.updatedAt?new Date(state.updatedAt):null,offline:true,error:String(error)}
+    return cachedStatus(settings,error)
+  }
+}
+async function getRealStatusWithBudget(settings,ms){
+  try{
+    return await Promise.race([
+      getRealStatus(settings),
+      timeoutAfter(ms,"Widget data")
+    ])
+  }catch(error){
+    console.log("Widget fallback: "+error);
+    return cachedStatus(settings,error)
   }
 }
 async function markAllSeen(settings){
@@ -521,6 +544,15 @@ function buildErrorWidget(settings,error){
     detail.font=Font.systemFont(Math.max(8,L.footer));detail.textColor=c.muted;detail.lineLimit=3;
   }
   w.refreshAfterDate=new Date(Date.now()+15*60000);
+  return w
+}
+async function widget(settings,family){
+  const fam=family||config.widgetFamily||"medium";
+  const status=config.runsInWidget
+    ? await getRealStatusWithBudget(settings,6500)
+    : await getRealStatus(settings);
+  const w=await buildWidget(status,settings,fam);
+  Script.setWidget(w);
   return w
 }
 async function presentWidget(widget,family){
@@ -896,9 +928,9 @@ async function settings(s){
 let SETTINGS=await firstLanguage(loadSettings());
 
 if(config.runsInWidget){
+  const fam=config.widgetFamily||"medium";
   try{
-    const status=await getRealStatus(SETTINGS),w=await buildWidget(status,SETTINGS);
-    Script.setWidget(w);
+    await widget(SETTINGS,fam);
   }catch(e){
     console.log("Widget error: "+e);
     Script.setWidget(buildErrorWidget(SETTINGS,e));
