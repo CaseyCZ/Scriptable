@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.0
+// Sideload Watch v0.2.1
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.0";
+const APP_VERSION = "0.2.1";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -31,6 +31,10 @@ const T = {
     settings:"Nastavení",subtitle:"Vyber zdroje a konkrétní aplikace, které chceš sledovat.",
     watched:"Sledované aplikace",watchedDetail:"Vyber source a potom aplikace uvnitř.",
     preview:"Náhled widgetu",previewDetail:"Vzhled widgetu zůstává stejný.",
+    appearance:"Vzhled widgetu",appearanceDetail:"Název, popisky, viditelnost a barvy widgetu.",
+    widgetTitle:"Název widgetu",footerLabel:"Spodní popisek",footerLabelDetail:"Nech prázdné pro automatický text.",
+    visibility:"Viditelnost",showNew:"Zobrazit NEW",showVersion:"Zobrazit verzi",showCount:"Zobrazit počet aktualizací",showTime:"Zobrazit čas kontroly",
+    customColors:"Vlastní barvy",useCustomColors:"Použít vlastní barvy",backgroundColor:"Barva pozadí",textColor:"Barva textu",mutedColor:"Barva vedlejšího textu",newColor:"Barva NEW textu",newBgColor:"Barva NEW pozadí",countColor:"Barva počtu aktualizací",resetAppearance:"Obnovit výchozí vzhled",
     tools:"Nástroje",toolsDetail:"Aktualizace, export, reset a údržba.",
     sources:"Sources",sourcesSub:"Otevři source a vyber konkrétní aplikace, které chceš sledovat.",
     searchSource:"Hledat source…",searchApp:"Hledat aplikaci…",apps:"aplikací",selected:"vybráno",
@@ -56,6 +60,10 @@ const T = {
     settings:"Settings",subtitle:"Choose sources and the exact apps you want to watch.",
     watched:"Watched apps",watchedDetail:"Choose a source, then select apps inside it.",
     preview:"Widget preview",previewDetail:"Widget appearance stays unchanged.",
+    appearance:"Widget appearance",appearanceDetail:"Title, labels, visibility and widget colors.",
+    widgetTitle:"Widget title",footerLabel:"Footer label",footerLabelDetail:"Leave empty for automatic text.",
+    visibility:"Visibility",showNew:"Show NEW",showVersion:"Show version",showCount:"Show update count",showTime:"Show checked time",
+    customColors:"Custom colors",useCustomColors:"Use custom colors",backgroundColor:"Background color",textColor:"Text color",mutedColor:"Secondary text color",newColor:"NEW text color",newBgColor:"NEW background color",countColor:"Update count color",resetAppearance:"Reset appearance",
     tools:"Tools",toolsDetail:"Updates, export, reset and maintenance.",
     sources:"Sources",sourcesSub:"Open a source and choose the exact apps you want to watch.",
     searchSource:"Search sources…",searchApp:"Search apps…",apps:"apps",selected:"selected",
@@ -81,6 +89,10 @@ const T = {
     settings:"Einstellungen",subtitle:"Wähle Quellen und konkrete Apps aus, die du beobachten möchtest.",
     watched:"Beobachtete Apps",watchedDetail:"Quelle öffnen und anschließend Apps darin auswählen.",
     preview:"Widget-Vorschau",previewDetail:"Das Aussehen des Widgets bleibt unverändert.",
+    appearance:"Widget-Aussehen",appearanceDetail:"Titel, Texte, Sichtbarkeit und Farben des Widgets.",
+    widgetTitle:"Widget-Titel",footerLabel:"Fußzeile",footerLabelDetail:"Leer lassen für automatischen Text.",
+    visibility:"Sichtbarkeit",showNew:"NEW anzeigen",showVersion:"Version anzeigen",showCount:"Update-Anzahl anzeigen",showTime:"Prüfzeit anzeigen",
+    customColors:"Eigene Farben",useCustomColors:"Eigene Farben verwenden",backgroundColor:"Hintergrundfarbe",textColor:"Textfarbe",mutedColor:"Sekundärtextfarbe",newColor:"NEW-Textfarbe",newBgColor:"NEW-Hintergrundfarbe",countColor:"Farbe der Update-Anzahl",resetAppearance:"Aussehen zurücksetzen",
     tools:"Werkzeuge",toolsDetail:"Updates, Export, Reset und Wartung.",
     sources:"Quellen",sourcesSub:"Öffne eine Quelle und wähle die Apps aus, die du beobachten möchtest.",
     searchSource:"Quelle suchen…",searchApp:"App suchen…",apps:"Apps",selected:"ausgewählt",
@@ -106,6 +118,10 @@ const T = {
     settings:"Ajustes",subtitle:"Elige las fuentes y las aplicaciones concretas que quieres vigilar.",
     watched:"Apps vigiladas",watchedDetail:"Abre una fuente y selecciona las apps dentro.",
     preview:"Vista previa",previewDetail:"El aspecto del widget no cambia.",
+    appearance:"Apariencia del widget",appearanceDetail:"Título, textos, visibilidad y colores del widget.",
+    widgetTitle:"Título del widget",footerLabel:"Etiqueta inferior",footerLabelDetail:"Déjalo vacío para usar texto automático.",
+    visibility:"Visibilidad",showNew:"Mostrar NEW",showVersion:"Mostrar versión",showCount:"Mostrar número de actualizaciones",showTime:"Mostrar hora de comprobación",
+    customColors:"Colores personalizados",useCustomColors:"Usar colores personalizados",backgroundColor:"Color de fondo",textColor:"Color del texto",mutedColor:"Color del texto secundario",newColor:"Color del texto NEW",newBgColor:"Color del fondo NEW",countColor:"Color del número de actualizaciones",resetAppearance:"Restablecer apariencia",
     tools:"Herramientas",toolsDetail:"Actualizaciones, exportación, reinicio y mantenimiento.",
     sources:"Fuentes",sourcesSub:"Abre una fuente y elige las apps concretas que quieres vigilar.",
     searchSource:"Buscar fuente…",searchApp:"Buscar app…",apps:"apps",selected:"seleccionadas",
@@ -133,7 +149,22 @@ const DEFAULTS = {
   language:null,
   watched:[],
   refreshMinutes:30,
-  settingsVersion:1
+  settingsVersion:1,
+
+  widgetTitle:"Sideload Watch",
+  footerLabel:"",
+  showNew:true,
+  showVersion:true,
+  showCount:true,
+  showTime:true,
+
+  useCustomColors:false,
+  backgroundColor:"#0B1020",
+  textColor:"#F8FAFC",
+  mutedColor:"#94A3B8",
+  newColor:"#34C759",
+  newBgColor:"#12351E",
+  countColor:"#34C759"
 };
 
 const fm = FileManager.local();
@@ -168,6 +199,14 @@ function merge(raw){
   if(!["cs","en","de","es"].includes(s.language))s.language=null;
   s.refreshMinutes=clamp(Number(s.refreshMinutes)||30,15,180);
   s.watched=normalizeWatched(s.watched);
+  s.widgetTitle=String(s.widgetTitle??DEFAULTS.widgetTitle).slice(0,40);
+  s.footerLabel=String(s.footerLabel??"").slice(0,40);
+  for(const k of ["showNew","showVersion","showCount","showTime","useCustomColors"]){
+    if(typeof s[k]!=="boolean")s[k]=DEFAULTS[k]
+  }
+  for(const k of ["backgroundColor","textColor","mutedColor","newColor","newBgColor","countColor"]){
+    if(!/^#[0-9a-fA-F]{6}$/.test(String(s[k]||"")))s[k]=DEFAULTS[k]
+  }
   s.settingsVersion=1;
   return s;
 }
@@ -302,11 +341,25 @@ function demoStatus(){
 function widgetText(settings){
   const L=T[settings.language||lang()]||T.en;
   return{
-    title:L.title,new:L.new,upToDate:L.upToDate,offline:L.offline,
-    updates:n=>L.updates(n)
+    title:settings.widgetTitle||L.title,new:L.new,upToDate:L.upToDate,offline:L.offline,
+    updates:n=>String(settings.footerLabel||"").trim()?String(settings.footerLabel).trim():L.updates(n)
   }
 }
-function colors(){
+function colors(settings){
+  if(settings.useCustomColors){
+    return{
+      bg:new Color(settings.backgroundColor||"#0B1020"),
+      panel:new Color(settings.backgroundColor||"#0B1020"),
+      text:new Color(settings.textColor||"#F8FAFC"),
+      muted:new Color(settings.mutedColor||"#94A3B8"),
+      border:new Color("263449"),
+      green:new Color(settings.newColor||"#34C759"),
+      greenSoft:new Color(settings.newBgColor||"#12351E"),
+      red:new Color("FF453A"),
+      blue:new Color("0A84FF"),
+      count:new Color(settings.countColor||"#34C759")
+    }
+  }
   return{
     bg:Color.dynamic(new Color("F5F7FB"),new Color("0B1020")),
     panel:Color.dynamic(new Color("FFFFFF"),new Color("111827")),
@@ -316,7 +369,8 @@ function colors(){
     green:new Color("34C759"),
     greenSoft:Color.dynamic(new Color("E8F8ED"),new Color("12351E")),
     red:new Color("FF453A"),
-    blue:new Color("0A84FF")
+    blue:new Color("0A84FF"),
+    count:new Color("34C759")
   }
 }
 function layoutForFamily(family){
@@ -333,7 +387,7 @@ function formatTime(date){
   const f=new DateFormatter();f.locale=Device.locale();f.useNoDateStyle();f.useShortTimeStyle();return f.string(date)
 }
 async function buildWidget(status,settings,familyOverride){
-  const family=familyOverride||config.widgetFamily||"medium",L=layoutForFamily(family),c=colors(),W=widgetText(settings),w=new ListWidget();
+  const family=familyOverride||config.widgetFamily||"medium",L=layoutForFamily(family),c=colors(settings),W=widgetText(settings),w=new ListWidget();
   w.backgroundColor=c.bg;w.setPadding(L.pad,L.pad,L.pad,L.pad);w.url=HUB_URL;
 
   const header=w.addStack();header.centerAlignContent();
@@ -363,20 +417,29 @@ async function buildWidget(status,settings,familyOverride){
     for(let i=0;i<visible.length;i++){
       const app=visible[i],row=w.addStack();row.centerAlignContent();row.size=new Size(0,family==="small"?21:24);
       const name=row.addText(app.name);name.font=Font.semiboldSystemFont(L.row);name.textColor=c.text;name.lineLimit=1;name.minimumScaleFactor=.65;
-      row.addSpacer(6);addNewBadge(row,c,Math.max(8,L.footer),W.new);row.addSpacer(6);
-      const version=row.addText(app.version);version.font=Font.mediumSystemFont(L.version);version.textColor=c.muted;version.lineLimit=1;version.minimumScaleFactor=.7;
+      if(settings.showNew!==false){
+        row.addSpacer(6);addNewBadge(row,c,Math.max(8,L.footer),W.new)
+      }
+      if(settings.showVersion!==false){
+        row.addSpacer(6);
+        const version=row.addText(app.version);version.font=Font.mediumSystemFont(L.version);version.textColor=c.muted;version.lineLimit=1;version.minimumScaleFactor=.7
+      }
       if(i<visible.length-1)w.addSpacer(L.rowGap)
     }
   }
 
   w.addSpacer();
-  const footer=w.addStack();footer.centerAlignContent();
-  const count=footer.addText(W.updates(status.total));count.font=Font.boldSystemFont(L.footer);count.textColor=status.total>0?c.green:c.muted;count.lineLimit=1;count.minimumScaleFactor=.7;
-  footer.addSpacer();
-  if(status.offline){
-    const off=footer.addText("⚠︎ "+W.offline);off.font=Font.mediumSystemFont(L.footer);off.textColor=c.red
-  }else{
-    const checked=footer.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted
+  if(settings.showCount!==false||settings.showTime!==false||status.offline){
+    const footer=w.addStack();footer.centerAlignContent();
+    if(settings.showCount!==false){
+      const count=footer.addText(W.updates(status.total));count.font=Font.boldSystemFont(L.footer);count.textColor=status.total>0?(c.count||c.green):c.muted;count.lineLimit=1;count.minimumScaleFactor=.7
+    }
+    if(settings.showCount!==false&&(settings.showTime!==false||status.offline))footer.addSpacer();
+    if(status.offline){
+      const off=footer.addText("⚠︎ "+W.offline);off.font=Font.mediumSystemFont(L.footer);off.textColor=c.red
+    }else if(settings.showTime!==false){
+      const checked=footer.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted
+    }
   }
   w.refreshAfterDate=new Date(Date.now()+settings.refreshMinutes*60000);
   return w
@@ -459,6 +522,7 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
   <div class="card">
     ${nav("sources","📦",L.watched,`${watchedCount} ${L.selected}`)}
     ${nav("preview","👁",L.preview,L.previewDetail)}
+    ${nav("appearance","🎨",L.appearance,L.appearanceDetail)}
     ${nav("behavior","⚙️",L.behavior,`${s.refreshMinutes} ${L.minutes}`)}
     ${nav("tools","🧰",L.tools,L.toolsDetail)}
   </div>
@@ -489,6 +553,40 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
   <div class="sectionTitle">${esc(L.demoPreview)}</div>
   <div class="previewGrid"><button class="previewBtn" onclick="preview('small',true)">${esc(L.small)}</button><button class="previewBtn" onclick="preview('medium',true)">${esc(L.medium)}</button><button class="previewBtn" onclick="preview('large',true)">${esc(L.large)}</button></div>
   <div id="previewStatus" class="status"></div>
+</div>
+
+<div id="appearance" class="screen">
+  <div class="topbar"><button class="back" onclick="showScreen('home')">‹ ${esc(L.back)}</button><span></span></div>
+  <div class="screenTitle">${esc(L.appearance)}</div><div class="screenSub">${esc(L.appearanceDetail)}</div>
+
+  <div class="card">
+    <div class="field"><label>${esc(L.widgetTitle)}</label><input id="widgetTitle" type="text" maxlength="40" value="${esc(s.widgetTitle||"Sideload Watch")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.footerLabel)}</label><div class="rowDetail" style="margin:-2px 0 9px">${esc(L.footerLabelDetail)}</div><input id="footerLabel" type="text" maxlength="40" value="${esc(s.footerLabel||"")}" oninput="saveAppearance()"></div>
+  </div>
+
+  <div class="sectionTitle">${esc(L.visibility)}</div>
+  <div class="card">
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showNew)}</div></div><span class="switch"><input id="showNew" type="checkbox" ${s.showNew!==false?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showVersion)}</div></div><span class="switch"><input id="showVersion" type="checkbox" ${s.showVersion!==false?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showCount)}</div></div><span class="switch"><input id="showCount" type="checkbox" ${s.showCount!==false?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.showTime)}</div></div><span class="switch"><input id="showTime" type="checkbox" ${s.showTime!==false?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+  </div>
+
+  <div class="sectionTitle">${esc(L.customColors)}</div>
+  <div class="card">
+    <label class="settingRow"><div class="rowText"><div class="rowTitle">${esc(L.useCustomColors)}</div></div><span class="switch"><input id="useCustomColors" type="checkbox" ${s.useCustomColors?"checked":""} onchange="saveAppearance()"><span class="slider"></span></span></label>
+    <div class="field"><label>${esc(L.backgroundColor)}</label><input id="backgroundColor" type="text" value="${esc(s.backgroundColor||"#0B1020")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.textColor)}</label><input id="textColor" type="text" value="${esc(s.textColor||"#F8FAFC")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.mutedColor)}</label><input id="mutedColor" type="text" value="${esc(s.mutedColor||"#94A3B8")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.newColor)}</label><input id="newColor" type="text" value="${esc(s.newColor||"#34C759")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.newBgColor)}</label><input id="newBgColor" type="text" value="${esc(s.newBgColor||"#12351E")}" oninput="saveAppearance()"></div>
+    <div class="field"><label>${esc(L.countColor)}</label><input id="countColor" type="text" value="${esc(s.countColor||"#34C759")}" oninput="saveAppearance()"></div>
+  </div>
+
+  <div class="actionGrid">
+    <button class="actionBtn secondary" onclick="resetAppearance()">↺ ${esc(L.resetAppearance)}</button>
+    <button class="actionBtn" onclick="preview('medium',true)">${esc(L.preview)}</button>
+  </div>
 </div>
 
 <div id="behavior" class="screen">
@@ -592,6 +690,39 @@ function selectCurrentSource(on){
   saveState();renderSources();renderApps()
 }
 function saveBehavior(){state.refreshMinutes=Number(document.getElementById('refreshMinutes').value)||30;saveState()}
+function saveAppearance(){
+  state.widgetTitle=document.getElementById('widgetTitle').value||"Sideload Watch";
+  state.footerLabel=document.getElementById('footerLabel').value||"";
+  state.showNew=document.getElementById('showNew').checked;
+  state.showVersion=document.getElementById('showVersion').checked;
+  state.showCount=document.getElementById('showCount').checked;
+  state.showTime=document.getElementById('showTime').checked;
+  state.useCustomColors=document.getElementById('useCustomColors').checked;
+  state.backgroundColor=document.getElementById('backgroundColor').value||"#0B1020";
+  state.textColor=document.getElementById('textColor').value||"#F8FAFC";
+  state.mutedColor=document.getElementById('mutedColor').value||"#94A3B8";
+  state.newColor=document.getElementById('newColor').value||"#34C759";
+  state.newBgColor=document.getElementById('newBgColor').value||"#12351E";
+  state.countColor=document.getElementById('countColor').value||"#34C759";
+  saveState()
+}
+function resetAppearance(){
+  state.widgetTitle="Sideload Watch";
+  state.footerLabel="";
+  state.showNew=true;
+  state.showVersion=true;
+  state.showCount=true;
+  state.showTime=true;
+  state.useCustomColors=false;
+  state.backgroundColor="#0B1020";
+  state.textColor="#F8FAFC";
+  state.mutedColor="#94A3B8";
+  state.newColor="#34C759";
+  state.newBgColor="#12351E";
+  state.countColor="#34C759";
+  saveState();
+  post({action:'reload',settings:state})
+}
 function setLanguage(l){state.language=l;document.querySelectorAll('.langBtn').forEach(b=>b.classList.remove('active'));const map={cs:0,en:1,de:2,es:3},buttons=document.querySelectorAll('.langBtn');if(buttons[map[l]])buttons[map[l]].classList.add('active');saveState();post({action:'language',language:l})}
 function preview(family,demo){document.getElementById('previewStatus').textContent='…';post({action:'preview',family,demo,settings:state})}
 window.__native=function(m){
@@ -647,6 +778,8 @@ async function settings(s){
         }catch(_){await send(web,{action:"status",text:tx(cur,"invalid")})}
       }else if(m.action==="language"){
         cur.language=["cs","en","de","es"].includes(m.language)?m.language:cur.language;saveSettings(cur)
+      }else if(m.action==="reload"){
+        cur=merge(m.settings||cur);saveSettings(cur);await web.loadHTML(settingsHTML(cur,catalogResult))
       }else if(m.action==="update"){
         cur=merge(cur);saveSettings(cur);const r=await updater(cur);await send(web,{action:"update",ok:r.ok,text:r.text})
       }
