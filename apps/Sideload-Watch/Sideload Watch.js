@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.3
+// Sideload Watch v0.2.4
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,13 +16,13 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.3";
+const APP_VERSION = "0.2.4";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
 const CATALOG_META_FILE = "SideloadWatch_catalog_meta.json";
 const CATALOG_URL = "https://raw.githubusercontent.com/CaseyCZ/iOS-Hub/main/data/catalog.json";
-const CATALOG_META_URL = "https://api.github.com/repos/CaseyCZ/iOS-Hub/contents/data/catalog.json?ref=main";
+const CATALOG_META_URL = "https://raw.githubusercontent.com/CaseyCZ/iOS-Hub/main/data/catalog-meta.json";
 const HUB_URL = "https://caseycz.github.io/iOS-Hub/";
 const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sideload-Watch/Sideload%20Watch.js";
 const UPDATE_MIN_BYTES = 12000;
@@ -256,37 +256,35 @@ function readCachedCatalog(){
 }
 function readCatalogMeta(){
   try{
-    if(!fm.fileExists(catalogMetaPath))return {sha:""};
+    if(!fm.fileExists(catalogMetaPath))return {version:""};
     const p=JSON.parse(fm.readString(catalogMetaPath));
-    return {sha:String(p?.sha||""),checkedAt:String(p?.checkedAt||"")};
-  }catch(_){return {sha:""}}
+    return {
+      version:String(p?.version||p?.sha||""),
+      checkedAt:String(p?.checkedAt||"")
+    };
+  }catch(_){return {version:""}}
 }
-function saveCatalogMeta(sha){
+function saveCatalogMeta(version){
   try{
     fm.writeString(catalogMetaPath,JSON.stringify({
-      sha:String(sha||""),
+      version:String(version||""),
       checkedAt:new Date().toISOString()
     }))
   }catch(_){}
 }
 async function fetchCatalogMeta(){
   const r=new Request(CATALOG_META_URL);
-  r.timeoutInterval=API_TIMEOUT;
-  r.headers={
-    "Accept":"application/vnd.github+json",
-    "X-GitHub-Api-Version":"2022-11-28",
-    "User-Agent":"Sideload-Watch"
-  };
+  r.timeoutInterval=config.runsInWidget?4:API_TIMEOUT;
   const p=await r.loadJSON();
-  const sha=String(p?.sha||"");
-  if(!sha)throw new Error("Catalog SHA unavailable");
-  return sha
+  const version=String(p?.generatedAt||"");
+  if(!version)throw new Error("Catalog version unavailable");
+  return version
 }
-async function downloadCatalog(remoteSha=""){
+async function downloadCatalog(remoteVersion=""){
   const data=normalizeCatalog(await requestJSON(CATALOG_URL));
   if(!data.sources.length)throw new Error("Empty catalog");
   fm.writeString(catalogCachePath,JSON.stringify(data));
-  if(remoteSha)saveCatalogMeta(remoteSha);
+  saveCatalogMeta(remoteVersion||data.generatedAt||"");
   return data
 }
 async function fetchCatalog(force=false){
@@ -294,10 +292,10 @@ async function fetchCatalog(force=false){
 
   if(force){
     try{
-      let remoteSha="";
-      try{remoteSha=await fetchCatalogMeta()}catch(_){}
-      const data=await downloadCatalog(remoteSha);
-      return {data,online:true,cached:false,updated:true,sha:remoteSha}
+      let remoteVersion="";
+      try{remoteVersion=await fetchCatalogMeta()}catch(_){}
+      const data=await downloadCatalog(remoteVersion);
+      return {data,online:true,cached:false,updated:true,version:remoteVersion}
     }catch(e){
       if(cached)return {data:cached,online:false,cached:true,error:String(e)};
       throw e
@@ -306,23 +304,23 @@ async function fetchCatalog(force=false){
 
   if(!cached){
     try{
-      let remoteSha="";
-      try{remoteSha=await fetchCatalogMeta()}catch(_){}
-      const data=await downloadCatalog(remoteSha);
-      return {data,online:true,cached:false,updated:true,sha:remoteSha}
+      let remoteVersion="";
+      try{remoteVersion=await fetchCatalogMeta()}catch(_){}
+      const data=await downloadCatalog(remoteVersion);
+      return {data,online:true,cached:false,updated:true,version:remoteVersion}
     }catch(e){throw e}
   }
 
   try{
-    const remoteSha=await fetchCatalogMeta();
-    const localSha=readCatalogMeta().sha;
+    const remoteVersion=await fetchCatalogMeta();
+    const localVersion=readCatalogMeta().version;
 
-    if(localSha&&remoteSha===localSha){
-      return {data:cached,online:true,cached:true,updated:false,sha:remoteSha}
+    if(localVersion&&remoteVersion===localVersion){
+      return {data:cached,online:true,cached:true,updated:false,version:remoteVersion}
     }
 
-    const data=await downloadCatalog(remoteSha);
-    return {data,online:true,cached:false,updated:true,sha:remoteSha}
+    const data=await downloadCatalog(remoteVersion);
+    return {data,online:true,cached:false,updated:true,version:remoteVersion}
   }catch(e){
     return {data:cached,online:false,cached:true,updated:false,error:String(e)}
   }
@@ -507,6 +505,22 @@ async function buildWidget(status,settings,familyOverride){
     }
   }
   w.refreshAfterDate=new Date(Date.now()+settings.refreshMinutes*60000);
+  return w
+}
+function buildErrorWidget(settings,error){
+  const family=config.widgetFamily||"medium",L=layoutForFamily(family),c=colors(settings),w=new ListWidget();
+  w.backgroundColor=c.bg;w.setPadding(L.pad,L.pad,L.pad,L.pad);
+  const title=w.addText(settings.widgetTitle||"Sideload Watch");
+  title.font=Font.boldSystemFont(L.title);title.textColor=c.text;title.lineLimit=1;
+  w.addSpacer(8);
+  const msg=w.addText("⚠︎ "+(tx(settings,"offline")||"offline"));
+  msg.font=Font.semiboldSystemFont(L.row);msg.textColor=c.red;msg.lineLimit=2;
+  if(error){
+    w.addSpacer(5);
+    const detail=w.addText(String(error).slice(0,120));
+    detail.font=Font.systemFont(Math.max(8,L.footer));detail.textColor=c.muted;detail.lineLimit=3;
+  }
+  w.refreshAfterDate=new Date(Date.now()+15*60000);
   return w
 }
 async function presentWidget(widget,family){
@@ -882,8 +896,13 @@ async function settings(s){
 let SETTINGS=await firstLanguage(loadSettings());
 
 if(config.runsInWidget){
-  const status=await getRealStatus(SETTINGS),w=await buildWidget(status,SETTINGS);
-  Script.setWidget(w);
+  try{
+    const status=await getRealStatus(SETTINGS),w=await buildWidget(status,SETTINGS);
+    Script.setWidget(w);
+  }catch(e){
+    console.log("Widget error: "+e);
+    Script.setWidget(buildErrorWidget(SETTINGS,e));
+  }
 }else{
   SETTINGS=await settings(SETTINGS);
 }
