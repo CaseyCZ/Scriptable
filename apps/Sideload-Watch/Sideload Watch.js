@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.6
+// Sideload Watch v0.2.7
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.6";
+const APP_VERSION = "0.2.7";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -389,6 +389,32 @@ async function getRealStatus(settings){
     return cachedStatus(settings,error)
   }
 }
+function instantStatus(settings){
+  const state=loadState();
+  const catalog=readCachedCatalog();
+  let current=catalog?resolveWatched(catalog,settings):[];
+  if(!current.length){
+    current=[];
+    for(const item of settings.watched){
+      const key=watchKey(item),now=state.lastCurrent[key];
+      if(!now)continue;
+      current.push({
+        key,
+        sourceId:item.sourceId,
+        sourceName:now.sourceName||"",
+        name:now.name||item.name,
+        version:now.version||"—",
+        iconURL:now.iconURL||""
+      })
+    }
+  }
+  const updates=current.filter(app=>state.seen[app.key]&&state.seen[app.key]!==app.version);
+  return{
+    updates,total:updates.length,current,
+    checkedAt:state.updatedAt?new Date(state.updatedAt):null,
+    offline:true,cached:true
+  }
+}
 async function getRealStatusWithBudget(settings,ms){
   try{
     return await Promise.race([
@@ -548,9 +574,25 @@ function buildErrorWidget(settings,error){
 }
 async function widget(settings,family){
   const fam=family||config.widgetFamily||"medium";
-  const status=config.runsInWidget
-    ? await getRealStatusWithBudget(settings,6500)
-    : await getRealStatus(settings);
+
+  // Home-screen widget: always provide content immediately from local data.
+  // Network refresh happens only after Scriptable already has a widget snapshot.
+  if(config.runsInWidget){
+    const initial=await buildWidget(instantStatus(settings),settings,fam);
+    Script.setWidget(initial);
+
+    try{
+      const fresh=await getRealStatusWithBudget(settings,4500);
+      const updated=await buildWidget(fresh,settings,fam);
+      Script.setWidget(updated);
+      return updated
+    }catch(e){
+      console.log("Widget refresh failed: "+e);
+      return initial
+    }
+  }
+
+  const status=await getRealStatus(settings);
   const w=await buildWidget(status,settings,fam);
   Script.setWidget(w);
   return w
