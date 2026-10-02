@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.4
+// Sideload Watch v0.2.5
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.4";
+const APP_VERSION = "0.2.5";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -542,7 +542,7 @@ function cmp(a,b){
 }
 async function updater(s){
   try{
-    const src=await getString(UPDATE_SOURCE_URL);
+    const src=await getString(UPDATE_SOURCE_URL+"?t="+Date.now());
     if(!src||src.length<UPDATE_MIN_BYTES||!src.includes('const APP_NAME = "Sideload Watch"'))throw new Error("Bad source");
     const m=src.match(/const APP_VERSION\s*=\s*"([^"]+)"/);if(!m)throw new Error("No version");
     const v=m[1];
