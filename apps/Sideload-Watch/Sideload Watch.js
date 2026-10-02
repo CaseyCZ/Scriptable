@@ -369,7 +369,7 @@ function cachedStatus(settings,error=null){
   }
 }
 function timeoutAfter(ms,label="Widget"){
-  return new Promise((_,reject)=>Timer.schedule(ms,false,()=>reject(new Error(label+" timeout")))
+  return new Promise((_,reject)=>Timer.schedule(ms,false,()=>reject(new Error(label+" timeout"))))
 }
 async function getRealStatus(settings){
   const state=loadState();
