@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.10
+// Sideload Watch v0.2.11
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.10";
+const APP_VERSION = "0.2.11";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -25,6 +25,7 @@ const CATALOG_URL = "https://raw.githubusercontent.com/CaseyCZ/iOS-Hub/main/data
 const CATALOG_META_URL = "https://raw.githubusercontent.com/CaseyCZ/iOS-Hub/main/data/catalog-meta.json";
 const HUB_URL = "https://caseycz.github.io/iOS-Hub/";
 const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sideload-Watch/Sideload%20Watch.js";
+const UPDATE_API_URL = "https://api.github.com/repos/CaseyCZ/Scriptable/contents/apps/Sideload-Watch/Sideload%20Watch.js?ref=Master";
 const UPDATE_MIN_BYTES = 12000;
 const API_TIMEOUT = 12;
 
@@ -232,6 +233,22 @@ async function requestJSON(url){
 }
 async function getString(url){
   const r=new Request(url);r.timeoutInterval=API_TIMEOUT;return await r.loadString()
+}
+async function getUpdateSource(){
+  const r=new Request(UPDATE_API_URL);
+  r.timeoutInterval=API_TIMEOUT;
+  r.headers={
+    "Accept":"application/vnd.github+json",
+    "X-GitHub-Api-Version":"2022-11-28",
+    "Cache-Control":"no-cache",
+    "User-Agent":"Sideload-Watch"
+  };
+  const j=await r.loadJSON();
+  const encoded=String(j?.content||"").replace(/\s+/g,"");
+  if(!encoded)throw new Error("Update source unavailable");
+  const data=Data.fromBase64String(encoded);
+  if(!data)throw new Error("Update decode failed");
+  return data.toRawString()
 }
 function normalizeCatalog(data){
   return {
@@ -667,7 +684,7 @@ function cmp(a,b){
 }
 async function updater(s){
   try{
-    const src=await getString(UPDATE_SOURCE_URL+"?t="+Date.now());
+    const src=await getUpdateSource();
     if(!src||src.length<UPDATE_MIN_BYTES||!src.includes('const APP_NAME = "Sideload Watch"'))throw new Error("Bad source");
     const m=src.match(/const APP_VERSION\s*=\s*"([^"]+)"/);if(!m)throw new Error("No version");
     const v=m[1];
