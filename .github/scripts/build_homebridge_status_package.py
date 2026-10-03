@@ -22,41 +22,23 @@ package = {
 }
 PACKAGE.write_text(json.dumps(package, ensure_ascii=False, indent=2), encoding="utf-8")
 
-entry = (
-    "      {name:'Homebridge Status',version:'" + version + "',icon:'🏠',"
-    "file:'./apps/Homebridge-Status/Homebridge%20Status.js',"
-    "install:'./apps/Homebridge-Status/Homebridge%20Status.scriptable',"
-    "preview:'https://raw.githubusercontent.com/homebridge/branding/latest/logos/homebridge-silhouette-round-white.png',"
-    "tags:['Homebridge','Monitoring','LAN / VPN','Widgets'],"
-    "description:{cs:'Homebridge monitoring s automatickým LAN → VPN fallbackem, stavem aktualizací a vlastním vzhledem.',"
-    "en:'Homebridge monitoring with automatic LAN → VPN fallback, update status and customizable appearance.'},"
-    "features:{cs:['LAN → VPN fallback bez ruční změny adresy','Homebridge, pluginy a Node.js update stav','CPU, RAM, teplota, uptime a grafy','Small / Medium / Large + Lock Screen'],"
-    "en:['LAN → VPN fallback without changing the address manually','Homebridge, plugins and Node.js update status','CPU, RAM, temperature, uptime and charts','Small / Medium / Large + Lock Screen']}}"
-)
-
+# Keep the app in the repository while it is being tested, but do not expose it
+# in the public website catalog yet.
 site = SITE.read_text(encoding="utf-8")
 block_match = re.search(r"(const ourApps=\[\n)(.*?)(\n    \];)", site, re.S)
 assert block_match, "ourApps block missing in index.html"
 body = block_match.group(2)
-
-if "{name:'Homebridge Status'" in body:
-    body, count = re.subn(
-        r"\s*\{name:'Homebridge Status'[^\n]*\}",
-        "\n" + entry,
-        body,
-        count=1,
-    )
-    assert count == 1, "Homebridge Status card update failed"
-else:
-    body = body.rstrip()
-    if body and not body.endswith(","):
-        body += ","
-    body += "\n" + entry
-
+body, _ = re.subn(
+    r"\n?\s*\{name:'Homebridge Status'[^\n]*\},?",
+    "",
+    body,
+    count=1,
+)
+body = re.sub(r",\s*$", "", body.rstrip())
 site = site[:block_match.start()] + block_match.group(1) + body + block_match.group(3) + site[block_match.end():]
 SITE.write_text(site, encoding="utf-8")
 
-print(f"Homebridge Status v{version} synchronized:")
+print(f"Homebridge Status v{version} synchronized (private testing):")
 print(f"- {SRC}")
 print(f"- {PACKAGE}")
-print(f"- {SITE}")
+print("- public website card hidden")
