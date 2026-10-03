@@ -1,50 +1,38 @@
 # Homebridge Status
 
-Scriptable widget pro sledování Homebridge postavený na ověřené API logice původního `homebridgeStatusWidget`, ale s rozhraním a nastavením sjednoceným s ostatními CaseyCZ Scriptable Apps.
+> **Testing build:** aplikace je zatím záměrně skrytá z veřejného webového katalogu. Instalační soubor zůstává v repozitáři pro soukromé testování.
 
-## Funkce
+Homebridge Status je Scriptable widget pro přehled stavu Homebridge v jednotném stylu CaseyCZ Scriptable Apps.
 
-- stav Homebridge, Homebridge verze, pluginů a Node.js
-- CPU load, teplota CPU, RAM a uptime
-- grafy CPU a RAM
-- Small, Medium a Large widget
-- Lock Screen: Inline, Circular a Rectangular
-- vlastní vzhled, motivy a barvy
-- nastavitelný refresh a timeout
-- notifikace při výpadku nebo dostupné aktualizaci
-- heslo uložené v Scriptable Keychain
-- automatická migrace základního nastavení ze starého `homebridgeStatus/black.json`
-- vlastní updater skriptu
+## Hlavní funkce
 
-## LAN → VPN fallback
+- zachovává ověřené Homebridge UI API z původního `homebridgeStatusWidget`,
+- primární LAN adresa + automatický fallback na druhou VPN adresu,
+- při každém novém obnovení se znovu preferuje LAN,
+- ukazuje Homebridge, Plugins a Node.js update status,
+- CPU load, RAM usage, teplotu CPU, uptime a grafy,
+- Small / Medium / Large widget,
+- Lock Screen Inline / Circular / Rectangular,
+- vzhled, navigace a nastavení sjednocené s Home Dashboardem,
+- nastavitelné barvy a motiv widgetu,
+- notifikace změn stavu,
+- self-update z `Master`,
+- heslo uložené v Scriptable Keychain.
 
-V nastavení lze zadat dvě adresy:
+## Připojení
+
+V aplikaci otevři **Připojení** a nastav:
 
 1. **Primární adresa (LAN)** – například `http://192.168.1.50:8581`
-2. **Záložní adresa (VPN)** – například Tailscale/VPN adresa `http://100.x.x.x:8581`
+2. **Záložní adresa (VPN)** – například Tailscale IP / hostname s portem `8581`
+3. Homebridge uživatelské jméno a heslo
 
-Při každém spuštění nebo obnovení widgetu se vždy nejdříve zkusí LAN adresa. Pokud není dostupná, skript automaticky zkusí VPN adresu. Není tedy potřeba ručně měnit Homebridge URL při odchodu z domácí sítě.
+Skript při každém načtení zkusí nejdřív LAN. Pokud se nepřipojí, automaticky zkusí VPN adresu.
 
-Medium a Large widget mohou zobrazit, zda právě používají `LAN` nebo `VPN`.
+## Staré nastavení
 
-## Nastavení
+Při prvním spuštění se skript pokusí převzít základní nastavení ze starého `homebridgeStatus/black.json`, pokud soubor existuje. Heslo se po migraci uloží do Keychainu.
 
-Spusť skript přímo v Scriptable. Otevře se nastavení ve stylu ostatních CaseyCZ widgetů:
+## Verze
 
-- **Připojení** – LAN/VPN URL, uživatel, heslo, HTTPS
-- **Náhled widgetu** – náhled všech podporovaných velikostí
-- **Vzhled widgetu** – motiv, barvy a viditelné údaje
-- **Chování** – refresh, timeout a ignorované update kontroly
-- **Notifikace** – výpadky, aktualizace a recovery zprávy
-- **Aktualizace** – kontrola a instalace nové verze skriptu
-
-## Ignorování aktualizací
-
-Do pole `Ignorovat aktualizace` lze zadat přesné npm názvy pluginů oddělené čárkou. Podporované jsou také speciální hodnoty:
-
-- `HOMEBRIDGE_UTD`
-- `NODEJS_UTD`
-
-## Původ
-
-Homebridge API části vycházejí z projektu `homebridgeStatusWidget` od lwitzani. Uživatelské rozhraní, fallback, nastavení, widget layouty a updater jsou upravené pro CaseyCZ Scriptable Apps.
+Aktuální testovací verze: **v0.1.1**
