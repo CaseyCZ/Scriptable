@@ -1,0 +1,67 @@
+name: Build Home Dashboard package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/Home-Dashboard/Home Dashboard.js'
+      - '.github/scripts/build_home_dashboard_package.py'
+      - '.github/workflows/build-home-dashboard-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Home-Dashboard/Home Dashboard.js' /tmp/HomeDashboard.mjs
+          node --check /tmp/HomeDashboard.mjs
+
+      - name: Build package and sync website
+        run: python .github/scripts/build_home_dashboard_package.py
+
+      - name: Validate package parity
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+
+          app=Path('apps/Home-Dashboard')
+          src=(app/'Home Dashboard.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Home Dashboard.scriptable').read_text(encoding='utf-8'))
+          site=Path('index.html').read_text(encoding='utf-8')
+          vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
+
+          assert pkg['name']=='Home Dashboard'
+          assert pkg['script']==src, '.scriptable does not contain exact Home Dashboard.js'
+          assert pkg.get('always_run_in_app') is False
+          assert pkg.get('share_sheet_inputs') == []
+          assert f"{{name:'Home Dashboard',version:'{version}'" in site
+          assert "install:'./apps/Home-Dashboard/Home%20Dashboard.scriptable'" in site
+          print(f'Home Dashboard v{version}: JS + package + website are synchronized')
+          PY
+
+      - name: Commit synchronized release files
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add \
+            'apps/Home-Dashboard/Home Dashboard.scriptable' \
+            index.html
+          if git diff --cached --quiet; then
+            echo "Home Dashboard release surfaces already synchronized"
+            exit 0
+          fi
+          git commit -m "Sync Home Dashboard package"
+          git push origin HEAD:Master
