@@ -1,0 +1,76 @@
+name: Build Homebridge Status package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/Homebridge-Status/Homebridge Status.js'
+      - '.github/scripts/build_homebridge_status_package.py'
+      - '.github/workflows/build-homebridge-status-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
+          node --check /tmp/HomebridgeStatus.mjs
+
+      - name: Build package and sync website
+        run: python .github/scripts/build_homebridge_status_package.py
+
+      - name: Validate package parity
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+
+          app=Path('apps/Homebridge-Status')
+          src=(app/'Homebridge Status.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Homebridge Status.scriptable').read_text(encoding='utf-8'))
+          site=Path('index.html').read_text(encoding='utf-8')
+          vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
+
+          assert pkg['name']=='Homebridge Status'
+          assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
+          assert pkg.get('always_run_in_app') is False
+          assert pkg.get('share_sheet_inputs') == []
+          assert f"{{name:'Homebridge Status',version:'{version}'" in site
+          assert "install:'./apps/Homebridge-Status/Homebridge%20Status.scriptable'" in site
+
+          # Core regression guards.
+          assert 'fallbackUrl' in src, 'VPN fallback setting missing'
+          assert 'route:"LAN"' in src and 'route:"VPN"' in src, 'LAN/VPN routing missing'
+          assert '/api/status/homebridge' in src, 'Homebridge status endpoint missing'
+          assert '/api/status/cpu' in src and '/api/status/ram' in src, 'CPU/RAM endpoints missing'
+          assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
+          assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
+          assert len(src)>18000
+          print(f'Homebridge Status v{version}: JS + package + website are synchronized')
+          PY
+
+      - name: Commit synchronized release files
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add \
+            'apps/Homebridge-Status/Homebridge Status.scriptable' \
+            index.html
+          if git diff --cached --quiet; then
+            echo "Homebridge Status release surfaces already synchronized"
+            exit 0
+          fi
+          git commit -m "Sync Homebridge Status package"
+          git push origin HEAD:Master
