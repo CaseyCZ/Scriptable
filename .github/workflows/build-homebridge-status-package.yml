@@ -47,8 +47,7 @@ jobs:
           assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
           assert pkg.get('always_run_in_app') is False
           assert pkg.get('share_sheet_inputs') == []
-          assert f"{{name:'Homebridge Status',version:'{version}'" in site
-          assert "install:'./apps/Homebridge-Status/Homebridge%20Status.scriptable'" in site
+          assert "{name:'Homebridge Status'" not in site, 'Homebridge Status must stay hidden from public catalog during testing'
 
           # Core regression guards.
           assert 'fallbackUrl' in src, 'VPN fallback setting missing'
@@ -58,7 +57,7 @@ jobs:
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
           assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
           assert len(src)>18000
-          print(f'Homebridge Status v{version}: JS + package + website are synchronized')
+          print(f'Homebridge Status v{version}: JS + package synchronized; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -72,5 +71,5 @@ jobs:
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync Homebridge Status package"
+          git commit -m "Sync private Homebridge Status package"
           git push origin HEAD:Master
