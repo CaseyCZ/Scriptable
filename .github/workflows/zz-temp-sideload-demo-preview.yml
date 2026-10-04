@@ -1,0 +1,81 @@
+name: Temporary Sideload Watch demo preview refresh
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/zz-temp-sideload-demo-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sideload Watch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          app=Path('apps/Sideload-Watch')
+          p=app/'Sideload Watch.js'
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('// Sideload Watch v0.2.23','// Sideload Watch v0.2.24',1)
+          s=s.replace('const APP_VERSION = "0.2.23";','const APP_VERSION = "0.2.24";',1)
+
+          repl={
+            'demoPreview:"Demo · 7 aktualizací"':'demoPreview:"Demo vzhledu"',
+            'demoPreview:"Demo · 7 updates"':'demoPreview:"Appearance demo"',
+            'demoPreview:"Demo · 7 Updates"':'demoPreview:"Design-Demo"',
+            'demoPreview:"Demo · 7 actualizaciones"':'demoPreview:"Demo de diseño"'
+          }
+          for old,new in repl.items():
+            if old not in s:
+              raise SystemExit(f'missing translation: {old}')
+            s=s.replace(old,new,1)
+
+          old='''function demoStatus(){\n  const demo=[\n    {name:"Stremio",version:"2.0.9"},\n    {name:"YouTubeRebornPlus",version:"20.06.1"},\n    {name:"Yattee",version:"2.1.0"},\n    {name:"SideStore",version:"0.6.3"},\n    {name:"UTM",version:"4.8.0"},\n    {name:"Provenance",version:"3.4.0"},\n    {name:"VortX",version:"0.5.0"}\n  ];\n  return{updates:demo,total:demo.length,checkedAt:new Date(),offline:false,cached:false,cacheOnly:false,failedSources:[],failedSourceIds:[],demo:true}\n}'''
+          new='''function demoStatus(settings){\n  const state=loadState();\n  const watched=Array.isArray(settings?.watched)?settings.watched:[];\n  const sourceIds=[...new Set(watched.map(x=>String(x.sourceId||"")).filter(Boolean))];\n  const sourceNameFor=id=>{\n    const item=watched.find(x=>String(x.sourceId||"")===id);\n    if(!item)return id;\n    return String(state.lastCurrent?.[watchKey(item)]?.sourceName||id)\n  };\n  const failedId=sourceIds.find(id=>sourceNameFor(id).toLowerCase().includes("livecontainer"))||sourceIds[0]||"";\n  const current=watched.map(item=>{\n    const prev=state.lastCurrent?.[watchKey(item)]||{};\n    return{\n      key:watchKey(item),sourceId:String(item.sourceId||""),\n      sourceName:String(prev.sourceName||item.sourceId||"source"),\n      sourceURL:item.sourceURL||"",name:item.name||"App",\n      version:String(prev.version||"1.0"),iconURL:String(prev.iconURL||"")\n    }\n  });\n  const failedName=failedId?(current.find(x=>x.sourceId===failedId)?.sourceName||failedId):"";\n  return{\n    updates:[],total:0,current,checkedAt:new Date(),\n    offline:!!failedId,cached:false,cacheOnly:false,\n    failedSources:failedName?[failedName]:[],\n    failedSourceIds:failedId?[failedId]:[],demo:true\n  }\n}'''
+          if old not in s:
+            raise SystemExit('demoStatus marker missing')
+          s=s.replace(old,new,1)
+
+          old='const status=m.demo?demoStatus():await getLiveStatus(cur),w=await buildWidget(status,cur,family);'
+          new='const status=m.demo?demoStatus(cur):await getLiveStatus(cur),w=await buildWidget(status,cur,family);'
+          if old not in s:
+            raise SystemExit('preview demo call marker missing')
+          s=s.replace(old,new,1)
+
+          p.write_text(s,encoding='utf-8')
+          (app/'version.json').write_text(json.dumps({'version':'0.2.24'},indent=2)+'\n',encoding='utf-8')
+
+          pkg_path=app/'Sideload Watch.scriptable'
+          if pkg_path.exists():
+              pkg=json.loads(pkg_path.read_text(encoding='utf-8'))
+              pkg['script']=s
+              pkg_path.write_text(json.dumps(pkg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: |
+          cp 'apps/Sideload-Watch/Sideload Watch.js' /tmp/sideload.mjs
+          node --check /tmp/sideload.mjs
+          grep -q 'const APP_VERSION = "0.2.24";' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'demoPreview:"Demo vzhledu"' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'function demoStatus(settings)' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'demoStatus(cur)' 'apps/Sideload-Watch/Sideload Watch.js'
+
+      - name: Commit app files
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git add 'apps/Sideload-Watch/Sideload Watch.js' 'apps/Sideload-Watch/version.json' 'apps/Sideload-Watch/Sideload Watch.scriptable'
+          git commit -m 'Refresh Sideload Watch demo previews'
+          git push origin HEAD:Master
