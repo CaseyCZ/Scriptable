@@ -21,22 +21,6 @@ jobs:
         with:
           ref: Master
 
-      - name: Apply v0.1.8 medium grid alignment
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('apps/Homebridge-Status/Homebridge Status.js')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace('// Homebridge Status v0.1.7','// Homebridge Status v0.1.8',1)
-          s=s.replace('const APP_VERSION = "0.1.7";','const APP_VERSION = "0.1.8";',1)
-          old='brand.size=new Size(156,0)'
-          new='brand.size=new Size(172,0)'
-          if old not in s:
-              raise SystemExit('medium brand alignment marker not found')
-          s=s.replace(old,new,1)
-          p.write_text(s,encoding='utf-8')
-          PY
-
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
@@ -91,12 +75,11 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
-            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Align Homebridge Status medium grid"
+          git commit -m "Sync private Homebridge Status package"
           git push origin HEAD:Master
