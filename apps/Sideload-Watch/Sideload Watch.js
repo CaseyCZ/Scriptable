@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.18
+// Sideload Watch v0.2.19
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.18";
+const APP_VERSION = "0.2.19";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -37,7 +37,7 @@ const T = {
     preview:"Náhled widgetu",previewDetail:"Vzhled widgetu zůstává stejný.",
     appearance:"Vzhled widgetu",appearanceDetail:"Název, popisky, viditelnost a barvy widgetu.",
     widgetTitle:"Název widgetu",footerLabel:"Spodní popisek",footerLabelDetail:"Nech prázdné pro automatický text.",
-    visibility:"Viditelnost",mediumLayout:"Rozložení Medium",mediumLayoutColumns:"2 sloupce",mediumLayoutCenter:"Na střed",showNew:"Zobrazit NEW",showVersion:"Zobrazit verzi",showCount:"Zobrazit počet aktualizací",showTime:"Zobrazit čas kontroly",
+    visibility:"Viditelnost",mediumLayout:"Rozložení Medium / Large",mediumLayoutColumns:"2 sloupce",mediumLayoutCenter:"Na střed",showNew:"Zobrazit NEW",showVersion:"Zobrazit verzi",showCount:"Zobrazit počet aktualizací",showTime:"Zobrazit čas kontroly",
     customColors:"Vlastní barvy",useCustomColors:"Použít vlastní barvy",backgroundColor:"Barva pozadí",textColor:"Barva textu",mutedColor:"Barva vedlejšího textu",newColor:"Barva NEW textu",newBgColor:"Barva NEW pozadí",countColor:"Barva počtu aktualizací",resetAppearance:"Obnovit výchozí vzhled",
     tools:"Nástroje",toolsDetail:"Aktualizace, export, reset a údržba.",
     sources:"Sources",sourcesSub:"Otevři source a vyber konkrétní aplikace, které chceš sledovat.",
@@ -66,7 +66,7 @@ const T = {
     preview:"Widget preview",previewDetail:"Widget appearance stays unchanged.",
     appearance:"Widget appearance",appearanceDetail:"Title, labels, visibility and widget colors.",
     widgetTitle:"Widget title",footerLabel:"Footer label",footerLabelDetail:"Leave empty for automatic text.",
-    visibility:"Visibility",mediumLayout:"Medium layout",mediumLayoutColumns:"2 columns",mediumLayoutCenter:"Centered",showNew:"Show NEW",showVersion:"Show version",showCount:"Show update count",showTime:"Show checked time",
+    visibility:"Visibility",mediumLayout:"Medium / Large layout",mediumLayoutColumns:"2 columns",mediumLayoutCenter:"Centered",showNew:"Show NEW",showVersion:"Show version",showCount:"Show update count",showTime:"Show checked time",
     customColors:"Custom colors",useCustomColors:"Use custom colors",backgroundColor:"Background color",textColor:"Text color",mutedColor:"Secondary text color",newColor:"NEW text color",newBgColor:"NEW background color",countColor:"Update count color",resetAppearance:"Reset appearance",
     tools:"Tools",toolsDetail:"Updates, export, reset and maintenance.",
     sources:"Sources",sourcesSub:"Open a source and choose the exact apps you want to watch.",
@@ -95,7 +95,7 @@ const T = {
     preview:"Widget-Vorschau",previewDetail:"Das Aussehen des Widgets bleibt unverändert.",
     appearance:"Widget-Aussehen",appearanceDetail:"Titel, Texte, Sichtbarkeit und Farben des Widgets.",
     widgetTitle:"Widget-Titel",footerLabel:"Fußzeile",footerLabelDetail:"Leer lassen für automatischen Text.",
-    visibility:"Sichtbarkeit",mediumLayout:"Medium-Layout",mediumLayoutColumns:"2 Spalten",mediumLayoutCenter:"Zentriert",showNew:"NEW anzeigen",showVersion:"Version anzeigen",showCount:"Update-Anzahl anzeigen",showTime:"Prüfzeit anzeigen",
+    visibility:"Sichtbarkeit",mediumLayout:"Medium-/Large-Layout",mediumLayoutColumns:"2 Spalten",mediumLayoutCenter:"Zentriert",showNew:"NEW anzeigen",showVersion:"Version anzeigen",showCount:"Update-Anzahl anzeigen",showTime:"Prüfzeit anzeigen",
     customColors:"Eigene Farben",useCustomColors:"Eigene Farben verwenden",backgroundColor:"Hintergrundfarbe",textColor:"Textfarbe",mutedColor:"Sekundärtextfarbe",newColor:"NEW-Textfarbe",newBgColor:"NEW-Hintergrundfarbe",countColor:"Farbe der Update-Anzahl",resetAppearance:"Aussehen zurücksetzen",
     tools:"Werkzeuge",toolsDetail:"Updates, Export, Reset und Wartung.",
     sources:"Quellen",sourcesSub:"Öffne eine Quelle und wähle die Apps aus, die du beobachten möchtest.",
@@ -124,7 +124,7 @@ const T = {
     preview:"Vista previa",previewDetail:"El aspecto del widget no cambia.",
     appearance:"Apariencia del widget",appearanceDetail:"Título, textos, visibilidad y colores del widget.",
     widgetTitle:"Título del widget",footerLabel:"Etiqueta inferior",footerLabelDetail:"Déjalo vacío para usar texto automático.",
-    visibility:"Visibilidad",mediumLayout:"Diseño Medium",mediumLayoutColumns:"2 columnas",mediumLayoutCenter:"Centrado",showNew:"Mostrar NEW",showVersion:"Mostrar versión",showCount:"Mostrar número de actualizaciones",showTime:"Mostrar hora de comprobación",
+    visibility:"Visibilidad",mediumLayout:"Diseño Medium / Large",mediumLayoutColumns:"2 columnas",mediumLayoutCenter:"Centrado",showNew:"Mostrar NEW",showVersion:"Mostrar versión",showCount:"Mostrar número de actualizaciones",showTime:"Mostrar hora de comprobación",
     customColors:"Colores personalizados",useCustomColors:"Usar colores personalizados",backgroundColor:"Color de fondo",textColor:"Color del texto",mutedColor:"Color del texto secundario",newColor:"Color del texto NEW",newBgColor:"Color del fondo NEW",countColor:"Color del número de actualizaciones",resetAppearance:"Restablecer apariencia",
     tools:"Herramientas",toolsDetail:"Actualizaciones, exportación, reinicio y mantenimiento.",
     sources:"Fuentes",sourcesSub:"Abre una fuente y elige las apps concretas que quieres vigilar.",
@@ -669,51 +669,58 @@ async function buildWidget(status,settings,familyOverride){
     const msg=body.addText(tx(settings,"noSelection"));msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
     body.addSpacer();
   }else if(status.total===0){
-    if(family==="medium"&&settings.mediumLayout!=="center"){
+    const summaryFamily=family==="medium"||family==="large";
+    if(summaryFamily&&settings.mediumLayout!=="center"){
       const summary=mediumSummary(status,settings);
+      const large=family==="large";
       const addCentered=(parent,value,font,color,scale=.72)=>{
         const row=parent.addStack();row.centerAlignContent();row.addSpacer();
         const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=scale;
         row.addSpacer();return text
       };
+      if(large)w.addSpacer(8);
       const columns=w.addStack();columns.centerAlignContent();columns.addSpacer();
       const left=columns.addStack();left.layoutVertically();left.size=new Size(135,0);
-      addCentered(left,"✓",Font.boldSystemFont(25),c.green);
-      left.addSpacer(3);
-      addCentered(left,W.upToDate,Font.semiboldSystemFont(11),c.text,.65);
-      if(settings.showCount!==false){left.addSpacer(4);addCentered(left,W.updates(status.total),Font.boldSystemFont(9),c.muted,.7)}
+      addCentered(left,"✓",Font.boldSystemFont(large?30:25),c.green);
+      left.addSpacer(large?5:3);
+      addCentered(left,W.upToDate,Font.semiboldSystemFont(large?13:11),c.text,.65);
+      if(settings.showCount!==false){left.addSpacer(large?6:4);addCentered(left,W.updates(status.total),Font.boldSystemFont(large?11:9),c.muted,.7)}
       columns.addSpacer(10);
       const right=columns.addStack();right.layoutVertically();right.size=new Size(145,0);
-      addCentered(right,summary.tracked,Font.boldSystemFont(8),c.muted);
-      right.addSpacer(3);
-      addCentered(right,summary.watchedLine,Font.semiboldSystemFont(10),c.text,.65);
-      right.addSpacer(2);
-      addCentered(right,summary.onlineLine,Font.mediumSystemFont(9),c.muted,.65);
-      if(status.offline){right.addSpacer(3);addCentered(right,offlineFooterText(status,settings),Font.mediumSystemFont(8),c.red,.55)}
+      addCentered(right,summary.tracked,Font.boldSystemFont(large?10:8),c.muted);
+      right.addSpacer(large?5:3);
+      addCentered(right,summary.watchedLine,Font.semiboldSystemFont(large?12:10),c.text,.65);
+      right.addSpacer(large?3:2);
+      addCentered(right,summary.onlineLine,Font.mediumSystemFont(large?11:9),c.muted,.65);
+      if(status.offline){right.addSpacer(large?5:3);addCentered(right,offlineFooterText(status,settings),Font.mediumSystemFont(large?10:8),c.red,.55)}
       columns.addSpacer();
     }else{
       const body=w.addStack();body.layoutVertically();
-      if(family==="medium"){
+      if(summaryFamily){
+        const large=family==="large";
         const centered=(value,font,color)=>{
           const row=body.addStack();row.centerAlignContent();row.addSpacer();
           const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=.72;
           row.addSpacer();return text
         };
-        centered("✓",Font.boldSystemFont(22),c.green);
-        body.addSpacer(2);
-        centered(W.upToDate,Font.semiboldSystemFont(12),c.text);
+        if(large)body.addSpacer();
+        centered("✓",Font.boldSystemFont(large?30:22),c.green);
+        body.addSpacer(large?4:2);
+        centered(W.upToDate,Font.semiboldSystemFont(large?14:12),c.text);
         const summary=mediumSummary(status,settings);
-        body.addSpacer(5);
-        centered(summary.tracked,Font.boldSystemFont(8),c.muted);
-        body.addSpacer(2);
-        centered(summary.watchedLine,Font.semiboldSystemFont(10),c.text);
-        body.addSpacer(1);
-        centered(summary.onlineLine,Font.mediumSystemFont(9),c.muted);
+        body.addSpacer(large?9:5);
+        centered(summary.tracked,Font.boldSystemFont(large?10:8),c.muted);
+        body.addSpacer(large?4:2);
+        centered(summary.watchedLine,Font.semiboldSystemFont(large?12:10),c.text);
+        body.addSpacer(large?3:1);
+        centered(summary.onlineLine,Font.mediumSystemFont(large?11:9),c.muted);
+        if(status.offline){body.addSpacer(large?5:3);centered(offlineFooterText(status,settings),Font.mediumSystemFont(large?10:8),c.red)}
+        if(large)body.addSpacer();
       }else{
         body.addSpacer();
-        const ok=body.addText("✓");ok.font=Font.boldSystemFont(family==="small"?24:30);ok.textColor=c.green;ok.centerAlignText();
+        const ok=body.addText("✓");ok.font=Font.boldSystemFont(24);ok.textColor=c.green;ok.centerAlignText();
         body.addSpacer(4);
-        const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
+        const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(11);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
         body.addSpacer();
       }
     }
@@ -733,10 +740,12 @@ async function buildWidget(status,settings,familyOverride){
     }
   }
 
+  const summaryFamily=family==="medium"||family==="large";
   if(family==="medium")w.addSpacer(5);else w.addSpacer();
-  if(family==="medium"){
-    const mediumColumns=status.total===0&&settings.mediumLayout!=="center";
-    if(!mediumColumns&&(settings.showCount!==false||status.offline)){
+  if(summaryFamily){
+    const summaryColumns=status.total===0&&settings.mediumLayout!=="center";
+    const summaryCenter=status.total===0&&settings.mediumLayout==="center";
+    if(!summaryColumns&&!summaryCenter&&(settings.showCount!==false||status.offline)){
       const footer=w.addStack();footer.centerAlignContent();footer.addSpacer();
       if(settings.showCount!==false){
         const count=footer.addText(W.updates(status.total));count.font=Font.boldSystemFont(L.footer);count.textColor=status.total>0?(c.count||c.green):c.muted;count.lineLimit=1;count.minimumScaleFactor=.7
@@ -748,7 +757,7 @@ async function buildWidget(status,settings,familyOverride){
       footer.addSpacer();
     }
     if(settings.showTime!==false){
-      w.addSpacer(2);
+      w.addSpacer(family==="large"?4:2);
       const timeRow=w.addStack();timeRow.addSpacer();
       const checked=timeRow.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted;checked.lineLimit=1;
       timeRow.addSpacer();
