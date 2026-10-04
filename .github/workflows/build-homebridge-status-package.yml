@@ -21,54 +21,6 @@ jobs:
         with:
           ref: Master
 
-      - name: Apply v0.1.11 Large redesign
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          p=Path('apps/Homebridge-Status/Homebridge Status.js')
-          s=p.read_text(encoding='utf-8')
-          if 'const APP_VERSION = "0.1.11";' not in s:
-              if 'const APP_VERSION = "0.1.10";' not in s:
-                  raise SystemExit('Expected Homebridge Status v0.1.10 source')
-              s=s.replace('// Homebridge Status v0.1.10','// Homebridge Status v0.1.11',1)
-              s=s.replace('const APP_VERSION = "0.1.10";','const APP_VERSION = "0.1.11";',1)
-
-              old='''  const [cpu,ram,uptime,plugins,hbVersion,nodeVersion,rpiHealth]=await Promise.all([\n    optionalApi(base,token,"/api/status/cpu",s),\n    optionalApi(base,token,"/api/status/ram",s),\n    optionalApi(base,token,"/api/status/uptime",s),\n    optionalApi(base,token,"/api/plugins",s),\n    optionalApi(base,token,"/api/status/homebridge-version",s),\n    optionalApi(base,token,"/api/status/nodejs",s),\n    optionalApi(base,token,"/api/status/rpi/throttled",s)\n  ]);'''
-              new='''  const [cpu,ram,uptime,plugins,hbVersion,nodeVersion,rpiHealth,network,serverInfo,childBridges]=await Promise.all([\n    optionalApi(base,token,"/api/status/cpu",s),\n    optionalApi(base,token,"/api/status/ram",s),\n    optionalApi(base,token,"/api/status/uptime",s),\n    optionalApi(base,token,"/api/plugins",s),\n    optionalApi(base,token,"/api/status/homebridge-version",s),\n    optionalApi(base,token,"/api/status/nodejs",s),\n    optionalApi(base,token,"/api/status/rpi/throttled",s),\n    optionalApi(base,token,"/api/status/network",s),\n    optionalApi(base,token,"/api/status/server-information",s),\n    optionalApi(base,token,"/api/status/homebridge/child-bridges",s)\n  ]);'''
-              if old not in s:
-                  raise SystemExit('snapshot Promise block not found')
-              s=s.replace(old,new,1)
-              oldret='return {connected:true,base,route,token,running,hbUtd,pluginsUtd,nodeUtd,cpu,ram,uptime,plugins,hbVersion,nodeVersion,rpiHealth,updatedAt:Date.now()}'
-              newret='return {connected:true,base,route,token,running,hbUtd,pluginsUtd,nodeUtd,cpu,ram,uptime,plugins,hbVersion,nodeVersion,rpiHealth,network,serverInfo,childBridges,updatedAt:Date.now()}'
-              if oldret not in s:
-                  raise SystemExit('snapshot return not found')
-              s=s.replace(oldret,newret,1)
-
-              marker='class LineChart{'
-              if marker not in s:
-                  raise SystemExit('LineChart marker missing')
-              large_status='''function addLargeStatusGrid(w,s,snap,c,font=10){const card=w.addStack();card.backgroundColor=c.card;card.cornerRadius=12;card.setPadding(8,14,8,14);const row=card.addStack();row.addSpacer(6);const left=row.addStack();left.layoutVertically();addStatusRow(left,tx(s,"running"),snap.running,c,font);left.addSpacer(5);addStatusRow(left,tx(s,"plugins"),snap.pluginsUtd,c,font);row.addSpacer();const right=row.addStack();right.layoutVertically();addMediumVersionRow(right,"Homebridge",snap.hbUtd,installedVersion(snap.hbVersion),c,font);right.addSpacer(5);addMediumVersionRow(right,"Node.js",snap.nodeUtd,installedVersion(snap.nodeVersion,true),c,font);row.addSpacer(6);return card}\n\n'''
-              s=s.replace(marker,large_status+marker,1)
-
-              system_re=r'function addSystemPanel\(w,s,snap,c\)\{.*?\}\n\nfunction centeredPanelText'
-              system_new='''function largeLabels(s){const lang=s.language||"cs";return({cs:{network:"Síť",host:"Host",ip:"IP",bridges:"Child Bridges"},en:{network:"Network",host:"Host",ip:"IP",bridges:"Child Bridges"},de:{network:"Netzwerk",host:"Host",ip:"IP",bridges:"Child Bridges"},es:{network:"Red",host:"Host",ip:"IP",bridges:"Puentes"}}[lang]||{network:"Síť",host:"Host",ip:"IP",bridges:"Child Bridges"})}\nfunction formatRate(v){const n=Number(v);if(!Number.isFinite(n))return"—";const mb=n/1024/1024;return mb<0.1?mb.toFixed(2):mb.toFixed(1)}\nfunction networkRateText(snap){const n=snap.network?.net;if(!n)return"—";return `↓ ${formatRate(n.rx_sec)}  ↑ ${formatRate(n.tx_sec)} MB/s`}\nfunction childBridgeSummary(snap){if(!Array.isArray(snap.childBridges))return{text:"—",ok:undefined};const total=snap.childBridges.length;if(total===0)return{text:"0",ok:true};const ok=snap.childBridges.filter(b=>["ok","up"].includes(String(b?.status||"").toLowerCase())).length;return{text:`${ok}/${total}`,ok:ok===total}}\nfunction addInlineInfo(row,label,value,c,valueColor){const cell=row.addStack();cell.centerAlignContent();addText(cell,label,9,c.muted,"semibold");cell.addSpacer(5);addText(cell,value,10,valueColor||c.text,"semibold");return cell}\nfunction addSystemPanel(w,s,snap,c){const L=largeLabels(s),p=w.addStack();p.layoutVertically();p.backgroundColor=c.card;p.cornerRadius=12;p.setPadding(8,14,8,14);let title=p.addStack();title.addSpacer();addText(title,tx(s,"system"),8,c.muted,"semibold");title.addSpacer();p.addSpacer(5);let r=p.addStack();r.addSpacer();const temp=cpuTemp(snap);addInlineInfo(r,tx(s,"tempShort"),temp===null?"—":fmt(temp)+" °C",c);r.addSpacer(18);addInlineInfo(r,L.network,networkRateText(snap),c);r.addSpacer();p.addSpacer(5);r=p.addStack();r.addSpacer();addInlineInfo(r,tx(s,"piUptime"),formatSeconds(snap.uptime?.time?.uptime),c);r.addSpacer(22);addInlineInfo(r,tx(s,"uiUptime"),formatSeconds(snap.uptime?.processUptime),c);r.addSpacer();return p}\n\nfunction centeredPanelText'''
-              s,n=re.subn(system_re,system_new,s,count=1,flags=re.S)
-              if n!=1:
-                  raise SystemExit('addSystemPanel replacement failed')
-
-              build_re=r'async function buildLarge\(snap,s\)\{.*?\}\nasync function buildAccessoryRectangular'
-              build_new='''async function buildLarge(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);w.setPadding(18,26,15,26);addHeader(w,s,c,snap,18);w.addSpacer(9);if(!snap.connected){addUnavailable(w,s,c,snap);return w}addLargeStatusGrid(w,s,snap,c,10);w.addSpacer(9);const metrics=w.addStack();addMetricCard(metrics,tx(s,"cpuLoad"),fmt(cpuLoad(snap)),"%",snap.cpu?.cpuLoadHistory,c,s.showGraphs,"",true,134,true);metrics.addSpacer(10);addMetricCard(metrics,tx(s,"ramUsage"),fmt(ramUsed(snap)),"%",snap.ram?.memoryUsageHistory,c,s.showGraphs,"",true,134,true);w.addSpacer(9);addSystemPanel(w,s,snap,c);w.addSpacer(9);const L=largeLabels(s),section=w.addStack();section.layoutVertically();section.backgroundColor=c.card;section.cornerRadius=12;section.setPadding(8,14,7,14);let title=section.addStack();title.addSpacer();addText(title,tx(s,"details"),8,c.muted,"semibold");title.addSpacer();section.addSpacer(5);const piWarnings=rpiWarningKeys(snap),bridges=childBridgeSummary(snap);const host=snap.serverInfo?.os?.hostname||"—",arch=snap.serverInfo?.os?.arch||"",ip=snap.serverInfo?.network?.ip4||"—",iface=snap.serverInfo?.network?.iface||"";const rows=[[L.host,arch?`${host} · ${arch}`:host,!!snap.serverInfo],[L.ip,iface?`${ip} · ${iface}`:ip,!!snap.serverInfo?.network],[L.bridges,bridges.text,bridges.ok],["Raspberry Pi",piWarnings===null?"—":piWarnings.length?`⚠ ${piWarnings.length}`:"OK",piWarnings===null?undefined:piWarnings.length===0]];for(const [name,value,ok] of rows){const r=section.addStack();r.centerAlignContent();r.addSpacer(6);const m=statusMeta(ok,c);addSymbol(r,m.icon,10,m.color);r.addSpacer(5);addText(r,name,10,c.text,"semibold");r.addSpacer();addText(r,value,8,ok===false?c.warn:c.muted,"semibold");r.addSpacer(6);section.addSpacer(4)}w.addSpacer();if(s.showUpdated){const df=new DateFormatter();df.useNoDateStyle();df.useShortTimeStyle();const foot=w.addStack();foot.addSpacer();addText(foot,df.string(new Date(snap.updatedAt)),8,c.muted);foot.addSpacer()}return w}\nasync function buildAccessoryRectangular'''
-              s,n=re.subn(build_re,build_new,s,count=1,flags=re.S)
-              if n!=1:
-                  raise SystemExit('buildLarge replacement failed')
-
-              p.write_text(s,encoding='utf-8')
-          else:
-              print('v0.1.11 already applied')
-          PY
-
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
@@ -120,12 +72,11 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
-            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Redesign Homebridge Status Large widget"
+          git commit -m "Sync private Homebridge Status package"
           git push origin HEAD:Master
