@@ -1,0 +1,104 @@
+name: Temporary Sideload Watch medium layout option
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/zz-temp-sideload-medium-layout-option.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sideload Watch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          app=Path('apps/Sideload-Watch')
+          p=app/'Sideload Watch.js'
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('// Sideload Watch v0.2.17','// Sideload Watch v0.2.18',1)
+          s=s.replace('const APP_VERSION = "0.2.17";','const APP_VERSION = "0.2.18";',1)
+
+          replacements={
+            'visibility:"Viditelnost",showNew:':'visibility:"Viditelnost",mediumLayout:"Rozložení Medium",mediumLayoutColumns:"2 sloupce",mediumLayoutCenter:"Na střed",showNew:',
+            'visibility:"Visibility",showNew:':'visibility:"Visibility",mediumLayout:"Medium layout",mediumLayoutColumns:"2 columns",mediumLayoutCenter:"Centered",showNew:',
+            'visibility:"Sichtbarkeit",showNew:':'visibility:"Sichtbarkeit",mediumLayout:"Medium-Layout",mediumLayoutColumns:"2 Spalten",mediumLayoutCenter:"Zentriert",showNew:',
+            'visibility:"Visibilidad",showNew:':'visibility:"Visibilidad",mediumLayout:"Diseño Medium",mediumLayoutColumns:"2 columnas",mediumLayoutCenter:"Centrado",showNew:'
+          }
+          for old,new in replacements.items():
+              if old not in s: raise SystemExit(f'translation marker missing: {old}')
+              s=s.replace(old,new,1)
+
+          old='''  widgetTitle:"Sideload Watch",\n  footerLabel:"",\n  showNew:true,'''
+          new='''  widgetTitle:"Sideload Watch",\n  footerLabel:"",\n  mediumLayout:"columns",\n  showNew:true,'''
+          if old not in s: raise SystemExit('defaults marker missing')
+          s=s.replace(old,new,1)
+
+          old='''  s.footerLabel=String(s.footerLabel??"").slice(0,40);\n  for(const k of ["showNew","showVersion","showCount","showTime","useCustomColors"]){'''
+          new='''  s.footerLabel=String(s.footerLabel??"").slice(0,40);\n  if(!["columns","center"].includes(s.mediumLayout))s.mediumLayout=DEFAULTS.mediumLayout;\n  for(const k of ["showNew","showVersion","showCount","showTime","useCustomColors"]){'''
+          if old not in s: raise SystemExit('merge marker missing')
+          s=s.replace(old,new,1)
+
+          old='''    <div class="field"><label>${esc(L.footerLabel)}</label><div class="rowDetail" style="margin:-2px 0 9px">${esc(L.footerLabelDetail)}</div><input id="footerLabel" type="text" maxlength="40" value="${esc(s.footerLabel||"")}" oninput="saveAppearance()"></div>\n  </div>'''
+          new='''    <div class="field"><label>${esc(L.footerLabel)}</label><div class="rowDetail" style="margin:-2px 0 9px">${esc(L.footerLabelDetail)}</div><input id="footerLabel" type="text" maxlength="40" value="${esc(s.footerLabel||"")}" oninput="saveAppearance()"></div>\n    <div class="field"><label>${esc(L.mediumLayout)}</label><select id="mediumLayout" onchange="saveAppearance()"><option value="columns" ${s.mediumLayout!=="center"?"selected":""}>${esc(L.mediumLayoutColumns)}</option><option value="center" ${s.mediumLayout==="center"?"selected":""}>${esc(L.mediumLayoutCenter)}</option></select></div>\n  </div>'''
+          if old not in s: raise SystemExit('appearance html marker missing')
+          s=s.replace(old,new,1)
+
+          old='''  state.footerLabel=document.getElementById('footerLabel').value||"";\n  state.showNew=document.getElementById('showNew').checked;'''
+          new='''  state.footerLabel=document.getElementById('footerLabel').value||"";\n  state.mediumLayout=document.getElementById('mediumLayout')?.value==="center"?"center":"columns";\n  state.showNew=document.getElementById('showNew').checked;'''
+          if old not in s: raise SystemExit('save appearance marker missing')
+          s=s.replace(old,new,1)
+
+          old='''  state.footerLabel="";\n  state.showNew=true;'''
+          new='''  state.footerLabel="";\n  state.mediumLayout="columns";\n  state.showNew=true;'''
+          if old not in s: raise SystemExit('reset appearance marker missing')
+          s=s.replace(old,new,1)
+
+          old='''  }else if(status.total===0){\n    const body=w.addStack();body.layoutVertically();\n    if(family==="medium"){\n      const centered=(value,font,color)=>{\n        const row=body.addStack();row.centerAlignContent();row.addSpacer();\n        const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=.72;\n        row.addSpacer();return text\n      };\n      centered("✓",Font.boldSystemFont(22),c.green);\n      body.addSpacer(2);\n      centered(W.upToDate,Font.semiboldSystemFont(12),c.text);\n      const summary=mediumSummary(status,settings);\n      body.addSpacer(5);\n      centered(summary.tracked,Font.boldSystemFont(8),c.muted);\n      body.addSpacer(2);\n      centered(summary.watchedLine,Font.semiboldSystemFont(10),c.text);\n      body.addSpacer(1);\n      centered(summary.onlineLine,Font.mediumSystemFont(9),c.muted);\n    }else{\n      body.addSpacer();\n      const ok=body.addText("✓");ok.font=Font.boldSystemFont(family==="small"?24:30);ok.textColor=c.green;ok.centerAlignText();\n      body.addSpacer(4);\n      const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;\n      body.addSpacer();\n    }\n  }else{'''
+          new='''  }else if(status.total===0){\n    if(family==="medium"&&settings.mediumLayout!=="center"){\n      const summary=mediumSummary(status,settings);\n      const addCentered=(parent,value,font,color,scale=.72)=>{\n        const row=parent.addStack();row.centerAlignContent();row.addSpacer();\n        const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=scale;\n        row.addSpacer();return text\n      };\n      const columns=w.addStack();columns.centerAlignContent();columns.addSpacer();\n      const left=columns.addStack();left.layoutVertically();left.size=new Size(135,0);\n      addCentered(left,"✓",Font.boldSystemFont(25),c.green);\n      left.addSpacer(3);\n      addCentered(left,W.upToDate,Font.semiboldSystemFont(11),c.text,.65);\n      if(settings.showCount!==false){left.addSpacer(4);addCentered(left,W.updates(status.total),Font.boldSystemFont(9),c.muted,.7)}\n      columns.addSpacer(10);\n      const right=columns.addStack();right.layoutVertically();right.size=new Size(145,0);\n      addCentered(right,summary.tracked,Font.boldSystemFont(8),c.muted);\n      right.addSpacer(3);\n      addCentered(right,summary.watchedLine,Font.semiboldSystemFont(10),c.text,.65);\n      right.addSpacer(2);\n      addCentered(right,summary.onlineLine,Font.mediumSystemFont(9),c.muted,.65);\n      if(status.offline){right.addSpacer(3);addCentered(right,offlineFooterText(status,settings),Font.mediumSystemFont(8),c.red,.55)}\n      columns.addSpacer();\n    }else{\n      const body=w.addStack();body.layoutVertically();\n      if(family==="medium"){\n        const centered=(value,font,color)=>{\n          const row=body.addStack();row.centerAlignContent();row.addSpacer();\n          const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=.72;\n          row.addSpacer();return text\n        };\n        centered("✓",Font.boldSystemFont(22),c.green);\n        body.addSpacer(2);\n        centered(W.upToDate,Font.semiboldSystemFont(12),c.text);\n        const summary=mediumSummary(status,settings);\n        body.addSpacer(5);\n        centered(summary.tracked,Font.boldSystemFont(8),c.muted);\n        body.addSpacer(2);\n        centered(summary.watchedLine,Font.semiboldSystemFont(10),c.text);\n        body.addSpacer(1);\n        centered(summary.onlineLine,Font.mediumSystemFont(9),c.muted);\n      }else{\n        body.addSpacer();\n        const ok=body.addText("✓");ok.font=Font.boldSystemFont(family==="small"?24:30);ok.textColor=c.green;ok.centerAlignText();\n        body.addSpacer(4);\n        const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;\n        body.addSpacer();\n      }\n    }\n  }else{'''
+          if old not in s: raise SystemExit('zero updates layout marker missing')
+          s=s.replace(old,new,1)
+
+          old='''  if(family==="medium"){\n    if(settings.showCount!==false||status.offline){'''
+          new='''  if(family==="medium"){\n    const mediumColumns=status.total===0&&settings.mediumLayout!=="center";\n    if(!mediumColumns&&(settings.showCount!==false||status.offline)){'''
+          if old not in s: raise SystemExit('medium footer marker missing')
+          s=s.replace(old,new,1)
+
+          p.write_text(s,encoding='utf-8')
+          (app/'version.json').write_text(json.dumps({'version':'0.2.18'},indent=2)+'\n',encoding='utf-8')
+
+          pkg_path=app/'Sideload Watch.scriptable'
+          if pkg_path.exists():
+              pkg=json.loads(pkg_path.read_text(encoding='utf-8'))
+              pkg['script']=s
+              pkg_path.write_text(json.dumps(pkg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: |
+          cp 'apps/Sideload-Watch/Sideload Watch.js' /tmp/sideload.mjs
+          node --check /tmp/sideload.mjs
+          grep -q 'const APP_VERSION = "0.2.18";' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'mediumLayout:"columns"' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'id="mediumLayout"' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'settings.mediumLayout!=="center"' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'const mediumColumns=status.total===0' 'apps/Sideload-Watch/Sideload Watch.js'
+
+      - name: Commit app files
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git add 'apps/Sideload-Watch/Sideload Watch.js' 'apps/Sideload-Watch/version.json' 'apps/Sideload-Watch/Sideload Watch.scriptable'
+          git commit -m 'Add Sideload Watch medium layout option'
+          git push origin HEAD:Master
