@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: house-signal;
 // ============================================================
-// Homebridge Status v0.1.8
+// Homebridge Status v0.1.9
 // CaseyCZ Scriptable Apps
 // Homebridge status widget with LAN -> VPN fallback.
 // Homebridge API logic based on homebridgeStatusWidget by lwitzani.
 // ============================================================
 
 const APP_NAME = "Homebridge Status";
-const APP_VERSION = "0.1.8";
+const APP_VERSION = "0.1.9";
 const SETTINGS_FILE = "HomebridgeStatus_settings.json";
 const STATE_FILE = "HomebridgeStatus_state.json";
 const PASSWORD_KEY = "HomebridgeStatus_Password";
@@ -185,13 +185,14 @@ function candidates(s){const out=[];if(s.primaryUrl)out.push({base:s.primaryUrl,
 async function snapshotFrom(base,route,s){
   const token=await authenticate(base,s);
   const overall=await apiJson(base,token,"/api/status/homebridge",s);
-  const [cpu,ram,uptime,plugins,hbVersion,nodeVersion]=await Promise.all([
+  const [cpu,ram,uptime,plugins,hbVersion,nodeVersion,rpiHealth]=await Promise.all([
     optionalApi(base,token,"/api/status/cpu",s),
     optionalApi(base,token,"/api/status/ram",s),
     optionalApi(base,token,"/api/status/uptime",s),
     optionalApi(base,token,"/api/plugins",s),
     optionalApi(base,token,"/api/status/homebridge-version",s),
-    optionalApi(base,token,"/api/status/nodejs",s)
+    optionalApi(base,token,"/api/status/nodejs",s),
+    optionalApi(base,token,"/api/status/rpi/throttled",s)
   ]);
   const ignored=ignoredSet(s);
   const running=overall&&(["ok","up"].includes(String(overall.status||"").toLowerCase()));
@@ -199,7 +200,7 @@ async function snapshotFrom(base,route,s){
   let pluginsUtd=undefined;
   if(Array.isArray(plugins))pluginsUtd=!plugins.some(p=>!ignored.has(p.name)&&p.updateAvailable);
   const nodeUtd=ignored.has("NODEJS_UTD")?true:(nodeVersion? !nodeVersion.updateAvailable:undefined);
-  return {connected:true,base,route,token,running,hbUtd,pluginsUtd,nodeUtd,cpu,ram,uptime,plugins,hbVersion,nodeVersion,updatedAt:Date.now()}
+  return {connected:true,base,route,token,running,hbUtd,pluginsUtd,nodeUtd,cpu,ram,uptime,plugins,hbVersion,nodeVersion,rpiHealth,updatedAt:Date.now()}
 }
 async function getSnapshot(s){
   if(!s.primaryUrl&&!s.fallbackUrl)return{connected:false,setup:true,updatedAt:Date.now(),error:"Not configured"};
@@ -216,6 +217,8 @@ function ramUsed(snap){const a=Number(snap?.ram?.mem?.available),t=Number(snap?.
 function fmt(v,d=1){return Number.isFinite(Number(v))?Number(v).toFixed(d).replace(/\.0$/,""):"—"}
 function formatSeconds(v){v=Number(v);if(!Number.isFinite(v))return"—";if(v>=864000)return fmt(v/86400,0)+"d";if(v>=86400)return fmt(v/86400,1)+"d";if(v>=3600)return fmt(v/3600,1)+"h";if(v>=60)return fmt(v/60,1)+"m";return fmt(v,0)+"s"}
 function statusCount(snap){const values=[snap.running,snap.hbUtd,snap.pluginsUtd,snap.nodeUtd];return{bad:values.filter(v=>v===false).length,unknown:values.filter(v=>v===undefined).length}}
+function pluginUpdateCount(snap,s){if(!Array.isArray(snap.plugins))return snap.pluginsUtd===false?1:0;const ignored=ignoredSet(s);return snap.plugins.filter(p=>p.updateAvailable&&!ignored.has(p.name)).length}
+function rpiWarningKeys(snap){if(!snap.rpiHealth||typeof snap.rpiHealth!=="object")return null;return Object.entries(snap.rpiHealth).filter(([,v])=>v===true).map(([k])=>k)}
 
 function colors(s){
   if(s.theme==="custom"||s.useCustomColors)return{bg:new Color(s.backgroundColor),card:new Color(s.cardColor),text:new Color(s.textColor),muted:new Color(s.mutedColor),accent:new Color(s.accentColor),ok:new Color(s.okColor),warn:new Color(s.warningColor),fail:new Color(s.failColor)};
@@ -253,7 +256,7 @@ function addMediumCompactStatus(parent,label,value,version,c,font=9){const r=par
 function addMediumTop(w,s,snap,c){const top=w.addStack();top.centerAlignContent();const brand=top.addStack();brand.size=new Size(172,0);brand.centerAlignContent();addSymbol(brand,"house.fill",15,c.accent);brand.addSpacer(6);addText(brand,s.widgetTitle||APP_NAME,15,c.text,"bold");if(s.showRoute&&snap.route){brand.addSpacer(6);addText(brand,snap.route,8,snap.route==="VPN"?c.warn:c.muted,"semibold")}top.addSpacer(7);const grid=top.addStack();grid.layoutVertically();let r=grid.addStack();addMediumCompactStatus(r,tx(s,"running"),snap.running,"",c,9);r.addSpacer(10);addMediumCompactStatus(r,"Homebridge",snap.hbUtd,installedVersion(snap.hbVersion),c,9);grid.addSpacer(4);r=grid.addStack();addMediumCompactStatus(r,tx(s,"plugins"),snap.pluginsUtd,"",c,9);r.addSpacer(10);addMediumCompactStatus(r,"Node.js",snap.nodeUtd,installedVersion(snap.nodeVersion,true),c,9);return top}
 function addMediumFooter(w,s,snap,c){const r=w.addStack();r.centerAlignContent();const left=r.addStack();left.size=new Size(100,0);left.addSpacer();const temp=cpuTemp(snap);if(s.showTemperature)addText(left,temp===null?"—":fmt(temp)+" °C",8,c.muted,"semibold");left.addSpacer();const mid=r.addStack();mid.addSpacer();if(s.showUpdated){const df=new DateFormatter();df.useNoDateStyle();df.useShortTimeStyle();addText(mid,df.string(new Date(snap.updatedAt)),8,c.muted)}mid.addSpacer();const right=r.addStack();right.size=new Size(100,0);right.addSpacer();if(s.showUptime&&snap.uptime)addText(right,`Pi ${formatSeconds(snap.uptime?.time?.uptime)} · UI ${formatSeconds(snap.uptime?.processUptime)}`,8,c.muted,"semibold");right.addSpacer();return r}
 async function buildMedium(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);w.setPadding(11,10,9,10);if(!snap.connected){addHeader(w,s,c,snap,16);addUnavailable(w,s,c,snap);return w}addMediumTop(w,s,snap,c);w.addSpacer(8);const metrics=w.addStack();addMetricCard(metrics,tx(s,"cpuLoad"),fmt(cpuLoad(snap)),"%",snap.cpu?.cpuLoadHistory,c,s.showGraphs,"",true,136,true);metrics.addSpacer(7);addMetricCard(metrics,tx(s,"ramUsage"),fmt(ramUsed(snap)),"%",snap.ram?.memoryUsageHistory,c,s.showGraphs,"",true,136,true);w.addSpacer();addMediumFooter(w,s,snap,c);return w}
-async function buildLarge(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);w.setPadding(18,20,15,20);addHeader(w,s,c,snap,18);w.addSpacer(9);if(!snap.connected){addUnavailable(w,s,c,snap);return w}addStatusGrid(w,s,snap,c,11);w.addSpacer(9);const metrics=w.addStack();const temp=cpuTemp(snap);addMetricCard(metrics,tx(s,"cpuLoad"),fmt(cpuLoad(snap)),"%",snap.cpu?.cpuLoadHistory,c,s.showGraphs,s.showTemperature&&temp!==null?fmt(temp)+" °C":"");metrics.addSpacer(10);addMetricCard(metrics,tx(s,"ramUsage"),fmt(ramUsed(snap)),"%",snap.ram?.memoryUsageHistory,c,s.showGraphs);w.addSpacer(9);addSystemPanel(w,s,snap,c);w.addSpacer(9);const updates=(Array.isArray(snap.plugins)?snap.plugins.filter(p=>p.updateAvailable&&!ignoredSet(s).has(p.name)):[]);const section=w.addStack();section.layoutVertically();section.backgroundColor=c.card;section.cornerRadius=12;section.setPadding(8,10,7,10);addText(section,tx(s,"details"),8,c.muted,"semibold");section.addSpacer(5);const hb=snap.hbVersion,nd=snap.nodeVersion;const rows=[];if(hb)rows.push(["Homebridge",hb.installedVersion||hb.currentVersion||"—",hb.latestVersion||"—",snap.hbUtd]);if(nd)rows.push(["Node.js",nd.currentVersion||nd.installedVersion||"—",nd.latestVersion||"—",snap.nodeUtd]);for(const p of updates.slice(0,2))rows.push([p.name,p.installedVersion||"—",p.latestVersion||"—",false]);if(!rows.length)rows.push([tx(s,"updates"),tx(s,"allUpdated"),"",true]);for(const [name,current,latest,ok] of rows.slice(0,4)){const r=section.addStack();r.centerAlignContent();const m=statusMeta(ok,c);addSymbol(r,m.icon,10,m.color);r.addSpacer(5);addText(r,name,10,c.text,"semibold");r.addSpacer();addText(r,latest?`${current} → ${latest}`:current,8,ok===false?c.warn:c.muted);section.addSpacer(4)}w.addSpacer();if(s.showUpdated){const df=new DateFormatter();df.useNoDateStyle();df.useShortTimeStyle();const foot=w.addStack();foot.addSpacer();addText(foot,df.string(new Date(snap.updatedAt)),8,c.muted);foot.addSpacer()}return w}
+async function buildLarge(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);w.setPadding(18,20,15,20);addHeader(w,s,c,snap,18);w.addSpacer(9);if(!snap.connected){addUnavailable(w,s,c,snap);return w}addStatusGrid(w,s,snap,c,11);w.addSpacer(9);const metrics=w.addStack();addMetricCard(metrics,tx(s,"cpuLoad"),fmt(cpuLoad(snap)),"%",snap.cpu?.cpuLoadHistory,c,s.showGraphs,"",true,145,true);metrics.addSpacer(10);addMetricCard(metrics,tx(s,"ramUsage"),fmt(ramUsed(snap)),"%",snap.ram?.memoryUsageHistory,c,s.showGraphs,"",true,145,true);w.addSpacer(9);addSystemPanel(w,s,snap,c);w.addSpacer(9);const section=w.addStack();section.layoutVertically();section.backgroundColor=c.card;section.cornerRadius=12;section.setPadding(8,10,7,10);addText(section,tx(s,"details"),8,c.muted,"semibold");section.addSpacer(5);const hb=snap.hbVersion,nd=snap.nodeVersion,pluginUpdates=pluginUpdateCount(snap,s),piWarnings=rpiWarningKeys(snap);const rows=[];if(hb)rows.push(["Homebridge",hb.installedVersion||hb.currentVersion||"—",hb.latestVersion||"—",snap.hbUtd]);if(nd)rows.push(["Node.js",nd.currentVersion||nd.installedVersion||"—",nd.latestVersion||"—",snap.nodeUtd]);rows.push([tx(s,"plugins"),pluginUpdates?`↑ ${pluginUpdates}`:"OK","",pluginUpdates===0]);rows.push(["Raspberry Pi",piWarnings===null?"—":piWarnings.length?`⚠ ${piWarnings.length}`:"OK","",piWarnings===null?undefined:piWarnings.length===0]);for(const [name,current,latest,ok] of rows.slice(0,4)){const r=section.addStack();r.centerAlignContent();const m=statusMeta(ok,c);addSymbol(r,m.icon,10,m.color);r.addSpacer(5);addText(r,name,10,c.text,"semibold");r.addSpacer();addText(r,latest?`${current} → ${latest}`:current,8,ok===false?c.warn:c.muted,"semibold");section.addSpacer(4)}w.addSpacer();if(s.showUpdated){const df=new DateFormatter();df.useNoDateStyle();df.useShortTimeStyle();const foot=w.addStack();foot.addSpacer();addText(foot,df.string(new Date(snap.updatedAt)),8,c.muted);foot.addSpacer()}return w}
 async function buildAccessoryRectangular(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);const top=w.addStack();top.centerAlignContent();addSymbol(top,"house.fill",11,c.accent);top.addSpacer(5);addText(top,s.widgetTitle,11,c.text,"semibold");top.addSpacer();if(snap.connected)addText(top,snap.route,8,snap.route==="VPN"?c.warn:c.muted,"semibold");w.addSpacer(3);if(!snap.connected){addText(w,tx(s,"unavailable"),10,c.fail,"semibold");return w}const row=w.addStack();addText(row,`CPU ${fmt(cpuLoad(snap))}%`,10,c.text,"semibold");row.addSpacer();addText(row,`RAM ${fmt(ramUsed(snap))}%`,10,c.text,"semibold");return w}
 async function buildAccessoryInline(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);const bad=snap.connected?statusCount(snap).bad:1;const t=w.addText(snap.connected?`${bad?"⚠":"✓"} Homebridge · CPU ${fmt(cpuLoad(snap))}% · RAM ${fmt(ramUsed(snap))}%`:`⚠ ${tx(s,"unavailable")}`);t.font=Font.systemFont(11);t.textColor=bad?c.warn:c.text;return w}
 async function buildAccessoryCircular(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);const st=w.addStack();st.layoutVertically();st.addSpacer();const r=st.addStack();r.addSpacer();addSymbol(r,snap.connected&&statusCount(snap).bad===0?"house.fill":"exclamationmark.triangle.fill",24,snap.connected&&statusCount(snap).bad===0?c.ok:c.warn);r.addSpacer();st.addSpacer();return w}
