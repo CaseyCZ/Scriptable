@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.12
+// Sideload Watch v0.2.13
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.12";
+const APP_VERSION = "0.2.13";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -417,7 +417,7 @@ function cachedStatus(settings,error=null){
   return{
     updates,total:updates.length,current,
     checkedAt:state.updatedAt?new Date(state.updatedAt):null,
-    offline:true,cached:true,error:error?String(error):null
+    offline:true,cached:true,cacheOnly:true,failedSources:[],error:error?String(error):null
   }
 }
 function timeoutAfter(ms,label="Widget"){
@@ -457,15 +457,24 @@ async function getLiveStatus(settings){
 
   if(!groups.size)return cachedStatus(settings);
 
-  const results=await Promise.allSettled([...groups.entries()].map(async([url,items])=>{
+  const entries=[...groups.entries()];
+  const results=await Promise.allSettled(entries.map(async([url,items])=>{
     const payload=await requestSourceJSON(url,3.5);
     const apps=Array.isArray(payload?.apps)?payload.apps:[];
     return{url,items,apps,sourceName:String(payload?.name||"")}
   }));
 
-  const current=[],failedSourceIds=new Set();
-  for(const result of results){
+  const current=[],failedSources=[];
+  for(let i=0;i<results.length;i++){
+    const result=results[i];
     if(result.status!=="fulfilled"){
+      const [url,items]=entries[i];
+      const names=[...new Set(items.map(item=>state.lastCurrent[watchKey(item)]?.sourceName||item.sourceId||"").filter(Boolean))];
+      if(names.length)failedSources.push(...names);
+      else{
+        try{failedSources.push(new URL(url).hostname.replace(/^www\./,""))}
+        catch(_){failedSources.push("source")}
+      }
       continue
     }
     const {items,apps,sourceName}=result.value;
@@ -515,8 +524,9 @@ async function getLiveStatus(settings){
   if(changed||current.length)saveState(state);
 
   const updates=current.filter(app=>state.seen[app.key]&&state.seen[app.key]!==app.version);
-  const offline=results.some(r=>r.status!=="fulfilled");
-  return{updates,total:updates.length,current,checkedAt:new Date(),offline,cached:offline}
+  const uniqueFailed=[...new Set(failedSources)];
+  const offline=uniqueFailed.length>0;
+  return{updates,total:updates.length,current,checkedAt:new Date(),offline,cached:offline,cacheOnly:false,failedSources:uniqueFailed}
 }
 async function getLiveStatusWithBudget(settings,ms){
   try{
@@ -547,7 +557,7 @@ function demoStatus(){
     {name:"Provenance",version:"3.4.0"},
     {name:"VortX",version:"0.5.0"}
   ];
-  return{updates:demo,total:demo.length,checkedAt:new Date(),offline:false,demo:true}
+  return{updates:demo,total:demo.length,checkedAt:new Date(),offline:false,cached:false,cacheOnly:false,failedSources:[],demo:true}
 }
 
 // ------------------------------------------------------------
@@ -559,6 +569,19 @@ function widgetText(settings){
     title:settings.widgetTitle||L.title,new:L.new,upToDate:L.upToDate,offline:L.offline,
     updates:n=>String(settings.footerLabel||"").trim()?String(settings.footerLabel).trim():L.updates(n)
   }
+}
+function offlineFooterText(status,settings){
+  const language=settings.language||lang();
+  if(status.cacheOnly){
+    return({cs:"⚠︎ použita cache",en:"⚠︎ cache used",de:"⚠︎ Cache verwendet",es:"⚠︎ caché usada"}[language]||"⚠︎ cache used")
+  }
+  const names=Array.isArray(status.failedSources)?status.failedSources.filter(Boolean):[];
+  if(names.length===1)return "⚠︎ "+names[0];
+  if(names.length>1){
+    const word={cs:"zdroje",en:"sources",de:"Quellen",es:"fuentes"}[language]||"sources";
+    return `⚠︎ ${names.length} ${word}`
+  }
+  return "⚠︎ "+(T[language]?.offline||"offline")
 }
 function colors(settings){
   if(settings.useCustomColors){
@@ -652,7 +675,7 @@ async function buildWidget(status,settings,familyOverride){
     }
     if(settings.showCount!==false&&(settings.showTime!==false||status.offline))footer.addSpacer();
     if(status.offline){
-      const off=footer.addText("⚠︎ "+W.offline);off.font=Font.mediumSystemFont(L.footer);off.textColor=c.red
+      const off=footer.addText(offlineFooterText(status,settings));off.font=Font.mediumSystemFont(L.footer);off.textColor=c.red;off.lineLimit=1;off.minimumScaleFactor=.6
     }else if(settings.showTime!==false){
       const checked=footer.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted
     }
