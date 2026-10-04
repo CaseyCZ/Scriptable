@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.23
+// Sideload Watch v0.2.24
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.23";
+const APP_VERSION = "0.2.24";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -43,7 +43,7 @@ const T = {
     sources:"Sources",sourcesSub:"Otevři source a vyber konkrétní aplikace, které chceš sledovat.",
     searchSource:"Hledat source…",searchApp:"Hledat aplikaci…",apps:"aplikací",selected:"vybráno",
     back:"Zpět",selectAll:"Vybrat vše",clearAll:"Zrušit vše",none:"Nic nenalezeno",
-    widgetPreview:"Náhled",realPreview:"Reálná data",demoPreview:"Demo · 7 aktualizací",
+    widgetPreview:"Náhled",realPreview:"Reálná data",demoPreview:"Demo vzhledu",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Chování",refresh:"Obnova widgetu",refreshDetail:"Požadovaný interval obnovy. iOS může widget obnovit později.",
     minutes:"min",language:"Jazyk",languageDetail:"Jazyk nastavení a widgetu.",
@@ -72,7 +72,7 @@ const T = {
     sources:"Sources",sourcesSub:"Open a source and choose the exact apps you want to watch.",
     searchSource:"Search sources…",searchApp:"Search apps…",apps:"apps",selected:"selected",
     back:"Back",selectAll:"Select all",clearAll:"Clear all",none:"Nothing found",
-    widgetPreview:"Preview",realPreview:"Live data",demoPreview:"Demo · 7 updates",
+    widgetPreview:"Preview",realPreview:"Live data",demoPreview:"Appearance demo",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Behavior",refresh:"Widget refresh",refreshDetail:"Requested refresh interval. iOS may refresh the widget later.",
     minutes:"min",language:"Language",languageDetail:"Language used by settings and widget.",
@@ -101,7 +101,7 @@ const T = {
     sources:"Quellen",sourcesSub:"Öffne eine Quelle und wähle die Apps aus, die du beobachten möchtest.",
     searchSource:"Quelle suchen…",searchApp:"App suchen…",apps:"Apps",selected:"ausgewählt",
     back:"Zurück",selectAll:"Alle auswählen",clearAll:"Alle abwählen",none:"Nichts gefunden",
-    widgetPreview:"Vorschau",realPreview:"Echte Daten",demoPreview:"Demo · 7 Updates",
+    widgetPreview:"Vorschau",realPreview:"Echte Daten",demoPreview:"Design-Demo",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Verhalten",refresh:"Widget-Aktualisierung",refreshDetail:"Gewünschtes Intervall. iOS kann das Widget später aktualisieren.",
     minutes:"Min",language:"Sprache",languageDetail:"Sprache für Einstellungen und Widget.",
@@ -130,7 +130,7 @@ const T = {
     sources:"Fuentes",sourcesSub:"Abre una fuente y elige las apps concretas que quieres vigilar.",
     searchSource:"Buscar fuente…",searchApp:"Buscar app…",apps:"apps",selected:"seleccionadas",
     back:"Atrás",selectAll:"Seleccionar todo",clearAll:"Borrar todo",none:"Sin resultados",
-    widgetPreview:"Vista previa",realPreview:"Datos reales",demoPreview:"Demo · 7 actualizaciones",
+    widgetPreview:"Vista previa",realPreview:"Datos reales",demoPreview:"Demo de diseño",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Comportamiento",refresh:"Actualización del widget",refreshDetail:"Intervalo solicitado. iOS puede actualizar el widget más tarde.",
     minutes:"min",language:"Idioma",languageDetail:"Idioma de los ajustes y del widget.",
@@ -552,17 +552,32 @@ async function markAllSeen(settings){
   }
   state.updatedAt=new Date().toISOString();saveState(state);return current.length
 }
-function demoStatus(){
-  const demo=[
-    {name:"Stremio",version:"2.0.9"},
-    {name:"YouTubeRebornPlus",version:"20.06.1"},
-    {name:"Yattee",version:"2.1.0"},
-    {name:"SideStore",version:"0.6.3"},
-    {name:"UTM",version:"4.8.0"},
-    {name:"Provenance",version:"3.4.0"},
-    {name:"VortX",version:"0.5.0"}
-  ];
-  return{updates:demo,total:demo.length,checkedAt:new Date(),offline:false,cached:false,cacheOnly:false,failedSources:[],failedSourceIds:[],demo:true}
+function demoStatus(settings){
+  const state=loadState();
+  const watched=Array.isArray(settings?.watched)?settings.watched:[];
+  const sourceIds=[...new Set(watched.map(x=>String(x.sourceId||"")).filter(Boolean))];
+  const sourceNameFor=id=>{
+    const item=watched.find(x=>String(x.sourceId||"")===id);
+    if(!item)return id;
+    return String(state.lastCurrent?.[watchKey(item)]?.sourceName||id)
+  };
+  const failedId=sourceIds.find(id=>sourceNameFor(id).toLowerCase().includes("livecontainer"))||sourceIds[0]||"";
+  const current=watched.map(item=>{
+    const prev=state.lastCurrent?.[watchKey(item)]||{};
+    return{
+      key:watchKey(item),sourceId:String(item.sourceId||""),
+      sourceName:String(prev.sourceName||item.sourceId||"source"),
+      sourceURL:item.sourceURL||"",name:item.name||"App",
+      version:String(prev.version||"1.0"),iconURL:String(prev.iconURL||"")
+    }
+  });
+  const failedName=failedId?(current.find(x=>x.sourceId===failedId)?.sourceName||failedId):"";
+  return{
+    updates:[],total:0,current,checkedAt:new Date(),
+    offline:!!failedId,cached:false,cacheOnly:false,
+    failedSources:failedName?[failedName]:[],
+    failedSourceIds:failedId?[failedId]:[],demo:true
+  }
 }
 
 // ------------------------------------------------------------
@@ -1225,7 +1240,7 @@ async function settings(s){
       }else if(m.action==="preview"){
         cur=merge(m.settings||cur);saveSettings(cur);
         const family=["small","medium","large"].includes(m.family)?m.family:"medium";
-        const status=m.demo?demoStatus():await getLiveStatus(cur),w=await buildWidget(status,cur,family);
+        const status=m.demo?demoStatus(cur):await getLiveStatus(cur),w=await buildWidget(status,cur,family);
         try{await presentWidget(w,family)}finally{await send(web,{action:"previewDone"})}
       }else if(m.action==="refreshCatalog"){
         try{
