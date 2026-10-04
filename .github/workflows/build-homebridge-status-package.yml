@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/Homebridge-Status/Homebridge Status.js'
       - '.github/scripts/build_homebridge_status_package.py'
+      - '.github/scripts/tune_homebridge_medium_v017.py'
       - '.github/workflows/build-homebridge-status-package.yml'
   workflow_dispatch:
 
@@ -20,6 +21,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: Master
+
+      - name: Apply v0.1.7 medium axes
+        run: python .github/scripts/tune_homebridge_medium_v017.py
 
       - name: Validate JavaScript syntax
         run: |
@@ -43,7 +47,7 @@ jobs:
           assert vm, 'APP_VERSION missing'
           version=vm.group(1)
 
-          assert version == '0.1.6'
+          assert version == '0.1.7'
           assert pkg['name']=='Homebridge Status'
           assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
           assert pkg.get('always_run_in_app') is False
@@ -52,16 +56,13 @@ jobs:
 
           assert 'const T = {' in src and 'cs:{' in src and 'en:{' in src and 'de:{' in src and 'es:{' in src, 'CZ/EN/DE/ES translations missing'
           assert 'language: "cs"' in src and 'setLanguage(this.value)' in src, 'language setting missing'
-          assert 'addSystemPanel' in src, 'large system panel missing'
-          assert 'centeredPanelText' in src and 'smallUpdateCount' in src and 'smallUpdateText' in src, 'small centered/update layout missing'
-          assert 'w.setPadding(14,16,11,16)' in src, 'small inset layout missing'
-          assert 'addMediumTop' in src and 'addMediumFooter' in src, 'medium original-style grid missing'
-          assert 'w.setPadding(11,10,9,10)' in src, 'medium stretched padding missing'
-          assert 'centerTitle=false,graphWidth=120' in src, 'metric card centering controls missing'
-          assert 'true,136' in src, 'medium wider metric cards missing'
-          assert 'top.addSpacer();const grid=top.addStack()' in src, 'medium top grid not pushed right'
-          assert 'installedVersion(snap.hbVersion)' in src and 'installedVersion(snap.nodeVersion,true)' in src, 'medium versions missing'
-          assert 'w.setPadding(18,20,15,20)' in src, 'large inset layout missing'
+          assert 'centerValue=false' in src, 'metric value centering control missing'
+          assert 'brand.size=new Size(156,0)' in src and 'top.addSpacer(7)' in src, 'medium top alignment missing'
+          assert 'left.size=new Size(100,0)' in src and 'right.size=new Size(100,0)' in src, 'symmetric footer columns missing'
+          assert 'true,136,true' in src, 'medium centered metric values missing'
+          assert 'w.setPadding(11,10,9,10)' in src, 'medium padding changed unexpectedly'
+          assert 'w.setPadding(14,16,11,16)' in src, 'small changed unexpectedly'
+          assert 'w.setPadding(18,20,15,20)' in src, 'large changed unexpectedly'
 
           assert 'fallbackUrl' in src, 'VPN fallback setting missing'
           assert 'route:"LAN"' in src and 'route:"VPN"' in src, 'LAN/VPN routing missing'
@@ -70,7 +71,7 @@ jobs:
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
           assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
           assert len(src)>25000
-          print(f'Homebridge Status v{version}: medium widened + centered labels + top grid right aligned; public card hidden')
+          print(f'Homebridge Status v{version}: medium axes aligned; time geometrically centered; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -78,11 +79,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
+            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync private Homebridge Status package"
+          git commit -m "Tune Homebridge Status medium axes"
           git push origin HEAD:Master
