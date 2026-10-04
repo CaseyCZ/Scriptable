@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.15
+// Sideload Watch v0.2.16
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.15";
+const APP_VERSION = "0.2.16";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -627,18 +627,37 @@ function formatTime(date){
   if(!date||isNaN(date.getTime()))return"—";
   const f=new DateFormatter();f.locale=Device.locale();f.useNoDateStyle();f.useShortTimeStyle();return f.string(date)
 }
+function mediumSummary(status,settings){
+  const language=settings.language||lang();
+  const labels={
+    cs:{tracked:"SLEDOVÁNO",apps:"aplikací",sources:"sources",online:"sources online",cache:"stav z cache"},
+    en:{tracked:"WATCHING",apps:"apps",sources:"sources",online:"sources online",cache:"cached status"},
+    de:{tracked:"BEOBACHTET",apps:"Apps",sources:"Quellen",online:"Quellen online",cache:"Status aus Cache"},
+    es:{tracked:"VIGILADAS",apps:"apps",sources:"fuentes",online:"fuentes online",cache:"estado en caché"}
+  }[language]||{tracked:"WATCHING",apps:"apps",sources:"sources",online:"sources online",cache:"cached status"};
+  const sourceIds=[...new Set((settings.watched||[]).map(x=>String(x.sourceId||"")).filter(Boolean))];
+  const failed=new Set((status.failedSourceIds||[]).map(String));
+  const failedWatched=sourceIds.filter(id=>failed.has(id)).length;
+  const online=Math.max(0,sourceIds.length-failedWatched);
+  return{
+    tracked:labels.tracked,
+    watchedLine:`${(settings.watched||[]).length} ${labels.apps} · ${sourceIds.length} ${labels.sources}`,
+    onlineLine:status.cacheOnly?labels.cache:`${online}/${sourceIds.length} ${labels.online}`
+  }
+}
 async function buildWidget(status,settings,familyOverride){
   const family=familyOverride||config.widgetFamily||"medium",L=layoutForFamily(family),c=colors(settings),W=widgetText(settings),w=new ListWidget();
   w.backgroundColor=c.bg;w.setPadding(L.pad,L.pad,L.pad,L.pad);
   try{w.url=URLScheme.forRunningScript()}catch(_){w.url="scriptable://"}
 
   const header=w.addStack();header.centerAlignContent();
+  if(family==="medium")header.addSpacer();
   const symbol=SFSymbol.named("arrow.triangle.2.circlepath");symbol.applyFont(Font.semiboldSystemFont(L.title));
   const icon=header.addImage(symbol.image);icon.imageSize=new Size(L.title,L.title);icon.tintColor=c.blue;
   header.addSpacer(7);
   const title=header.addText(W.title);title.font=Font.boldSystemFont(L.title);title.textColor=c.text;title.lineLimit=1;
+  if(status.demo){header.addSpacer(7);const d=header.addText("DEMO");d.font=Font.boldSystemFont(Math.max(8,L.footer));d.textColor=c.muted}
   header.addSpacer();
-  if(status.demo){const d=header.addText("DEMO");d.font=Font.boldSystemFont(Math.max(8,L.footer));d.textColor=c.muted}
 
   w.addSpacer(family==="small"?8:10);
 
@@ -653,6 +672,15 @@ async function buildWidget(status,settings,familyOverride){
     const ok=body.addText("✓");ok.font=Font.boldSystemFont(family==="small"?24:30);ok.textColor=c.green;ok.centerAlignText();
     body.addSpacer(4);
     const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
+    if(family==="medium"){
+      const summary=mediumSummary(status,settings);
+      body.addSpacer(11);
+      const tracked=body.addText(summary.tracked);tracked.font=Font.boldSystemFont(9);tracked.textColor=c.muted;tracked.centerAlignText();tracked.lineLimit=1;
+      body.addSpacer(3);
+      const watched=body.addText(summary.watchedLine);watched.font=Font.semiboldSystemFont(11);watched.textColor=c.text;watched.centerAlignText();watched.lineLimit=1;watched.minimumScaleFactor=.75;
+      body.addSpacer(2);
+      const online=body.addText(summary.onlineLine);online.font=Font.mediumSystemFont(10);online.textColor=c.muted;online.centerAlignText();online.lineLimit=1;online.minimumScaleFactor=.75;
+    }
     body.addSpacer();
   }else{
     const visible=status.updates.slice(0,L.maxRows);
@@ -671,7 +699,25 @@ async function buildWidget(status,settings,familyOverride){
   }
 
   w.addSpacer();
-  if(settings.showCount!==false||settings.showTime!==false||status.offline){
+  if(family==="medium"){
+    if(settings.showCount!==false||status.offline){
+      const footer=w.addStack();footer.centerAlignContent();footer.addSpacer();
+      if(settings.showCount!==false){
+        const count=footer.addText(W.updates(status.total));count.font=Font.boldSystemFont(L.footer);count.textColor=status.total>0?(c.count||c.green):c.muted;count.lineLimit=1;count.minimumScaleFactor=.7
+      }
+      if(settings.showCount!==false&&status.offline){const sep=footer.addText(" · ");sep.font=Font.mediumSystemFont(L.footer);sep.textColor=c.muted}
+      if(status.offline){
+        const off=footer.addText(offlineFooterText(status,settings));off.font=Font.mediumSystemFont(L.footer);off.textColor=c.red;off.lineLimit=1;off.minimumScaleFactor=.6
+      }
+      footer.addSpacer();
+    }
+    if(settings.showTime!==false){
+      w.addSpacer(4);
+      const timeRow=w.addStack();timeRow.addSpacer();
+      const checked=timeRow.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted;checked.lineLimit=1;
+      timeRow.addSpacer();
+    }
+  }else if(settings.showCount!==false||settings.showTime!==false||status.offline){
     const footer=w.addStack();footer.centerAlignContent();
     if(settings.showCount!==false){
       const count=footer.addText(W.updates(status.total));count.font=Font.boldSystemFont(L.footer);count.textColor=status.total>0?(c.count||c.green):c.muted;count.lineLimit=1;count.minimumScaleFactor=.7
