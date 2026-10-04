@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.13
+// Sideload Watch v0.2.14
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.13";
+const APP_VERSION = "0.2.14";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -417,7 +417,7 @@ function cachedStatus(settings,error=null){
   return{
     updates,total:updates.length,current,
     checkedAt:state.updatedAt?new Date(state.updatedAt):null,
-    offline:true,cached:true,cacheOnly:true,failedSources:[],error:error?String(error):null
+    offline:true,cached:true,cacheOnly:true,failedSources:[],failedSourceIds:[],error:error?String(error):null
   }
 }
 function timeoutAfter(ms,label="Widget"){
@@ -464,11 +464,12 @@ async function getLiveStatus(settings){
     return{url,items,apps,sourceName:String(payload?.name||"")}
   }));
 
-  const current=[],failedSources=[];
+  const current=[],failedSources=[],failedSourceIds=[];
   for(let i=0;i<results.length;i++){
     const result=results[i];
     if(result.status!=="fulfilled"){
       const [url,items]=entries[i];
+      failedSourceIds.push(...items.map(item=>String(item.sourceId||"")).filter(Boolean));
       const names=[...new Set(items.map(item=>state.lastCurrent[watchKey(item)]?.sourceName||item.sourceId||"").filter(Boolean))];
       if(names.length)failedSources.push(...names);
       else{
@@ -525,8 +526,9 @@ async function getLiveStatus(settings){
 
   const updates=current.filter(app=>state.seen[app.key]&&state.seen[app.key]!==app.version);
   const uniqueFailed=[...new Set(failedSources)];
+  const uniqueFailedIds=[...new Set(failedSourceIds)];
   const offline=uniqueFailed.length>0;
-  return{updates,total:updates.length,current,checkedAt:new Date(),offline,cached:offline,cacheOnly:false,failedSources:uniqueFailed}
+  return{updates,total:updates.length,current,checkedAt:new Date(),offline,cached:offline,cacheOnly:false,failedSources:uniqueFailed,failedSourceIds:uniqueFailedIds}
 }
 async function getLiveStatusWithBudget(settings,ms){
   try{
@@ -557,7 +559,7 @@ function demoStatus(){
     {name:"Provenance",version:"3.4.0"},
     {name:"VortX",version:"0.5.0"}
   ];
-  return{updates:demo,total:demo.length,checkedAt:new Date(),offline:false,cached:false,cacheOnly:false,failedSources:[],demo:true}
+  return{updates:demo,total:demo.length,checkedAt:new Date(),offline:false,cached:false,cacheOnly:false,failedSources:[],failedSourceIds:[],demo:true}
 }
 
 // ------------------------------------------------------------
@@ -780,7 +782,7 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
 .switch{position:relative;width:50px;height:30px;flex:0 0 50px}.switch input{display:none}.slider{position:absolute;inset:0;background:#243149;border:1px solid var(--border);border-radius:999px}.slider:before{content:"";position:absolute;width:24px;height:24px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.18s}.switch input:checked+.slider{background:var(--accent2);border-color:var(--accent)}.switch input:checked+.slider:before{transform:translateX(20px)}
 .previewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}.actionGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}.previewBtn,.actionBtn{min-height:48px;border:1px solid #1d4ed8;border-radius:13px;background:linear-gradient(135deg,#0369a1,#0284c7);color:#fff;font:inherit;font-weight:800;font-size:13px;touch-action:manipulation}.actionBtn.secondary{background:#243149;border-color:var(--border)}.actionBtn.danger{background:#3a1720;border-color:#6b2738;color:#fecdd3}.actionBtn.full{grid-column:1/-1}
 .info{margin:14px 0;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);color:#cbd5e1;font-size:.86rem;line-height:1.45}.status{min-height:20px;color:var(--ok);font-size:12px;padding:0 14px 12px}.footer{color:#64748b;text-align:center;font-size:.76rem;margin:16px 4px 0}
-.searchBox{margin:0 0 11px}.countPill{font-size:11px;font-weight:800;color:#bfdbfe;background:#0f1f46;border:1px solid #1d4ed8;padding:5px 8px;border-radius:999px;white-space:nowrap}.topbarActions{display:flex;align-items:center;gap:8px}.catalogRefreshBtn{width:32px;height:32px;border:1px solid #1d4ed8;border-radius:999px;background:#0f1f46;color:#38bdf8;font:inherit;font-size:20px;font-weight:700;line-height:1;padding:0;display:grid;place-items:center;touch-action:manipulation}.catalogRefreshBtn:disabled{opacity:.55}.catalogRefreshBtn.spinning{animation:catalogSpin .7s linear infinite}@keyframes catalogSpin{to{transform:rotate(360deg)}}.sourceIcon{width:34px;height:34px;border-radius:9px;background:#0f1f46;display:grid;place-items:center;flex:0 0 34px;font-size:17px}.empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
+.searchBox{margin:0 0 11px}.countPill{font-size:11px;font-weight:800;color:#bfdbfe;background:#0f1f46;border:1px solid #1d4ed8;padding:5px 8px;border-radius:999px;white-space:nowrap}.topbarActions{display:flex;align-items:center;gap:8px}.catalogRefreshBtn{width:32px;height:32px;border:1px solid #1d4ed8;border-radius:999px;background:#0f1f46;color:#38bdf8;font:inherit;font-size:20px;font-weight:700;line-height:1;padding:0;display:grid;place-items:center;touch-action:manipulation}.catalogRefreshBtn:disabled{opacity:.55}.catalogRefreshBtn.spinning{animation:catalogSpin .7s linear infinite}@keyframes catalogSpin{to{transform:rotate(360deg)}}.sourceHealthPill{font-size:11px;font-weight:800;color:#fecaca;background:#3a1720;border:1px solid #7f1d1d;padding:5px 8px;border-radius:999px;white-space:nowrap}.sourceErrorIcon{color:#ff453a;font-size:17px;font-weight:800;line-height:1}.sourceIcon{width:34px;height:34px;border-radius:9px;background:#0f1f46;display:grid;place-items:center;flex:0 0 34px;font-size:17px}.empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
 .langGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}.langBtn{min-height:48px;border:1px solid var(--border);border-radius:13px;background:#243149;color:#fff;font:inherit;font-weight:750}.langBtn.active{border-color:var(--accent);background:#0f1f46;color:#bfdbfe}
 @media(max-width:430px){.hero{padding:18px}.navDetail{max-width:128px}.previewGrid{grid-template-columns:1fr}.actionGrid{grid-template-columns:1fr}.actionBtn.full{grid-column:auto}}
 </style></head><body>
@@ -804,7 +806,7 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
 </div>
 
 <div id="sources" class="screen">
-  <div class="topbar"><button class="back" onclick="showScreen('home')">‹ ${esc(L.back)}</button><div class="topbarActions"><button id="catalogRefreshBtn" class="catalogRefreshBtn" type="button" title="${esc(L.refreshCatalog)}" aria-label="${esc(L.refreshCatalog)}" onclick="refreshCatalogTop()">↻</button><span id="watchedPill" class="countPill">${watchedCount} ${esc(L.selected)}</span></div></div>
+  <div class="topbar"><button class="back" onclick="showScreen('home')">‹ ${esc(L.back)}</button><div class="topbarActions"><span id="sourceHealthPill" class="sourceHealthPill" hidden></span><button id="catalogRefreshBtn" class="catalogRefreshBtn" type="button" title="${esc(L.refreshCatalog)}" aria-label="${esc(L.refreshCatalog)}" onclick="refreshCatalogTop()">↻</button><span id="watchedPill" class="countPill">${watchedCount} ${esc(L.selected)}</span></div></div>
   <div class="screenTitle">${esc(L.sources)}</div><div class="screenSub">${esc(L.sourcesSub)}</div>
   <input id="sourceSearch" class="searchBox" type="search" placeholder="${esc(L.searchSource)}" oninput="renderSources()">
   <div id="sourceList" class="card"></div>
@@ -895,14 +897,18 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
 let state=${JSON.stringify(s)};
 let catalog=${JSON.stringify(initialCatalog)};
 let currentSourceId=null;
+let failedSourceIds=new Set();
+let sourceCacheOnly=false;
 window.__nativeQueue=[];
 function post(m){window.__nativeQueue.push({...m,nonce:Date.now()+Math.random()})}
-function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='sources')renderSources()}
+function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='sources'){updateSourceHealthUI();renderSources()}}
 function norm(v){return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase()}
 function key(x){return [x.sourceId||'',x.bundleIdentifier||'',x.name||''].join('|')}
 function selectedSet(){return new Set((state.watched||[]).map(key))}
 function watchedForSource(id){return(state.watched||[]).filter(x=>x.sourceId===id)}
 function sourceObj(id){return(catalog.sources||[]).find(x=>x.id===id)}
+function sourceFailed(src){return failedSourceIds.has(String(src?.id||""))}
+function updateSourceHealthUI(){const p=document.getElementById('sourceHealthPill');if(!p)return;if(sourceCacheOnly){p.hidden=false;p.textContent='⚠︎ '+${JSON.stringify('Cache')};return}const n=failedSourceIds.size;p.hidden=n===0;p.textContent=n?'⚠︎ '+n:''}
 function refreshCounts(){
   const n=(state.watched||[]).length;
   const p=document.getElementById('watchedPill');if(p)p.textContent=n+' '+${JSON.stringify(L.selected)};
@@ -911,7 +917,7 @@ function appKey(src,app){return key({sourceId:src.id,bundleIdentifier:app.bundle
 function saveState(){post({action:'save',settings:state});document.getElementById('jsonBox').value=JSON.stringify(state,null,2);refreshCounts()}
 function renderSources(){
   const root=document.getElementById('sourceList'),q=norm(document.getElementById('sourceSearch').value);root.innerHTML='';
-  const rows=(catalog.sources||[]).filter(s=>!q||norm(s.name+' '+s.id).includes(q));
+  const rows=(catalog.sources||[]).filter(s=>!q||norm(s.name+' '+s.id).includes(q)).slice().sort((a,b)=>String(a.name||a.id||'').localeCompare(String(b.name||b.id||''),state.language||'en',{sensitivity:'base'}));
   if(!rows.length){root.innerHTML='<div class="empty">'+${JSON.stringify(L.none)}+'</div>';return}
   for(const src of rows){
     const n=watchedForSource(src.id).length,row=document.createElement('div');row.className='sourceRow';row.onclick=()=>openSource(src.id);
@@ -922,6 +928,7 @@ function renderSources(){
     const detail=document.createElement('div');detail.className='rowDetail';detail.textContent=(src.apps||[]).length+' '+${JSON.stringify(L.apps)}+' · '+n+' '+${JSON.stringify(L.selected)};
     txt.append(title,detail);left.append(icon,txt);
     const right=document.createElement('div');right.className='navRight';
+    if(sourceFailed(src)){const warn=document.createElement('span');warn.className='sourceErrorIcon';warn.textContent='⚠︎';warn.title=src.name;right.appendChild(warn)}
     if(n){const pill=document.createElement('span');pill.className='countPill';pill.textContent=String(n);right.appendChild(pill)}
     const ch=document.createElement('span');ch.className='chevron';ch.textContent='›';right.appendChild(ch);
     row.append(left,right);root.appendChild(row)
@@ -1034,6 +1041,7 @@ function finishCatalogRefresh(){
 window.__native=function(m){
   if(!m)return;
   if(m.action==='catalog'){catalog=m.catalog||{sources:[]};document.getElementById('catalogMode').textContent=m.online?${JSON.stringify(L.online)}:${JSON.stringify(L.cached)};document.getElementById('catalogCount').textContent=(catalog.sources||[]).length;renderSources();if(currentSourceId&&sourceObj(currentSourceId))renderApps();finishCatalogRefresh();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
+  if(m.action==='sourceHealth'){failedSourceIds=new Set((m.failedSourceIds||[]).map(String));sourceCacheOnly=!!m.cacheOnly;updateSourceHealthUI();renderSources()}
   if(m.action==='status'){finishCatalogRefresh();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
   if(m.action==='previewDone'){document.getElementById('previewStatus').textContent=''}
   if(m.action==='update'){const e=document.getElementById('updateStatus');e.textContent=m.text||'';e.className='updateStatus '+(m.ok?'ok':'error')}
@@ -1053,6 +1061,7 @@ async function settings(s){
   let dismissed=false,cur=merge(s);
   const presentPromise=web.present(false).then(()=>{dismissed=true});
   const sleep=ms=>new Promise(resolve=>Timer.schedule(ms,false,resolve));
+  ;(async()=>{try{const h=await getLiveStatus(cur);await send(web,{action:"sourceHealth",failedSourceIds:h.failedSourceIds||[],cacheOnly:!!h.cacheOnly})}catch(e){console.log("Source health: "+e)}})();
 
   while(!dismissed){
     await sleep(160);if(dismissed)break;
@@ -1072,7 +1081,8 @@ async function settings(s){
         try{
           const r=await fetchCatalog(true);catalogResult=r;
           cur=enrichWatchedSources(cur,r.data);saveSettings(cur);
-          await send(web,{action:"catalog",catalog:r.data,online:r.online,text:tx(cur,"catalogUpdated")})
+          await send(web,{action:"catalog",catalog:r.data,online:r.online,text:tx(cur,"catalogUpdated")});
+          const h=await getLiveStatus(cur);await send(web,{action:"sourceHealth",failedSourceIds:h.failedSourceIds||[],cacheOnly:!!h.cacheOnly})
         }catch(e){await send(web,{action:"status",text:tx(cur,"catalogFail")})}
       }else if(m.action==="markSeen"){
         const n=await markAllSeen(cur);await send(web,{action:"status",text:`${tx(cur,"done")} · ${n}`})
