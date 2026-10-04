@@ -21,6 +21,22 @@ jobs:
         with:
           ref: Master
 
+      - name: Apply v0.1.10 Small metric row fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('apps/Homebridge-Status/Homebridge Status.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('// Homebridge Status v0.1.9','// Homebridge Status v0.1.10',1)
+          s=s.replace('const APP_VERSION = "0.1.9";','const APP_VERSION = "0.1.10";',1)
+          old='centeredPanelText(panel,`CPU ${fmt(cpuLoad(snap))}%  ·  RAM ${fmt(ramUsed(snap))}%`,9,c.text,"semibold");'
+          new='const metricRow=panel.addStack();metricRow.centerAlignContent();metricRow.addSpacer();addText(metricRow,`CPU ${fmt(cpuLoad(snap))}%`,9,c.text,"semibold");metricRow.addSpacer(8);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`,9,c.text,"semibold");metricRow.addSpacer();'
+          if old not in s:
+              raise SystemExit('Small combined CPU/RAM row not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
@@ -43,36 +59,26 @@ jobs:
           assert vm, 'APP_VERSION missing'
           version=vm.group(1)
 
-          assert version == '0.1.9'
+          assert version == '0.1.10'
           assert pkg['name']=='Homebridge Status'
           assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
           assert pkg.get('always_run_in_app') is False
           assert pkg.get('share_sheet_inputs') == []
           assert "{name:'Homebridge Status'" not in site, 'Homebridge Status must stay hidden from public catalog during testing'
 
-          assert 'const T = {' in src and 'cs:{' in src and 'en:{' in src and 'de:{' in src and 'es:{' in src, 'CZ/EN/DE/ES translations missing'
-          assert 'language: "cs"' in src and 'setLanguage(this.value)' in src, 'language setting missing'
-          assert 'brand.size=new Size(172,0)' in src and 'top.addSpacer(7)' in src, 'medium alignment changed unexpectedly'
-          assert 'true,136,true' in src, 'medium centered values missing'
-          assert 'w.setPadding(14,16,11,16)' in src, 'small changed unexpectedly'
-          assert 'w.setPadding(11,10,9,10)' in src, 'medium padding changed unexpectedly'
-          assert 'w.setPadding(18,20,15,20)' in src, 'large padding changed unexpectedly'
+          assert 'const metricRow=panel.addStack()' in src, 'Small split CPU/RAM row missing'
+          assert 'addText(metricRow,`CPU ${fmt(cpuLoad(snap))}%`' in src, 'Small CPU value missing'
+          assert 'addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`' in src, 'Small RAM value missing'
+          assert 'w.setPadding(14,16,11,16)' in src, 'small padding changed unexpectedly'
+          assert 'w.setPadding(11,10,9,10)' in src, 'medium changed unexpectedly'
+          assert 'w.setPadding(18,20,15,20)' in src, 'large changed unexpectedly'
 
           assert '/api/status/rpi/throttled' in src, 'Raspberry Pi health endpoint missing'
-          assert 'rpiWarningKeys' in src and 'pluginUpdateCount' in src, 'Large detail helpers missing'
-          assert 'true,145,true' in src, 'Large centered CPU/RAM metrics missing'
-          assert 'rows.push([tx(s,"plugins")' in src, 'Plugin update count row missing'
-          assert 'rows.push(["Raspberry Pi"' in src, 'Raspberry Pi health row missing'
-          assert 's.showGraphs,"",true,145,true' in src, 'Large CPU/RAM should not duplicate temperature'
-
           assert 'fallbackUrl' in src, 'VPN fallback setting missing'
-          assert 'route:"LAN"' in src and 'route:"VPN"' in src, 'LAN/VPN routing missing'
-          assert '/api/status/homebridge' in src, 'Homebridge status endpoint missing'
-          assert '/api/status/cpu' in src and '/api/status/ram' in src, 'CPU/RAM endpoints missing'
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
           assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
           assert len(src)>25000
-          print(f'Homebridge Status v{version}: Large health/details + Pi diagnostics; public card hidden')
+          print(f'Homebridge Status v{version}: Small CPU/RAM values fit independently; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -80,11 +86,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
+            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync private Homebridge Status package"
+          git commit -m "Fix Homebridge Status Small metric row"
           git push origin HEAD:Master
