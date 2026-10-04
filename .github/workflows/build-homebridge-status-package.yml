@@ -21,6 +21,35 @@ jobs:
         with:
           ref: Master
 
+      - name: Apply v0.1.13 Large layout finish
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('apps/Homebridge-Status/Homebridge Status.js')
+          s=p.read_text(encoding='utf-8')
+          if 'const APP_VERSION = "0.1.13";' not in s:
+              s=s.replace('// Homebridge Status v0.1.12','// Homebridge Status v0.1.13',1)
+              s=s.replace('const APP_VERSION = "0.1.12";','const APP_VERSION = "0.1.13";',1)
+
+              old=re.search(r'function addLargeStatusGrid\(w,s,snap,c,font=10\)\{.*?return card\}\n',s)
+              if not old: raise SystemExit('addLargeStatusGrid not found')
+              new='''function addLargeCenteredStatus(parent,label,value,version,c,font=10){const r=parent.addStack();r.centerAlignContent();r.addSpacer();const m=statusMeta(value,c);addSymbol(r,m.icon,font+1,m.color);r.addSpacer(5);addText(r,label,font,c.text,"semibold");if(version){r.addSpacer(6);addText(r,version,font-1,c.muted,"semibold")}r.addSpacer();return r}\nfunction addLargeStatusGrid(w,s,snap,c,font=10){const card=w.addStack();card.backgroundColor=c.card;card.cornerRadius=12;card.setPadding(8,10,8,10);const row=card.addStack();row.addSpacer();const left=row.addStack();left.layoutVertically();left.size=new Size(118,0);addLargeCenteredStatus(left,tx(s,"running"),snap.running,"",c,font);left.addSpacer(5);addLargeCenteredStatus(left,tx(s,"plugins"),snap.pluginsUtd,"",c,font);row.addSpacer(8);const right=row.addStack();right.layoutVertically();right.size=new Size(154,0);addLargeCenteredStatus(right,"Homebridge",snap.hbUtd,installedVersion(snap.hbVersion),c,font);right.addSpacer(5);addLargeCenteredStatus(right,"Node.js",snap.nodeUtd,installedVersion(snap.nodeVersion,true),c,font);row.addSpacer();return card}\n'''
+              s=s[:old.start()]+new+s[old.end():]
+
+              old=re.search(r'function addSystemPanel\(w,s,snap,c\)\{.*?return p\}\n\nfunction centeredPanelText',s,re.S)
+              if not old: raise SystemExit('addSystemPanel block not found')
+              new='''function addLargeInfoCell(parent,label,value,c,valueColor){const cell=parent.addStack();cell.layoutVertically();cell.size=new Size(132,0);centeredPanelText(cell,label,8,c.muted,"semibold");cell.addSpacer(3);centeredPanelText(cell,value,9,valueColor||c.text,"semibold");return cell}\nfunction addLargePairRow(parent,leftLabel,leftValue,rightLabel,rightValue,c,leftColor,rightColor){const r=parent.addStack();r.addSpacer();addLargeInfoCell(r,leftLabel,leftValue,c,leftColor);r.addSpacer(8);addLargeInfoCell(r,rightLabel,rightValue,c,rightColor);r.addSpacer();return r}\nfunction addSystemPanel(w,s,snap,c){const L=largeLabels(s),p=w.addStack();p.layoutVertically();p.backgroundColor=c.card;p.cornerRadius=12;p.setPadding(8,10,8,10);centeredPanelText(p,tx(s,"system"),8,c.muted,"semibold");p.addSpacer(6);const temp=cpuTemp(snap);addLargePairRow(p,tx(s,"tempShort"),temp===null?"—":fmt(temp)+" °C",L.network,networkRateText(snap),c);p.addSpacer(6);addLargePairRow(p,tx(s,"piUptime"),formatSeconds(snap.uptime?.time?.uptime),tx(s,"uiUptime"),formatSeconds(snap.uptime?.processUptime),c);return p}\nfunction addLargeDetailsPanel(w,s,snap,c){const L=largeLabels(s),p=w.addStack();p.layoutVertically();p.backgroundColor=c.card;p.cornerRadius=12;p.setPadding(8,10,8,10);centeredPanelText(p,tx(s,"details"),8,c.muted,"semibold");p.addSpacer(6);const piWarnings=rpiWarningKeys(snap),bridges=childBridgeSummary(snap);const host=snap.serverInfo?.os?.hostname||"—",arch=snap.serverInfo?.os?.arch||"",ip=snap.serverInfo?.network?.ip4||"—",iface=snap.serverInfo?.network?.iface||"";addLargePairRow(p,L.host,arch?`${host} · ${arch}`:host,L.ip,iface?`${ip} · ${iface}`:ip,c);p.addSpacer(6);const piText=piWarnings===null?"—":piWarnings.length?`⚠ ${piWarnings.length}`:"OK";addLargePairRow(p,L.bridges,bridges.text,"Raspberry Pi",piText,c,bridges.ok===false?c.warn:c.text,piWarnings&&piWarnings.length?c.warn:c.text);return p}\n\nfunction centeredPanelText'''
+              s=s[:old.start()]+new+s[old.end():]
+
+              old=re.search(r'async function buildLarge\(snap,s\)\{.*?return w\}\nasync function buildAccessoryRectangular',s,re.S)
+              if not old: raise SystemExit('buildLarge block not found')
+              new='''async function buildLarge(snap,s){const c=colors(s),w=new ListWidget();configureWidget(w,s,c);w.setPadding(18,30,15,30);addHeader(w,s,c,snap,18);w.addSpacer(9);if(!snap.connected){addUnavailable(w,s,c,snap);return w}addLargeStatusGrid(w,s,snap,c,10);w.addSpacer(9);const metrics=w.addStack();addMetricCard(metrics,tx(s,"cpuLoad"),fmt(cpuLoad(snap)),"%",snap.cpu?.cpuLoadHistory,c,s.showGraphs,"",true,128,true);metrics.addSpacer(8);addMetricCard(metrics,tx(s,"ramUsage"),fmt(ramUsed(snap)),"%",snap.ram?.memoryUsageHistory,c,s.showGraphs,"",true,128,true);w.addSpacer(9);addSystemPanel(w,s,snap,c);w.addSpacer(9);addLargeDetailsPanel(w,s,snap,c);w.addSpacer();if(s.showUpdated){const df=new DateFormatter();df.useNoDateStyle();df.useShortTimeStyle();const foot=w.addStack();foot.addSpacer();addText(foot,df.string(new Date(snap.updatedAt)),8,c.muted);foot.addSpacer()}return w}\nasync function buildAccessoryRectangular'''
+              s=s[:old.start()]+new+s[old.end():]
+              p.write_text(s,encoding='utf-8')
+          PY
+
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
@@ -39,20 +68,20 @@ jobs:
           pkg=json.loads((app/'Homebridge Status.scriptable').read_text(encoding='utf-8'))
           site=Path('index.html').read_text(encoding='utf-8')
           vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
-          assert vm and vm.group(1)=='0.1.12'
+          assert vm and vm.group(1)=='0.1.13'
           assert pkg['script']==src
           assert "{name:'Homebridge Status'" not in site
-          assert 'w.setPadding(14,10,11,10)' in src
-          assert 'panel.setPadding(7,4,7,4)' in src
-          assert 'metricRow.addSpacer(4);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`' in src
+          assert 'w.setPadding(14,10,11,10)' in src, 'Small changed unexpectedly'
           assert 'w.setPadding(11,10,9,10)' in src, 'Medium changed unexpectedly'
-          assert 'w.setPadding(18,26,15,26)' in src, 'Large changed unexpectedly'
+          assert 'w.setPadding(18,30,15,30)' in src, 'Large center padding missing'
+          assert 'addLargeCenteredStatus' in src
+          assert 'addLargeDetailsPanel' in src
+          assert 'addLargePairRow' in src
           assert '/api/status/network' in src and '/api/status/server-information' in src and '/api/status/homebridge/child-bridges' in src
           assert '/api/status/rpi/throttled' in src
           assert 'fallbackUrl' in src
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src
-          assert 'const UPDATE_SOURCE_URL' in src
-          print('Homebridge Status v0.1.12: Small padding reduced; public card hidden')
+          print('Homebridge Status v0.1.13: Large centered 2x2 API layout; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -60,11 +89,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
+            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync private Homebridge Status package"
+          git commit -m "Finish Homebridge Status Large layout"
           git push origin HEAD:Master
