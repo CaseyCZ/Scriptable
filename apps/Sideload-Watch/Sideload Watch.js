@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.14
+// Sideload Watch v0.2.15
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.14";
+const APP_VERSION = "0.2.15";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -385,11 +385,12 @@ function enrichWatchedSources(settings,catalog){
   const s=merge(settings),map=new Map((catalog?.sources||[]).map(src=>[src.id,src]));
   let changed=false;
   s.watched=s.watched.map(item=>{
-    if(item.sourceURL)return item;
     const src=map.get(item.sourceId);
     if(!src?.sourceURL)return item;
+    const nextURL=String(src.sourceURL);
+    if(String(item.sourceURL||"")===nextURL)return item;
     changed=true;
-    return {...item,sourceURL:String(src.sourceURL)}
+    return {...item,sourceURL:nextURL}
   });
   if(changed)saveSettings(s);
   return s
@@ -960,14 +961,20 @@ function renderApps(){
     sw.append(input,slider);row.append(text,sw);root.appendChild(row)
   }
 }
+function pruneFailedSources(){
+  const watchedIds=new Set((state.watched||[]).map(x=>String(x.sourceId||"")));
+  failedSourceIds=new Set([...failedSourceIds].filter(id=>watchedIds.has(String(id))));
+  if(!watchedIds.size)sourceCacheOnly=false;
+  updateSourceHealthUI()
+}
 function toggleApp(item,on){
-  const k=key(item),arr=(state.watched||[]).filter(x=>key(x)!==k);if(on)arr.push(item);state.watched=arr;saveState();renderSources();renderApps()
+  const k=key(item),arr=(state.watched||[]).filter(x=>key(x)!==k);if(on)arr.push(item);state.watched=arr;pruneFailedSources();saveState();renderSources();renderApps()
 }
 function selectCurrentSource(on){
   const src=sourceObj(currentSourceId);if(!src)return;
   const other=(state.watched||[]).filter(x=>x.sourceId!==src.id);
   state.watched=on?other.concat((src.apps||[]).map(a=>({sourceId:src.id,bundleIdentifier:a.bundleIdentifier||'',name:a.name,sourceURL:src.sourceURL||''}))):other;
-  saveState();renderSources();renderApps()
+  pruneFailedSources();saveState();renderSources();renderApps()
 }
 function saveBehavior(){state.refreshMinutes=Number(document.getElementById('refreshMinutes').value)||30;saveState()}
 function enableCustomColors(){
