@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.19
+// Sideload Watch v0.2.20
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.19";
+const APP_VERSION = "0.2.20";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -649,7 +649,11 @@ function mediumSummary(status,settings){
 }
 async function buildWidget(status,settings,familyOverride){
   const family=familyOverride||config.widgetFamily||"medium",L=layoutForFamily(family),c=colors(settings),W=widgetText(settings),w=new ListWidget();
-  w.backgroundColor=c.bg;w.setPadding(L.pad,L.pad,L.pad,L.pad);
+  w.backgroundColor=c.bg;
+  const twoColumnSummary=(family==="medium"||family==="large")&&settings.mediumLayout!=="center"&&status.total===0;
+  const topPad=twoColumnSummary?(family==="large"?10:7):L.pad;
+  const bottomPad=twoColumnSummary?(family==="large"?10:8):L.pad;
+  w.setPadding(topPad,L.pad,bottomPad,L.pad);
   try{w.url=URLScheme.forRunningScript()}catch(_){w.url="scriptable://"}
 
   const header=w.addStack();header.centerAlignContent();
@@ -687,6 +691,7 @@ async function buildWidget(status,settings,familyOverride){
       if(settings.showCount!==false){left.addSpacer(large?6:4);addCentered(left,W.updates(status.total),Font.boldSystemFont(large?11:9),c.muted,.7)}
       columns.addSpacer(10);
       const right=columns.addStack();right.layoutVertically();right.size=new Size(145,0);
+      right.addSpacer(large?8:6);
       addCentered(right,summary.tracked,Font.boldSystemFont(large?10:8),c.muted);
       right.addSpacer(large?5:3);
       addCentered(right,summary.watchedLine,Font.semiboldSystemFont(large?12:10),c.text,.65);
@@ -757,7 +762,8 @@ async function buildWidget(status,settings,familyOverride){
       footer.addSpacer();
     }
     if(settings.showTime!==false){
-      w.addSpacer(family==="large"?4:2);
+      if(summaryColumns)w.addSpacer();
+      else w.addSpacer(family==="large"?4:2);
       const timeRow=w.addStack();timeRow.addSpacer();
       const checked=timeRow.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted;checked.lineLimit=1;
       timeRow.addSpacer();
