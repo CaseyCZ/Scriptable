@@ -1,0 +1,65 @@
+name: Home Dashboard layout update
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/home-dashboard-layout-update.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Update widget layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          p = Path('apps/Home-Dashboard/Home Dashboard.js')
+          s = p.read_text(encoding='utf-8')
+
+          assert 'Home Dashboard v0.3.11' in s
+          assert 'const APP_VERSION = "0.3.11";' in s
+          s = s.replace('Home Dashboard v0.3.11', 'Home Dashboard v0.3.12', 1)
+          s = s.replace('const APP_VERSION = "0.3.11";', 'const APP_VERSION = "0.3.12";', 1)
+
+          old_rows = 'const r=rows[i],line=w.addStack();line.centerAlignContent();'
+          new_rows = 'const r=rows[i],line=w.addStack();line.setPadding(0,8,0,8);line.centerAlignContent();'
+          assert old_rows in s
+          s = s.replace(old_rows, new_rows, 1)
+
+          old_footer = 'const foot=w.addText(`${tx(settings,"checked")}: ${df.string(when)}`);foot.font=Font.systemFont(L.detail);foot.textColor=c.muted;foot.lineLimit=1'
+          new_footer = 'const footRow=w.addStack();footRow.addSpacer();const foot=footRow.addText(df.string(when));foot.font=Font.systemFont(L.detail);foot.textColor=c.muted;foot.lineLimit=1;footRow.addSpacer()'
+          assert old_footer in s
+          s = s.replace(old_footer, new_footer, 1)
+
+          p.write_text(s, encoding='utf-8')
+
+          v = Path('apps/Home-Dashboard/version.json')
+          data = json.loads(v.read_text(encoding='utf-8'))
+          data['version'] = '0.3.12'
+          v.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Validate JavaScript
+        run: |
+          cp 'apps/Home-Dashboard/Home Dashboard.js' /tmp/HomeDashboard.mjs
+          node --check /tmp/HomeDashboard.mjs
+
+      - name: Commit update and remove one-time workflow
+        run: |
+          rm '.github/workflows/home-dashboard-layout-update.yml'
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add 'apps/Home-Dashboard/Home Dashboard.js' 'apps/Home-Dashboard/version.json' '.github/workflows/home-dashboard-layout-update.yml'
+          git commit -m "Refine Home Dashboard widget spacing"
+          git push origin HEAD:Master
