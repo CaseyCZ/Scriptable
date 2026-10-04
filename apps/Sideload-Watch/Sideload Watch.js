@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.24
+// Sideload Watch v0.2.25
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.24";
+const APP_VERSION = "0.2.25";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -43,7 +43,7 @@ const T = {
     sources:"Sources",sourcesSub:"Otevři source a vyber konkrétní aplikace, které chceš sledovat.",
     searchSource:"Hledat source…",searchApp:"Hledat aplikaci…",apps:"aplikací",selected:"vybráno",
     back:"Zpět",selectAll:"Vybrat vše",clearAll:"Zrušit vše",none:"Nic nenalezeno",
-    widgetPreview:"Náhled",realPreview:"Reálná data",demoPreview:"Demo vzhledu",
+    widgetPreview:"Náhled",realPreview:"Reálná data",demoPreview:"Demo vzhledu",demoUpdates:"Demo aktualizací",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Chování",refresh:"Obnova widgetu",refreshDetail:"Požadovaný interval obnovy. iOS může widget obnovit později.",
     minutes:"min",language:"Jazyk",languageDetail:"Jazyk nastavení a widgetu.",
@@ -72,7 +72,7 @@ const T = {
     sources:"Sources",sourcesSub:"Open a source and choose the exact apps you want to watch.",
     searchSource:"Search sources…",searchApp:"Search apps…",apps:"apps",selected:"selected",
     back:"Back",selectAll:"Select all",clearAll:"Clear all",none:"Nothing found",
-    widgetPreview:"Preview",realPreview:"Live data",demoPreview:"Appearance demo",
+    widgetPreview:"Preview",realPreview:"Live data",demoPreview:"Appearance demo",demoUpdates:"Updates demo",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Behavior",refresh:"Widget refresh",refreshDetail:"Requested refresh interval. iOS may refresh the widget later.",
     minutes:"min",language:"Language",languageDetail:"Language used by settings and widget.",
@@ -101,7 +101,7 @@ const T = {
     sources:"Quellen",sourcesSub:"Öffne eine Quelle und wähle die Apps aus, die du beobachten möchtest.",
     searchSource:"Quelle suchen…",searchApp:"App suchen…",apps:"Apps",selected:"ausgewählt",
     back:"Zurück",selectAll:"Alle auswählen",clearAll:"Alle abwählen",none:"Nichts gefunden",
-    widgetPreview:"Vorschau",realPreview:"Echte Daten",demoPreview:"Design-Demo",
+    widgetPreview:"Vorschau",realPreview:"Echte Daten",demoPreview:"Design-Demo",demoUpdates:"Update-Demo",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Verhalten",refresh:"Widget-Aktualisierung",refreshDetail:"Gewünschtes Intervall. iOS kann das Widget später aktualisieren.",
     minutes:"Min",language:"Sprache",languageDetail:"Sprache für Einstellungen und Widget.",
@@ -130,7 +130,7 @@ const T = {
     sources:"Fuentes",sourcesSub:"Abre una fuente y elige las apps concretas que quieres vigilar.",
     searchSource:"Buscar fuente…",searchApp:"Buscar app…",apps:"apps",selected:"seleccionadas",
     back:"Atrás",selectAll:"Seleccionar todo",clearAll:"Borrar todo",none:"Sin resultados",
-    widgetPreview:"Vista previa",realPreview:"Datos reales",demoPreview:"Demo de diseño",
+    widgetPreview:"Vista previa",realPreview:"Datos reales",demoPreview:"Demo de diseño",demoUpdates:"Demo de actualizaciones",
     small:"Small",medium:"Medium",large:"Large",
     behavior:"Comportamiento",refresh:"Actualización del widget",refreshDetail:"Intervalo solicitado. iOS puede actualizar el widget más tarde.",
     minutes:"min",language:"Idioma",languageDetail:"Idioma de los ajustes y del widget.",
@@ -552,8 +552,21 @@ async function markAllSeen(settings){
   }
   state.updatedAt=new Date().toISOString();saveState(state);return current.length
 }
-function demoStatus(settings){
+function demoStatus(settings,mode="summary"){
   const state=loadState();
+  if(mode==="updates"){
+    const watched=Array.isArray(settings?.watched)?settings.watched:[];
+    const fallback=[
+      {name:"LiveContainer",version:"3.4.1"},
+      {name:"Stremio",version:"2.1.0"},
+      {name:"Provenance Emulator",version:"3.5.0"}
+    ];
+    const updates=(watched.length?watched.slice(0,3).map((item,i)=>{
+      const prev=state.lastCurrent?.[watchKey(item)]||{};
+      return{name:item.name||fallback[i]?.name||`App ${i+1}`,version:String(prev.version||fallback[i]?.version||"1.0")};
+    }):fallback);
+    return{updates,total:updates.length,current:[],checkedAt:new Date(),offline:false,cached:false,cacheOnly:false,failedSources:[],failedSourceIds:[],demo:true}
+  }
   const watched=Array.isArray(settings?.watched)?settings.watched:[];
   const sourceIds=[...new Set(watched.map(x=>String(x.sourceId||"")).filter(Boolean))];
   const sourceNameFor=id=>{
@@ -982,7 +995,9 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
   <div class="sectionTitle">${esc(L.realPreview)}</div>
   <div class="previewGrid"><button class="previewBtn" onclick="preview('small',false)">${esc(L.small)}</button><button class="previewBtn" onclick="preview('medium',false)">${esc(L.medium)}</button><button class="previewBtn" onclick="preview('large',false)">${esc(L.large)}</button></div>
   <div class="sectionTitle">${esc(L.demoPreview)}</div>
-  <div class="previewGrid"><button class="previewBtn" onclick="preview('small',true)">${esc(L.small)}</button><button class="previewBtn" onclick="preview('medium',true)">${esc(L.medium)}</button><button class="previewBtn" onclick="preview('large',true)">${esc(L.large)}</button></div>
+  <div class="previewGrid"><button class="previewBtn" onclick="preview('small','summary')">${esc(L.small)}</button><button class="previewBtn" onclick="preview('medium','summary')">${esc(L.medium)}</button><button class="previewBtn" onclick="preview('large','summary')">${esc(L.large)}</button></div>
+  <div class="sectionTitle">${esc(L.demoUpdates)}</div>
+  <div class="previewGrid"><button class="previewBtn" onclick="preview('small','updates')">${esc(L.small)}</button><button class="previewBtn" onclick="preview('medium','updates')">${esc(L.medium)}</button><button class="previewBtn" onclick="preview('large','updates')">${esc(L.large)}</button></div>
   <div id="previewStatus" class="status"></div>
 </div>
 
@@ -1240,7 +1255,7 @@ async function settings(s){
       }else if(m.action==="preview"){
         cur=merge(m.settings||cur);saveSettings(cur);
         const family=["small","medium","large"].includes(m.family)?m.family:"medium";
-        const status=m.demo?demoStatus(cur):await getLiveStatus(cur),w=await buildWidget(status,cur,family);
+        const status=m.demo?demoStatus(cur,m.demo):await getLiveStatus(cur),w=await buildWidget(status,cur,family);
         try{await presentWidget(w,family)}finally{await send(web,{action:"previewDone"})}
       }else if(m.action==="refreshCatalog"){
         try{
