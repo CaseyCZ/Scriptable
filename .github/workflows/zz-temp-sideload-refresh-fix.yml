@@ -1,0 +1,72 @@
+name: Temporary Sideload Watch source refresh fix
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/zz-temp-sideload-refresh-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sideload Watch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          app=Path('apps/Sideload-Watch')
+          p=app/'Sideload Watch.js'
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('// Sideload Watch v0.2.14','// Sideload Watch v0.2.15',1)
+          s=s.replace('const APP_VERSION = "0.2.14";','const APP_VERSION = "0.2.15";',1)
+
+          old='''  s.watched=s.watched.map(item=>{\n    if(item.sourceURL)return item;\n    const src=map.get(item.sourceId);\n    if(!src?.sourceURL)return item;\n    changed=true;\n    return {...item,sourceURL:String(src.sourceURL)}\n  });'''
+          new='''  s.watched=s.watched.map(item=>{\n    const src=map.get(item.sourceId);\n    if(!src?.sourceURL)return item;\n    const nextURL=String(src.sourceURL);\n    if(String(item.sourceURL||"")===nextURL)return item;\n    changed=true;\n    return {...item,sourceURL:nextURL}\n  });'''
+          if old not in s: raise SystemExit('enrichWatchedSources marker missing')
+          s=s.replace(old,new,1)
+
+          old='''function toggleApp(item,on){\n  const k=key(item),arr=(state.watched||[]).filter(x=>key(x)!==k);if(on)arr.push(item);state.watched=arr;saveState();renderSources();renderApps()\n}'''
+          new='''function pruneFailedSources(){\n  const watchedIds=new Set((state.watched||[]).map(x=>String(x.sourceId||"")));\n  failedSourceIds=new Set([...failedSourceIds].filter(id=>watchedIds.has(String(id))));\n  if(!watchedIds.size)sourceCacheOnly=false;\n  updateSourceHealthUI()\n}\nfunction toggleApp(item,on){\n  const k=key(item),arr=(state.watched||[]).filter(x=>key(x)!==k);if(on)arr.push(item);state.watched=arr;pruneFailedSources();saveState();renderSources();renderApps()\n}'''
+          if old not in s: raise SystemExit('toggleApp marker missing')
+          s=s.replace(old,new,1)
+
+          old='''  state.watched=on?other.concat((src.apps||[]).map(a=>({sourceId:src.id,bundleIdentifier:a.bundleIdentifier||'',name:a.name,sourceURL:src.sourceURL||''}))):other;\n  saveState();renderSources();renderApps()'''
+          new='''  state.watched=on?other.concat((src.apps||[]).map(a=>({sourceId:src.id,bundleIdentifier:a.bundleIdentifier||'',name:a.name,sourceURL:src.sourceURL||''}))):other;\n  pruneFailedSources();saveState();renderSources();renderApps()'''
+          if old not in s: raise SystemExit('selectCurrentSource marker missing')
+          s=s.replace(old,new,1)
+
+          p.write_text(s,encoding='utf-8')
+          (app/'version.json').write_text(json.dumps({'version':'0.2.15'},indent=2)+'\n',encoding='utf-8')
+
+          pkg_path=app/'Sideload Watch.scriptable'
+          if pkg_path.exists():
+              pkg=json.loads(pkg_path.read_text(encoding='utf-8'))
+              pkg['script']=s
+              pkg_path.write_text(json.dumps(pkg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: |
+          cp 'apps/Sideload-Watch/Sideload Watch.js' /tmp/sideload.mjs
+          node --check /tmp/sideload.mjs
+          grep -q 'const APP_VERSION = "0.2.15";' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'const nextURL=String(src.sourceURL)' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'function pruneFailedSources()' 'apps/Sideload-Watch/Sideload Watch.js'
+
+      - name: Commit app files
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git add 'apps/Sideload-Watch/Sideload Watch.js' 'apps/Sideload-Watch/version.json' 'apps/Sideload-Watch/Sideload Watch.scriptable'
+          git commit -m 'Fix Sideload Watch source refresh state'
+          git push origin HEAD:Master
