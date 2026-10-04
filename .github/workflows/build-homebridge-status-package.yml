@@ -21,30 +21,6 @@ jobs:
         with:
           ref: Master
 
-      - name: Apply v0.1.12 Small padding fix
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('apps/Homebridge-Status/Homebridge Status.js')
-          s=p.read_text(encoding='utf-8')
-          if 'const APP_VERSION = "0.1.12";' not in s:
-              s=s.replace('// Homebridge Status v0.1.11','// Homebridge Status v0.1.12',1)
-              s=s.replace('const APP_VERSION = "0.1.11";','const APP_VERSION = "0.1.12";',1)
-              old='w.setPadding(14,16,11,16);addHeader(w,s,c,snap,13)'
-              new='w.setPadding(14,10,11,10);addHeader(w,s,c,snap,13)'
-              if old not in s: raise SystemExit('Small outer padding marker not found')
-              s=s.replace(old,new,1)
-              old='panel.cornerRadius=12;panel.setPadding(7,8,7,8);'
-              new='panel.cornerRadius=12;panel.setPadding(7,4,7,4);'
-              if old not in s: raise SystemExit('Small panel padding marker not found')
-              s=s.replace(old,new,1)
-              old='metricRow.addSpacer(8);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`'
-              new='metricRow.addSpacer(4);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`'
-              if old not in s: raise SystemExit('Small CPU/RAM spacer marker not found')
-              s=s.replace(old,new,1)
-              p.write_text(s,encoding='utf-8')
-          PY
-
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
@@ -71,7 +47,12 @@ jobs:
           assert 'metricRow.addSpacer(4);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`' in src
           assert 'w.setPadding(11,10,9,10)' in src, 'Medium changed unexpectedly'
           assert 'w.setPadding(18,26,15,26)' in src, 'Large changed unexpectedly'
-          print('Homebridge Status v0.1.12: Small padding reduced')
+          assert '/api/status/network' in src and '/api/status/server-information' in src and '/api/status/homebridge/child-bridges' in src
+          assert '/api/status/rpi/throttled' in src
+          assert 'fallbackUrl' in src
+          assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src
+          assert 'const UPDATE_SOURCE_URL' in src
+          print('Homebridge Status v0.1.12: Small padding reduced; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -79,12 +60,11 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
-            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Fix Homebridge Status Small padding"
+          git commit -m "Sync private Homebridge Status package"
           git push origin HEAD:Master
