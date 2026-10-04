@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/Homebridge-Status/Homebridge Status.js'
       - '.github/scripts/build_homebridge_status_package.py'
+      - '.github/scripts/upgrade_homebridge_status_v012.py'
       - '.github/workflows/build-homebridge-status-package.yml'
   workflow_dispatch:
 
@@ -20,6 +21,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: Master
+
+      - name: Apply v0.1.2 languages and widget layout
+        run: python .github/scripts/upgrade_homebridge_status_v012.py
 
       - name: Validate JavaScript syntax
         run: |
@@ -43,27 +47,28 @@ jobs:
           assert vm, 'APP_VERSION missing'
           version=vm.group(1)
 
+          assert version == '0.1.2'
           assert pkg['name']=='Homebridge Status'
           assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
           assert pkg.get('always_run_in_app') is False
           assert pkg.get('share_sheet_inputs') == []
           assert "{name:'Homebridge Status'" not in site, 'Homebridge Status must stay hidden from public catalog during testing'
 
-          # Keep settings UI aligned with Home Dashboard.
-          assert 'class="hero"' in src and 'class="eyebrow"' in src, 'Home Dashboard hero style missing'
-          assert 'class="navRow"' in src and 'class="chevron"' in src, 'Home Dashboard navigation style missing'
-          assert 'class="switch"' in src and 'class="slider"' in src, 'Home Dashboard switch style missing'
-          assert '‹ Zpět' in src, 'Home Dashboard back navigation missing'
+          assert 'const T = {' in src and 'cs:{' in src and 'en:{' in src and 'de:{' in src and 'es:{' in src, 'CZ/EN/DE/ES translations missing'
+          assert 'language: "cs"' in src and 'setLanguage(this.value)' in src, 'language setting missing'
+          assert 'addSystemPanel' in src, 'large system panel missing'
+          assert 'w.setPadding(14,16,11,16)' in src, 'small inset layout missing'
+          assert 'w.setPadding(15,18,13,18)' in src, 'medium inset layout missing'
+          assert 'w.setPadding(18,20,15,20)' in src, 'large inset layout missing'
 
-          # Core regression guards.
           assert 'fallbackUrl' in src, 'VPN fallback setting missing'
           assert 'route:"LAN"' in src and 'route:"VPN"' in src, 'LAN/VPN routing missing'
           assert '/api/status/homebridge' in src, 'Homebridge status endpoint missing'
           assert '/api/status/cpu' in src and '/api/status/ram' in src, 'CPU/RAM endpoints missing'
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
           assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
-          assert len(src)>18000
-          print(f'Homebridge Status v{version}: Home UI + package synchronized; public card hidden')
+          assert len(src)>25000
+          print(f'Homebridge Status v{version}: 4 languages + inset layouts synchronized; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -71,11 +76,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
+            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync private Homebridge Status package"
+          git commit -m "Update Homebridge Status to v0.1.2"
           git push origin HEAD:Master
