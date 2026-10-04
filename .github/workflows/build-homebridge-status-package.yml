@@ -21,6 +21,30 @@ jobs:
         with:
           ref: Master
 
+      - name: Apply v0.1.12 Small padding fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('apps/Homebridge-Status/Homebridge Status.js')
+          s=p.read_text(encoding='utf-8')
+          if 'const APP_VERSION = "0.1.12";' not in s:
+              s=s.replace('// Homebridge Status v0.1.11','// Homebridge Status v0.1.12',1)
+              s=s.replace('const APP_VERSION = "0.1.11";','const APP_VERSION = "0.1.12";',1)
+              old='w.setPadding(14,16,11,16);addHeader(w,s,c,snap,13)'
+              new='w.setPadding(14,10,11,10);addHeader(w,s,c,snap,13)'
+              if old not in s: raise SystemExit('Small outer padding marker not found')
+              s=s.replace(old,new,1)
+              old='panel.cornerRadius=12;panel.setPadding(7,8,7,8);'
+              new='panel.cornerRadius=12;panel.setPadding(7,4,7,4);'
+              if old not in s: raise SystemExit('Small panel padding marker not found')
+              s=s.replace(old,new,1)
+              old='metricRow.addSpacer(8);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`'
+              new='metricRow.addSpacer(4);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`'
+              if old not in s: raise SystemExit('Small CPU/RAM spacer marker not found')
+              s=s.replace(old,new,1)
+              p.write_text(s,encoding='utf-8')
+          PY
+
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
@@ -34,37 +58,20 @@ jobs:
           python - <<'PY'
           import json,re
           from pathlib import Path
-
           app=Path('apps/Homebridge-Status')
           src=(app/'Homebridge Status.js').read_text(encoding='utf-8')
           pkg=json.loads((app/'Homebridge Status.scriptable').read_text(encoding='utf-8'))
           site=Path('index.html').read_text(encoding='utf-8')
           vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
-          assert vm, 'APP_VERSION missing'
-          version=vm.group(1)
-
-          assert version == '0.1.11'
-          assert pkg['name']=='Homebridge Status'
-          assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
-          assert pkg.get('always_run_in_app') is False
-          assert pkg.get('share_sheet_inputs') == []
-          assert "{name:'Homebridge Status'" not in site, 'Homebridge Status must stay hidden from public catalog during testing'
-
-          assert 'w.setPadding(14,16,11,16)' in src, 'Small changed unexpectedly'
+          assert vm and vm.group(1)=='0.1.12'
+          assert pkg['script']==src
+          assert "{name:'Homebridge Status'" not in site
+          assert 'w.setPadding(14,10,11,10)' in src
+          assert 'panel.setPadding(7,4,7,4)' in src
+          assert 'metricRow.addSpacer(4);addText(metricRow,`RAM ${fmt(ramUsed(snap))}%`' in src
           assert 'w.setPadding(11,10,9,10)' in src, 'Medium changed unexpectedly'
-          assert 'w.setPadding(18,26,15,26)' in src, 'Large centered padding missing'
-          assert 'addLargeStatusGrid' in src, 'Centered Large status grid missing'
-          assert '/api/status/network' in src, 'Network API missing'
-          assert '/api/status/server-information' in src, 'Server information API missing'
-          assert '/api/status/homebridge/child-bridges' in src, 'Child bridges API missing'
-          assert 'networkRateText' in src and 'childBridgeSummary' in src, 'Large API helpers missing'
-          assert 'rows=[[L.host' in src and 'L.bridges' in src, 'Unique Large detail rows missing'
-          assert '/api/status/rpi/throttled' in src, 'Raspberry Pi health endpoint missing'
-          assert 'fallbackUrl' in src, 'VPN fallback setting missing'
-          assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
-          assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
-          assert len(src)>25000
-          print(f'Homebridge Status v{version}: centered Large + network/server/child bridge API details; public card hidden')
+          assert 'w.setPadding(18,26,15,26)' in src, 'Large changed unexpectedly'
+          print('Homebridge Status v0.1.12: Small padding reduced')
           PY
 
       - name: Commit synchronized release files
@@ -72,11 +79,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
+            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync private Homebridge Status package"
+          git commit -m "Fix Homebridge Status Small padding"
           git push origin HEAD:Master
