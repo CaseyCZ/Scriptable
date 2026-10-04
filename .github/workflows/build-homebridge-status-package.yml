@@ -6,7 +6,6 @@ on:
     paths:
       - 'apps/Homebridge-Status/Homebridge Status.js'
       - '.github/scripts/build_homebridge_status_package.py'
-      - '.github/scripts/upgrade_homebridge_status_v012.py'
       - '.github/workflows/build-homebridge-status-package.yml'
   workflow_dispatch:
 
@@ -21,20 +20,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: Master
-
-      - name: Apply v0.1.2 languages and widget layout
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('.github/scripts/upgrade_homebridge_status_v012.py')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace('widget_block, src, count=1, flags=re.S)', '(lambda _m: widget_block), src, count=1, flags=re.S)')
-          s=s.replace("notify_update + '\\n\\nfunction esc', src, count=1, flags=re.S)", "(lambda _m: notify_update + '\\n\\nfunction esc'), src, count=1, flags=re.S)")
-          s=s.replace("settings_html + '\\nasync function sendToWeb', src, count=1, flags=re.S)", "(lambda _m: settings_html + '\\nasync function sendToWeb'), src, count=1, flags=re.S)")
-          s=s.replace("settings_ui + '\\n\\nlet SETTINGS=', src, count=1, flags=re.S)", "(lambda _m: settings_ui + '\\n\\nlet SETTINGS='), src, count=1, flags=re.S)")
-          p.write_text(s,encoding='utf-8')
-          PY
-          python .github/scripts/upgrade_homebridge_status_v012.py
 
       - name: Validate JavaScript syntax
         run: |
@@ -58,7 +43,6 @@ jobs:
           assert vm, 'APP_VERSION missing'
           version=vm.group(1)
 
-          assert version == '0.1.2'
           assert pkg['name']=='Homebridge Status'
           assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
           assert pkg.get('always_run_in_app') is False
@@ -79,7 +63,7 @@ jobs:
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
           assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
           assert len(src)>25000
-          print(f'Homebridge Status v{version}: 4 languages + inset layouts synchronized; public card hidden')
+          print(f'Homebridge Status v{version}: package valid; 4 languages + inset layouts; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -87,12 +71,11 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
-            'apps/Homebridge-Status/Homebridge Status.js' \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
             index.html
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Update Homebridge Status to v0.1.2"
+          git commit -m "Sync private Homebridge Status package"
           git push origin HEAD:Master
