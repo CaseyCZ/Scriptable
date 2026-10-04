@@ -23,7 +23,18 @@ jobs:
           ref: Master
 
       - name: Apply v0.1.2 languages and widget layout
-        run: python .github/scripts/upgrade_homebridge_status_v012.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/upgrade_homebridge_status_v012.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('widget_block, src, count=1, flags=re.S)', '(lambda _m: widget_block), src, count=1, flags=re.S)')
+          s=s.replace("notify_update + '\\n\\nfunction esc', src, count=1, flags=re.S)", "(lambda _m: notify_update + '\\n\\nfunction esc'), src, count=1, flags=re.S)")
+          s=s.replace("settings_html + '\\nasync function sendToWeb', src, count=1, flags=re.S)", "(lambda _m: settings_html + '\\nasync function sendToWeb'), src, count=1, flags=re.S)")
+          s=s.replace("settings_ui + '\\n\\nlet SETTINGS=', src, count=1, flags=re.S)", "(lambda _m: settings_ui + '\\n\\nlet SETTINGS='), src, count=1, flags=re.S)")
+          p.write_text(s,encoding='utf-8')
+          PY
+          python .github/scripts/upgrade_homebridge_status_v012.py
 
       - name: Validate JavaScript syntax
         run: |
