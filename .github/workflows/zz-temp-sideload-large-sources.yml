@@ -1,0 +1,66 @@
+name: Temporary Sideload Watch large sources overview
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/zz-temp-sideload-large-sources.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Patch Sideload Watch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          app=Path('apps/Sideload-Watch')
+          p=app/'Sideload Watch.js'
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('// Sideload Watch v0.2.20','// Sideload Watch v0.2.21',1)
+          s=s.replace('const APP_VERSION = "0.2.20";','const APP_VERSION = "0.2.21";',1)
+
+          # Move the two-column summary down a little for both Medium and Large.
+          s=s.replace('''      if(large)w.addSpacer(8);\n      const columns=w.addStack();''','''      w.addSpacer(large?10:8);\n      const columns=w.addStack();''',1)
+
+          old='''      if(status.offline){right.addSpacer(large?5:3);addCentered(right,offlineFooterText(status,settings),Font.mediumSystemFont(large?10:8),c.red,.55)}\n      columns.addSpacer();'''
+          new='''      if(status.offline){right.addSpacer(large?5:3);addCentered(right,offlineFooterText(status,settings),Font.mediumSystemFont(large?10:8),c.red,.55)}\n      columns.addSpacer();\n\n      if(large){\n        w.addSpacer(14);\n        const sourceLabel={cs:"SOURCES",en:"SOURCES",de:"QUELLEN",es:"FUENTES"}[settings.language||lang()]||"SOURCES";\n        const labelRow=w.addStack();labelRow.addSpacer();\n        const label=labelRow.addText(sourceLabel);label.font=Font.boldSystemFont(10);label.textColor=c.muted;label.lineLimit=1;\n        labelRow.addSpacer();\n        w.addSpacer(6);\n\n        const failedIds=new Set((status.failedSourceIds||[]).map(String));\n        const currentByKey=new Map((status.current||[]).map(x=>[String(x.key||""),x]));\n        const sourceMap=new Map();\n        for(const item of settings.watched||[]){\n          const id=String(item.sourceId||"");if(!id||sourceMap.has(id))continue;\n          const cur=currentByKey.get(watchKey(item));\n          sourceMap.set(id,{\n            id,\n            name:String(cur?.sourceName||id),\n            health:status.cacheOnly?null:!failedIds.has(id)\n          });\n        }\n        const sources=[...sourceMap.values()].sort((a,b)=>a.name.localeCompare(b.name,settings.language||"en",{sensitivity:"base"}));\n        const split=Math.ceil(sources.length/2);\n        const leftSources=sources.slice(0,split),rightSources=sources.slice(split);\n        const sourceGrid=w.addStack();sourceGrid.centerAlignContent();sourceGrid.addSpacer();\n        const addSourceColumn=(items)=>{\n          const col=sourceGrid.addStack();col.layoutVertically();col.size=new Size(145,0);\n          items.forEach((item,index)=>{\n            const row=col.addStack();row.centerAlignContent();\n            const mark=row.addText(item.health===null?"○":(item.health?"●":"⚠︎"));\n            mark.font=Font.boldSystemFont(9);mark.textColor=item.health===null?c.muted:(item.health?c.green:c.red);\n            row.addSpacer(5);\n            const name=row.addText(item.name);name.font=Font.mediumSystemFont(10);name.textColor=item.health===false?c.red:c.text;name.lineLimit=1;name.minimumScaleFactor=.65;\n            row.addSpacer();\n            if(index<items.length-1)col.addSpacer(5);\n          });\n          return col\n        };\n        addSourceColumn(leftSources);\n        sourceGrid.addSpacer(12);\n        addSourceColumn(rightSources);\n        sourceGrid.addSpacer();\n      }'''
+          if old not in s: raise SystemExit('large source insertion marker missing')
+          s=s.replace(old,new,1)
+
+          p.write_text(s,encoding='utf-8')
+          (app/'version.json').write_text(json.dumps({'version':'0.2.21'},indent=2)+'\n',encoding='utf-8')
+
+          pkg_path=app/'Sideload Watch.scriptable'
+          if pkg_path.exists():
+              pkg=json.loads(pkg_path.read_text(encoding='utf-8'))
+              pkg['script']=s
+              pkg_path.write_text(json.dumps(pkg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: |
+          cp 'apps/Sideload-Watch/Sideload Watch.js' /tmp/sideload.mjs
+          node --check /tmp/sideload.mjs
+          grep -q 'const APP_VERSION = "0.2.21";' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'const sourceLabel=' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'const failedIds=new Set' 'apps/Sideload-Watch/Sideload Watch.js'
+          grep -q 'w.addSpacer(large?10:8)' 'apps/Sideload-Watch/Sideload Watch.js'
+
+      - name: Commit app files
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git add 'apps/Sideload-Watch/Sideload Watch.js' 'apps/Sideload-Watch/version.json' 'apps/Sideload-Watch/Sideload Watch.scriptable'
+          git commit -m 'Fill Sideload Watch large widget with source health'
+          git push origin HEAD:Master
