@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.20
+// Sideload Watch v0.2.21
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.20";
+const APP_VERSION = "0.2.21";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -682,7 +682,7 @@ async function buildWidget(status,settings,familyOverride){
         const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=scale;
         row.addSpacer();return text
       };
-      if(large)w.addSpacer(8);
+      w.addSpacer(large?10:8);
       const columns=w.addStack();columns.centerAlignContent();columns.addSpacer();
       const left=columns.addStack();left.layoutVertically();left.size=new Size(135,0);
       addCentered(left,"✓",Font.boldSystemFont(large?30:25),c.green);
@@ -699,6 +699,49 @@ async function buildWidget(status,settings,familyOverride){
       addCentered(right,summary.onlineLine,Font.mediumSystemFont(large?11:9),c.muted,.65);
       if(status.offline){right.addSpacer(large?5:3);addCentered(right,offlineFooterText(status,settings),Font.mediumSystemFont(large?10:8),c.red,.55)}
       columns.addSpacer();
+
+      if(large){
+        w.addSpacer(14);
+        const sourceLabel={cs:"SOURCES",en:"SOURCES",de:"QUELLEN",es:"FUENTES"}[settings.language||lang()]||"SOURCES";
+        const labelRow=w.addStack();labelRow.addSpacer();
+        const label=labelRow.addText(sourceLabel);label.font=Font.boldSystemFont(10);label.textColor=c.muted;label.lineLimit=1;
+        labelRow.addSpacer();
+        w.addSpacer(6);
+
+        const failedIds=new Set((status.failedSourceIds||[]).map(String));
+        const currentByKey=new Map((status.current||[]).map(x=>[String(x.key||""),x]));
+        const sourceMap=new Map();
+        for(const item of settings.watched||[]){
+          const id=String(item.sourceId||"");if(!id||sourceMap.has(id))continue;
+          const cur=currentByKey.get(watchKey(item));
+          sourceMap.set(id,{
+            id,
+            name:String(cur?.sourceName||id),
+            health:status.cacheOnly?null:!failedIds.has(id)
+          });
+        }
+        const sources=[...sourceMap.values()].sort((a,b)=>a.name.localeCompare(b.name,settings.language||"en",{sensitivity:"base"}));
+        const split=Math.ceil(sources.length/2);
+        const leftSources=sources.slice(0,split),rightSources=sources.slice(split);
+        const sourceGrid=w.addStack();sourceGrid.centerAlignContent();sourceGrid.addSpacer();
+        const addSourceColumn=(items)=>{
+          const col=sourceGrid.addStack();col.layoutVertically();col.size=new Size(145,0);
+          items.forEach((item,index)=>{
+            const row=col.addStack();row.centerAlignContent();
+            const mark=row.addText(item.health===null?"○":(item.health?"●":"⚠︎"));
+            mark.font=Font.boldSystemFont(9);mark.textColor=item.health===null?c.muted:(item.health?c.green:c.red);
+            row.addSpacer(5);
+            const name=row.addText(item.name);name.font=Font.mediumSystemFont(10);name.textColor=item.health===false?c.red:c.text;name.lineLimit=1;name.minimumScaleFactor=.65;
+            row.addSpacer();
+            if(index<items.length-1)col.addSpacer(5);
+          });
+          return col
+        };
+        addSourceColumn(leftSources);
+        sourceGrid.addSpacer(12);
+        addSourceColumn(rightSources);
+        sourceGrid.addSpacer();
+      }
     }else{
       const body=w.addStack();body.layoutVertically();
       if(summaryFamily){
