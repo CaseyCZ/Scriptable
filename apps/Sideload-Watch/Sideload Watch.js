@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.16
+// Sideload Watch v0.2.17
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.16";
+const APP_VERSION = "0.2.17";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -651,7 +651,6 @@ async function buildWidget(status,settings,familyOverride){
   try{w.url=URLScheme.forRunningScript()}catch(_){w.url="scriptable://"}
 
   const header=w.addStack();header.centerAlignContent();
-  if(family==="medium")header.addSpacer();
   const symbol=SFSymbol.named("arrow.triangle.2.circlepath");symbol.applyFont(Font.semiboldSystemFont(L.title));
   const icon=header.addImage(symbol.image);icon.imageSize=new Size(L.title,L.title);icon.tintColor=c.blue;
   header.addSpacer(7);
@@ -659,7 +658,7 @@ async function buildWidget(status,settings,familyOverride){
   if(status.demo){header.addSpacer(7);const d=header.addText("DEMO");d.font=Font.boldSystemFont(Math.max(8,L.footer));d.textColor=c.muted}
   header.addSpacer();
 
-  w.addSpacer(family==="small"?8:10);
+  w.addSpacer(family==="small"?8:(family==="medium"?5:10));
 
   if(!settings.watched.length){
     const body=w.addStack();body.layoutVertically();body.addSpacer();
@@ -668,20 +667,30 @@ async function buildWidget(status,settings,familyOverride){
     const msg=body.addText(tx(settings,"noSelection"));msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
     body.addSpacer();
   }else if(status.total===0){
-    const body=w.addStack();body.layoutVertically();body.addSpacer();
-    const ok=body.addText("✓");ok.font=Font.boldSystemFont(family==="small"?24:30);ok.textColor=c.green;ok.centerAlignText();
-    body.addSpacer(4);
-    const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
+    const body=w.addStack();body.layoutVertically();
     if(family==="medium"){
-      const summary=mediumSummary(status,settings);
-      body.addSpacer(11);
-      const tracked=body.addText(summary.tracked);tracked.font=Font.boldSystemFont(9);tracked.textColor=c.muted;tracked.centerAlignText();tracked.lineLimit=1;
-      body.addSpacer(3);
-      const watched=body.addText(summary.watchedLine);watched.font=Font.semiboldSystemFont(11);watched.textColor=c.text;watched.centerAlignText();watched.lineLimit=1;watched.minimumScaleFactor=.75;
+      const centered=(value,font,color)=>{
+        const row=body.addStack();row.centerAlignContent();row.addSpacer();
+        const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=.72;
+        row.addSpacer();return text
+      };
+      centered("✓",Font.boldSystemFont(22),c.green);
       body.addSpacer(2);
-      const online=body.addText(summary.onlineLine);online.font=Font.mediumSystemFont(10);online.textColor=c.muted;online.centerAlignText();online.lineLimit=1;online.minimumScaleFactor=.75;
+      centered(W.upToDate,Font.semiboldSystemFont(12),c.text);
+      const summary=mediumSummary(status,settings);
+      body.addSpacer(5);
+      centered(summary.tracked,Font.boldSystemFont(8),c.muted);
+      body.addSpacer(2);
+      centered(summary.watchedLine,Font.semiboldSystemFont(10),c.text);
+      body.addSpacer(1);
+      centered(summary.onlineLine,Font.mediumSystemFont(9),c.muted);
+    }else{
+      body.addSpacer();
+      const ok=body.addText("✓");ok.font=Font.boldSystemFont(family==="small"?24:30);ok.textColor=c.green;ok.centerAlignText();
+      body.addSpacer(4);
+      const msg=body.addText(W.upToDate);msg.font=Font.semiboldSystemFont(family==="small"?11:13);msg.textColor=c.text;msg.centerAlignText();msg.lineLimit=2;
+      body.addSpacer();
     }
-    body.addSpacer();
   }else{
     const visible=status.updates.slice(0,L.maxRows);
     for(let i=0;i<visible.length;i++){
@@ -698,7 +707,7 @@ async function buildWidget(status,settings,familyOverride){
     }
   }
 
-  w.addSpacer();
+  if(family==="medium")w.addSpacer(5);else w.addSpacer();
   if(family==="medium"){
     if(settings.showCount!==false||status.offline){
       const footer=w.addStack();footer.centerAlignContent();footer.addSpacer();
@@ -712,7 +721,7 @@ async function buildWidget(status,settings,familyOverride){
       footer.addSpacer();
     }
     if(settings.showTime!==false){
-      w.addSpacer(4);
+      w.addSpacer(2);
       const timeRow=w.addStack();timeRow.addSpacer();
       const checked=timeRow.addText(formatTime(status.checkedAt));checked.font=Font.mediumSystemFont(L.footer);checked.textColor=c.muted;checked.lineLimit=1;
       timeRow.addSpacer();
