@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.22
+// Sideload Watch v0.2.23
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.22";
+const APP_VERSION = "0.2.23";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -682,7 +682,7 @@ async function buildWidget(status,settings,familyOverride){
         const text=row.addText(value);text.font=font;text.textColor=color;text.lineLimit=1;text.minimumScaleFactor=scale;
         row.addSpacer();return text
       };
-      w.addSpacer(large?10:8);
+      w.addSpacer(large?10:28);
       const columns=w.addStack();columns.centerAlignContent();columns.addSpacer();
       const left=columns.addStack();left.layoutVertically();left.size=new Size(135,0);
       addCentered(left,"✓",Font.boldSystemFont(large?30:25),c.green);
