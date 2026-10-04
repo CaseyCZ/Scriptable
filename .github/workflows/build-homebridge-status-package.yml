@@ -6,7 +6,7 @@ on:
     paths:
       - 'apps/Homebridge-Status/Homebridge Status.js'
       - '.github/scripts/build_homebridge_status_package.py'
-      - '.github/scripts/tune_homebridge_medium_v014.py'
+      - '.github/scripts/tune_homebridge_medium_v015.py'
       - '.github/workflows/build-homebridge-status-package.yml'
   workflow_dispatch:
 
@@ -22,8 +22,8 @@ jobs:
         with:
           ref: Master
 
-      - name: Apply v0.1.4 medium widget tuning
-        run: python .github/scripts/tune_homebridge_medium_v014.py
+      - name: Apply v0.1.5 medium original-style layout
+        run: python .github/scripts/tune_homebridge_medium_v015.py
 
       - name: Validate JavaScript syntax
         run: |
@@ -47,7 +47,7 @@ jobs:
           assert vm, 'APP_VERSION missing'
           version=vm.group(1)
 
-          assert version == '0.1.4'
+          assert version == '0.1.5'
           assert pkg['name']=='Homebridge Status'
           assert pkg['script']==src, '.scriptable does not contain exact Homebridge Status.js'
           assert pkg.get('always_run_in_app') is False
@@ -59,8 +59,9 @@ jobs:
           assert 'addSystemPanel' in src, 'large system panel missing'
           assert 'centeredPanelText' in src and 'smallUpdateCount' in src and 'smallUpdateText' in src, 'small centered/update layout missing'
           assert 'w.setPadding(14,16,11,16)' in src, 'small inset layout missing'
-          assert 'w.setPadding(13,13,11,13)' in src, 'medium original padding missing'
-          assert 'addMediumStatusGrid' in src and 'installedVersion' in src, 'medium version rows missing'
+          assert 'addMediumTop' in src and 'addMediumFooter' in src, 'medium original-style grid missing'
+          assert 'w.setPadding(11,13,9,13)' in src, 'medium compact padding missing'
+          assert 'installedVersion(snap.hbVersion)' in src and 'installedVersion(snap.nodeVersion,true)' in src, 'medium versions missing'
           assert 'w.setPadding(18,20,15,20)' in src, 'large inset layout missing'
 
           assert 'fallbackUrl' in src, 'VPN fallback setting missing'
@@ -70,7 +71,7 @@ jobs:
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src, 'Lock Screen widget families missing'
           assert 'const UPDATE_SOURCE_URL' in src, 'Self updater missing'
           assert len(src)>25000
-          print(f'Homebridge Status v{version}: medium restored + versions aligned; public card hidden')
+          print(f'Homebridge Status v{version}: medium original-style grid + aligned versions; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -85,5 +86,5 @@ jobs:
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Tune Homebridge Status medium widget"
+          git commit -m "Tune Homebridge Status medium layout"
           git push origin HEAD:Master
