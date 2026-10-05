@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/Home-Dashboard/Home Dashboard.js'
       - '.github/scripts/build_home_dashboard_package.py'
+      - '.github/scripts/sync_release_metadata.py'
       - '.github/workflows/build-home-dashboard-package.yml'
   workflow_dispatch:
 
@@ -29,6 +30,9 @@ jobs:
       - name: Build package and sync website
         run: python .github/scripts/build_home_dashboard_package.py
 
+      - name: Sync README, website and version metadata
+        run: python .github/scripts/sync_release_metadata.py
+
       - name: Validate package parity
         run: |
           python - <<'PY'
@@ -39,6 +43,8 @@ jobs:
           src=(app/'Home Dashboard.js').read_text(encoding='utf-8')
           pkg=json.loads((app/'Home Dashboard.scriptable').read_text(encoding='utf-8'))
           site=Path('index.html').read_text(encoding='utf-8')
+          root_cz=Path('README.md').read_text(encoding='utf-8')
+          root_en=Path('README_EN.md').read_text(encoding='utf-8')
           vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
           assert vm, 'APP_VERSION missing'
           version=vm.group(1)
@@ -47,9 +53,14 @@ jobs:
           assert pkg['script']==src, '.scriptable does not contain exact Home Dashboard.js'
           assert pkg.get('always_run_in_app') is False
           assert pkg.get('share_sheet_inputs') == []
+          assert json.loads((app/'version.json').read_text(encoding='utf-8'))['version']==version
+          assert f'VERZE-v{version}-38BDF8' in (app/'README.md').read_text(encoding='utf-8')
+          assert f'VERSION-v{version}-38BDF8' in (app/'README_EN.md').read_text(encoding='utf-8')
+          marker=f'<strong>Home Dashboard</strong></td><td><code>v{version}</code>'
+          assert marker in root_cz and marker in root_en
           assert f"{{name:'Home Dashboard',version:'{version}'" in site
           assert "install:'./apps/Home-Dashboard/Home%20Dashboard.scriptable'" in site
-          print(f'Home Dashboard v{version}: JS + package + website are synchronized')
+          print(f'Home Dashboard v{version}: package, website and CZ/EN READMEs synchronized')
           PY
 
       - name: Commit synchronized release files
@@ -58,10 +69,11 @@ jobs:
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
             'apps/Home-Dashboard/Home Dashboard.scriptable' \
-            index.html
+            README.md README_EN.md index.html \
+            apps/*/README.md apps/*/README_EN.md apps/*/version.json
           if git diff --cached --quiet; then
             echo "Home Dashboard release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync Home Dashboard package"
+          git commit -m "Sync Home Dashboard release surfaces"
           git push origin HEAD:Master
