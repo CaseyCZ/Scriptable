@@ -30,3 +30,5 @@ h1{font-size:clamp(43px,8vw,82px);line-height:.96;letter-spacing:-.065em;margin:
 footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
 @media(max-width:900px){.topbar{gap:8px}.topActions{margin-left:auto}.topLink{padding:0 9px}}
 @media(max-width:660px){.wrap{width:min(100% - 20px,1180px)}.topbar{min-height:62px;align-items:center;flex-direction:row}.brand small{display:none}.brandIcon{width:36px;height:36px}.topActions{width:auto;flex-wrap:nowrap}.topActions .topLink{display:none}.lang{height:36px}.lang button{height:28px;padding:0 7px}.iconBtn{width:36px;height:36px}.settingsPanel{left:auto;right:0;top:48px;width:min(310px,calc(100vw - 20px))}.hero{padding:54px 0 30px}h1{font-size:clamp(40px,14vw,61px)}}
+
+/* deploy trigger 2026-10-05 */
