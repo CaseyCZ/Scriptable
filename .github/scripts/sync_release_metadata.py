@@ -116,13 +116,16 @@ if marker not in root_cz:
 if marker not in root_en:
     root_en = root_en.replace("## Apps\n", "## Apps\n\n" + marker + "\n", 1)
 
-root_cz = root_cz.replace(
-    "Homebridge monitoring s LAN → VPN fallbackem, vlastním vzhledem, notifikacemi a více velikostmi widgetu.",
-    "Testovací Homebridge monitoring s LAN → VPN fallbackem, vlastním vzhledem, notifikacemi a více velikostmi widgetu.",
+# Keep the testing label stable across repeated workflow runs.
+root_cz = re.sub(
+    r'(?:Testovací\s+)*Homebridge monitoring s LAN → VPN fallbackem',
+    'Testovací Homebridge monitoring s LAN → VPN fallbackem',
+    root_cz,
 )
-root_en = root_en.replace(
-    "Homebridge monitoring with automatic LAN → VPN fallback, customizable appearance, notifications and multiple widget sizes.",
-    "Testing Homebridge monitor with automatic LAN → VPN fallback, customizable appearance, notifications and multiple widget sizes.",
+root_en = re.sub(
+    r'(?:Testing\s+)*(?:Homebridge monitoring|Homebridge monitor) with automatic LAN → VPN fallback',
+    'Testing Homebridge monitor with automatic LAN → VPN fallback',
+    root_en,
 )
 
 write_if_changed(ROOT_CZ, root_cz)
