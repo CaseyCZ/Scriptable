@@ -1,3 +1,4 @@
+# one-time trigger
 name: Move GitHub to footer once
 
 on:
