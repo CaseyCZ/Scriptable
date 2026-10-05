@@ -27,23 +27,27 @@ jobs:
           text = home.read_text(encoding='utf-8')
           start = text.index('function decodeHtmlText(v){')
           end = text.index('\nfunction scanJsonName', start)
-          replacement = '''function decodeHtmlText(v){
-  const entities={nbsp:" ",amp:"&",quot:'"',"#39":"'",lt:"<",gt:">"};
-  return String(v||"")
-    .replace(/&(nbsp|amp|quot|#39|lt|gt);/gi,(match,name)=>entities[String(name).toLowerCase()]??match)
-    .replace(/\\s+/g," ")
-    .trim()
-}'''
+          replacement = "\n".join([
+              'function decodeHtmlText(v){',
+              '  const entities={nbsp:" ",amp:"&",quot:\'"\',"#39":"\'",lt:"<",gt:">"};',
+              '  return String(v||"")',
+              '    .replace(/&(nbsp|amp|quot|#39|lt|gt);/gi,(match,name)=>entities[String(name).toLowerCase()]??match)',
+              '    .replace(/\\s+/g," ")',
+              '    .trim()',
+              '}'
+          ])
           text = text[:start] + replacement + text[end:]
           home.write_text(text, encoding='utf-8')
 
           test = Path('.github/scripts/test_sports_info_layout.cjs')
           text = test.read_text(encoding='utf-8')
           old = r'''const ui=html.match(/<script>([\s\S]*?)<\/script>/)[1];new vm.Script(ui);'''
-          new = '''const scriptStart=html.indexOf('<script>');
-          const scriptEnd=html.indexOf('</script>',scriptStart+8);
-          assert.ok(scriptStart>=0&&scriptEnd>scriptStart,'settings HTML contains inline script');
-          const ui=html.slice(scriptStart+8,scriptEnd);new vm.Script(ui);'''
+          new = "\n".join([
+              "const scriptStart=html.indexOf('<script>');",
+              "const scriptEnd=html.indexOf('</script>',scriptStart+8);",
+              "assert.ok(scriptStart>=0&&scriptEnd>scriptStart,'settings HTML contains inline script');",
+              "const ui=html.slice(scriptStart+8,scriptEnd);new vm.Script(ui);"
+          ])
           if old not in text:
               raise SystemExit('Sports Info test extraction line not found')
           text = text.replace(old, new, 1)
