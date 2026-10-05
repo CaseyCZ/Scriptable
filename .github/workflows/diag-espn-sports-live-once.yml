@@ -1,4 +1,4 @@
-name: Diagnose Sports Live ESPN once
+name: Fix Sports Live ESPN schedules once
 
 on:
   push:
@@ -6,31 +6,98 @@ on:
       - '.github/workflows/diag-espn-sports-live-once.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diag:
+  fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Test ESPN single-day scoreboards
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Use ESPN team schedules for single-team widget
         shell: bash
         run: |
-          set -euo pipefail
           python - <<'PY'
-          import json, urllib.request, datetime
-          base='https://site.api.espn.com/apis/site/v2/sports'
-          leagues=[('hockey','nhl'),('basketball','nba'),('baseball','mlb')]
-          today=datetime.date.today()
-          def get(url):
-              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
-              with urllib.request.urlopen(req,timeout=20) as r:return json.load(r)
-          for sport,league in leagues:
-              print('\n===',sport,league,'===')
-              for off in [-7,-3,0,3,7,14,30]:
-                  day=(today+datetime.timedelta(days=off)).strftime('%Y%m%d')
-                  u=f'{base}/{sport}/{league}/scoreboard?dates={day}&limit=100'
-                  try:
-                      d=get(u); print(day,'events=',len(d.get('events',[])))
-                  except Exception as ex:
-                      print(day,'ERROR',repr(ex))
+          from pathlib import Path
+
+          p=Path('apps/Sports-Live/Sports-Live,js')
+          s=p.read_text(encoding='utf-8')
+
+          old='''async function eventsFor(s){
+  const needs={recent:5,upcoming:clamp(Number(s.nextCount)||4,1,8)};
+  let all=unique(await scoreboardFor(s,sportsLiveEventWindow(s,needs,0),needs));
+  for(let level=1;level<=2;level++){
+    const scoped=all.filter(e=>eventMatchesTeam(e,s)),now=Date.now();
+    const upcoming=scoped.filter(e=>e.state!=="in"&&!e.completed&&e.state!=="post"&&new Date(e.date).getTime()>now-4*3600000).length;
+    if(scoped.length&&upcoming>=needs.upcoming)break;
+    try{all=unique([...all,...await scoreboardFor(s,sportsLiveEventWindow(s,needs,level),needs)])}catch(_){break}
+  }
+  return all
+}
+'''
+
+          new='''async function espnTeamSchedule(s){
+  const m=league(s),base=s.apiEspnBase||DEFAULTS.apiEspnBase;
+  let teamId=String(s.teamId||"");
+  if(!teamId&&s.teamName){
+    const wanted=norm(s.teamName),teams=await espnTeams(s);
+    const hit=teams.find(t=>{const n=norm(t.name||t.short);return n===wanted||n.includes(wanted)||wanted.includes(n)});
+    teamId=String(hit?.id||"")
+  }
+  if(!teamId)return[];
+  const d=await requestJSON(`${base}/apis/site/v2/sports/${encodeURIComponent(m.espnSport)}/${encodeURIComponent(m.espnLeague)}/teams/${encodeURIComponent(teamId)}/schedule`);
+  return unique((d.events||[]).map(normEvent).filter(Boolean))
+}
+async function eventsFor(s){
+  const m=league(s);
+  if(m.provider==="espn")return await espnTeamSchedule(s);
+  const needs={recent:5,upcoming:clamp(Number(s.nextCount)||4,1,8)};
+  let all=unique(await scoreboardFor(s,sportsLiveEventWindow(s,needs,0),needs));
+  for(let level=1;level<=2;level++){
+    const scoped=all.filter(e=>eventMatchesTeam(e,s)),now=Date.now();
+    const upcoming=scoped.filter(e=>e.state!=="in"&&!e.completed&&e.state!=="post"&&new Date(e.date).getTime()>now-4*3600000).length;
+    if(scoped.length&&upcoming>=needs.upcoming)break;
+    try{all=unique([...all,...await scoreboardFor(s,sportsLiveEventWindow(s,needs,level),needs)])}catch(_){break}
+  }
+  return all
+}
+'''
+
+          if old not in s:
+              raise SystemExit('eventsFor block not found')
+          s=s.replace(old,new,1)
+          s=s.replace('// Sports Live v0.2.3','// Sports Live v0.2.4',1)
+          s=s.replace('const APP_VERSION = "0.2.3";','const APP_VERSION = "0.2.4";',1)
+          p.write_text(s,encoding='utf-8')
           PY
+
+      - name: Validate syntax and ESPN source
+        shell: bash
+        run: |
+          node --check 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'const APP_VERSION = "0.2.4";' 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'async function espnTeamSchedule(s)' 'apps/Sports-Live/Sports-Live,js'
+          python - <<'PY'
+          import json,urllib.request
+          u='https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/25/schedule'
+          req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
+          with urllib.request.urlopen(req,timeout=20) as r:d=json.load(r)
+          n=len(d.get('events',[]))
+          print('NHL team schedule events:',n)
+          if n<1: raise SystemExit('ESPN NHL team schedule returned no events')
+          PY
+
+      - name: Remove one-time workflow
+        run: git rm .github/workflows/diag-espn-sports-live-once.yml
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add -A
+          git commit -m "Fix ESPN team schedules in Sports Live"
+          git push origin Master
