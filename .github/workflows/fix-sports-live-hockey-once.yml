@@ -17,34 +17,20 @@ jobs:
         with:
           ref: Master
 
-      - name: Match Sports Info fail-open team logic
+      - name: Match Sports Info fail-open data handling
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('apps/Sports-Live/Sports-Live,js')
           s = p.read_text(encoding='utf-8')
-          old_match = "\n".join([
-              'function norm(v){return String(v||\"\").trim().toLowerCase()}',
-              'function eventMatchesTeam(e,s){if(!s.teamId&&!s.teamName)return false;for(const t of[e.home,e.away])if((s.teamId&&String(t.id)===String(s.teamId))||(s.teamName&&norm(t.name)===norm(s.teamName)))return true;return false}',
-              'function teamIs(t,s){return (s.teamId&&String(t?.id)===String(s.teamId))||(s.teamName&&norm(t?.name)===norm(s.teamName))}'
-          ])
-          new_match = "\n".join([
-              'function normTeamName(v){return String(v||\"\").normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g,\"\").toLowerCase().replace(/[^a-z0-9]+/g,\" \").trim()}',
-              'function teamMatches(t,s){if(!t)return false;if(s.teamId&&String(t.id||\"\")===String(s.teamId))return true;const a=normTeamName(t.name||t.short),b=normTeamName(s.teamName);return !!b&&(a===b||a.includes(b)||b.includes(a))}',
-              'function eventMatchesTeam(e,s){return teamMatches(e?.home,s)||teamMatches(e?.away,s)}',
-              'function teamIs(t,s){return teamMatches(t,s)}'
-          ])
-          if old_match not in s:
-              raise SystemExit('Old team matching block not found')
-          s = s.replace(old_match, new_match, 1)
           old_prepare = 'const [events,rows]=await Promise.all([eventsFor(s),tableFor(s)]),all=events.filter(e=>eventMatchesTeam(e,s)).sort((a,b)=>new Date(a.date)-new Date(b.date)),now=Date.now();'
           new_prepare = 'const events=await eventsFor(s);let rows=[];try{rows=await tableFor(s)}catch(e){console.log(e)}const all=events.filter(e=>eventMatchesTeam(e,s)).sort((a,b)=>new Date(a.date)-new Date(b.date)),now=Date.now();'
           if old_prepare not in s:
               raise SystemExit('Old prepareData Promise.all block not found')
           s = s.replace(old_prepare, new_prepare, 1)
           s = s.replace('// Sports Live v0.2.1', '// Sports Live v0.2.2', 1)
-          s = s.replace('const APP_VERSION = \"0.2.1\";', 'const APP_VERSION = \"0.2.2\";', 1)
+          s = s.replace('const APP_VERSION = "0.2.1";', 'const APP_VERSION = "0.2.2";', 1)
           p.write_text(s, encoding='utf-8')
           PY
 
@@ -52,8 +38,8 @@ jobs:
         run: |
           node --check 'apps/Sports-Live/Sports-Live,js'
           grep -F 'const APP_VERSION = "0.2.2";' 'apps/Sports-Live/Sports-Live,js'
-          grep -F 'function teamMatches(t,s)' 'apps/Sports-Live/Sports-Live,js'
           grep -F 'try{rows=await tableFor(s)}catch(e){console.log(e)}' 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'function norm(v){try{return String(v||"").normalize("NFD")' 'apps/Sports-Live/Sports-Live,js'
 
       - name: Remove one-time workflow
         run: git rm .github/workflows/fix-sports-live-hockey-once.yml
