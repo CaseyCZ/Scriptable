@@ -1,0 +1,76 @@
+name: Sync iOS Hub visual style once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-ios-hub-visual-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Align Scriptable visual system with iOS Hub
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          marker = '/* iOS Hub visual sync 2026-10-05 */'
+          if marker not in text:
+              css = r'''
+    /* iOS Hub visual sync 2026-10-05 */
+    :root{--action:#0376b5;--action2:#075985}
+    html[data-theme="light"]{--page:#eef3f8;--border:#d7e0eb}
+    body{background:radial-gradient(circle at 50% -10%,var(--hero1),var(--bg) 38%,var(--page) 76%)}
+    .wrap{width:min(1380px,calc(100% - 32px));margin:auto}
+    .topbar{position:sticky;top:0;z-index:100;min-height:68px;padding:0;display:flex;align-items:center;gap:18px;justify-content:flex-start}
+    .topbar::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:100vw;transform:translateX(-50%);z-index:-1;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--page) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:-.03em;white-space:nowrap}
+    .brandIcon{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--action2),var(--action));box-shadow:0 10px 28px rgba(14,165,233,.23);font-size:0}
+    .brandIcon::after{content:"JS";font-size:11px;font-weight:900;letter-spacing:-.03em}
+    .brand small{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.05em;margin-top:1px}
+    .topActions{display:flex;align-items:center;gap:7px;margin-left:auto}
+    .topLink,.iconBtn{height:38px;border:1px solid var(--border);background:color-mix(in srgb,var(--panel) 90%,transparent);border-radius:10px;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;font-size:11px;font-weight:850;cursor:pointer}
+    .iconBtn{width:38px;padding:0;font-size:15px}
+    .topLink:hover,.iconBtn:hover{border-color:var(--accent)}
+    .lang{height:38px;display:flex;align-items:center;gap:4px;padding:3px;border:1px solid var(--border);border-radius:10px;background:color-mix(in srgb,var(--panel) 90%,transparent)}
+    .lang button{height:30px;border-radius:7px;padding:0 9px;font-size:10px}
+    .settingsPanel{right:0;top:52px;z-index:120;border-radius:16px}
+    .hero{padding:78px 0 46px;text-align:center}
+    .badge{padding:7px 12px;font-size:11px;font-weight:900;letter-spacing:.04em}
+    h1{font-size:clamp(43px,8vw,82px);line-height:.96;letter-spacing:-.065em;margin:22px auto 18px;max-width:900px}
+    .lead{max-width:750px;font-size:clamp(15px,2vw,19px);line-height:1.6}
+    .heroActions{margin-top:25px}
+    .btn{min-height:42px;border-radius:11px;padding:0 14px;font-size:12px;font-weight:900}
+    .sectionHead{margin:34px 0 16px;text-align:center;justify-content:center}
+    .sectionHead>div{width:100%}
+    .sectionHead h2{font-size:29px;letter-spacing:-.04em}
+    .sectionHead p{max-width:720px;margin:5px auto 0;line-height:1.55}
+    .card{border-radius:18px}
+    footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
+    @media(max-width:900px){.topbar{gap:8px}.topActions{margin-left:auto}.topLink{padding:0 9px}}
+    @media(max-width:660px){.wrap{width:min(100% - 20px,1180px)}.topbar{min-height:62px;align-items:center;flex-direction:row}.brand small{display:none}.brandIcon{width:36px;height:36px}.topActions{width:auto;flex-wrap:nowrap}.topActions .topLink{display:none}.lang{height:36px}.lang button{height:28px;padding:0 7px}.iconBtn{width:36px;height:36px}.settingsPanel{left:auto;right:0;top:48px;width:min(310px,calc(100vw - 20px))}.hero{padding:54px 0 30px}h1{font-size:clamp(40px,14vw,61px)}}
+'''
+              text = text.replace('  </style>', css + '\n  </style>', 1)
+          text = text.replace('Scriptable Apps<small>by CaseyCZ</small>', 'Scriptable Apps<small>Scriptable · Widgets</small>')
+          path.write_text(text, encoding='utf-8')
+
+      - name: Remove one-time workflow
+        run: git rm .github/workflows/sync-ios-hub-visual-once.yml
+
+      - name: Commit visual sync
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add index.html .github/workflows/sync-ios-hub-visual-once.yml
+          git commit -m "Align Scriptable visual style with iOS Hub"
+          git push origin Master
