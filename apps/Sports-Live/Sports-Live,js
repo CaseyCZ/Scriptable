@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: orange; icon-glyph: trophy;
 // ============================================================
-// Sports Live v0.2.4
+// Sports Live v0.2.5
 // CaseyCZ Scriptable Apps
 // Single-team live widget using the same multi-provider data layer as Sports Info.
 // Settings follow the CaseyCZ / Homebridge style; widget layout remains Sports Live.
 // ============================================================
 
 const APP_NAME = "Sports Live";
-const APP_VERSION = "0.2.4";
+const APP_VERSION = "0.2.5";
 const SETTINGS_FILE = "SportsLive_settings.json";
 const CACHE_FILE = "SportsLive_cache.json";
 const BACKGROUND_FILE = "SportsLive_background.jpg";
@@ -100,7 +100,7 @@ function range(a,b){const x=new Date(),y=new Date();x.setDate(x.getDate()+a);y.s
 async function requestJSON(url,headers=null){const r=new Request(url);r.timeoutInterval=API_TIMEOUT;if(headers)r.headers=headers;return await r.loadJSON()}
 async function getString(url){const r=new Request(url);r.timeoutInterval=API_TIMEOUT;return await r.loadString()}
 const BROWSER_HEADERS={"User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148","Accept":"application/json","Accept-Language":"en-US,en;q=0.9"};
-function normEvent(e){try{const c=(e.competitions||[])[0]||{},arr=c.competitors||[],h=arr.find(x=>x.homeAway==="home")||arr[0]||{},a=arr.find(x=>x.homeAway==="away")||arr[1]||{},st=e.status?.type||{};const team=x=>({id:String(x.team?.id||""),name:x.team?.displayName||x.team?.name||"",short:x.team?.shortDisplayName||x.team?.abbreviation||x.team?.displayName||"",abbr:x.team?.abbreviation||"",logo:x.team?.logo||"",score:x.score==null?"":String(x.score)});return{id:String(e.id||""),date:e.date||c.date||"",state:st.state||"",completed:!!st.completed,status:st.shortDetail||st.detail||st.description||"",home:team(h),away:team(a)}}catch(_){return null}}
+function normEvent(e){try{const c=(e.competitions||[])[0]||{},arr=c.competitors||[],h=arr.find(x=>x.homeAway==="home")||arr[0]||{},a=arr.find(x=>x.homeAway==="away")||arr[1]||{},st=e.status?.type||{};const team=x=>({id:String(x.team?.id||""),name:x.team?.displayName||x.team?.name||"",short:x.team?.shortDisplayName||x.team?.abbreviation||x.team?.displayName||"",abbr:x.team?.abbreviation||"",logo:x.team?.logos?.[0]?.href||x.team?.logo||"",score:x.score==null?"":String(x.score)});return{id:String(e.id||""),date:e.date||c.date||"",state:st.state||"",completed:!!st.completed,status:st.shortDetail||st.detail||st.description||"",home:team(h),away:team(a)}}catch(_){return null}}
 function sourceLabel(s){const m=league(s);return m.provider==="soccer"?"OneFootball + ESPN + FotMob":m.provider==="livesport"?"Livesport · bez klíče":m.provider==="floorball"?(s.sportsApiKey?"SportsAPI Pro":"Florbal"):m.provider==="sofa"?"SofaScore":"ESPN"}
 async function espnScoreboard(s,dates){const m=league(s),base=s.apiEspnBase||DEFAULTS.apiEspnBase,d=await requestJSON(`${base}/apis/site/v2/sports/${encodeURIComponent(m.espnSport)}/${encodeURIComponent(m.espnLeague)}/scoreboard?dates=${encodeURIComponent(dates)}&limit=100`);return(d.events||[]).map(normEvent).filter(Boolean)}
 async function espnTeams(s){const m=league(s),base=s.apiEspnBase||DEFAULTS.apiEspnBase,d=await requestJSON(`${base}/apis/site/v2/sports/${encodeURIComponent(m.espnSport)}/${encodeURIComponent(m.espnLeague)}/teams?limit=500`),r=d.sports?.[0]?.leagues?.[0]?.teams||[];return r.map(x=>x.team||x).map(t=>({id:String(t.id||""),name:t.displayName||t.name||"",short:t.shortDisplayName||t.abbreviation||t.displayName||"",logo:t.logos?.[0]?.href||t.logo||""})).filter(x=>x.id&&x.name).sort((a,b)=>a.name.localeCompare(b.name))}
