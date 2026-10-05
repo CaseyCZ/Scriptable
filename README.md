@@ -17,14 +17,16 @@
 
 ## Aplikace
 
+<!-- App versions are synchronized automatically from APP_VERSION in each production script. -->
+
 <table>
   <thead><tr><th>Aplikace</th><th>Verze</th><th>Info</th><th>Odkaz</th></tr></thead>
   <tbody>
-    <tr><td><strong>LockScreen Generator</strong></td><td><code>v2.10.0</code></td><td>Nástroj pro tvorbu vlastního vzhledu zamykací obrazovky.</td><td><a href="./apps/LockScreenGenerator/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="LockScreen Generator" /></a></td></tr>
+    <tr><td><strong>LockScreen Generator</strong></td><td><code>v2.10.2</code></td><td>Nástroj pro tvorbu vlastního vzhledu zamykací obrazovky.</td><td><a href="./apps/LockScreenGenerator/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="LockScreen Generator" /></a></td></tr>
     <tr><td><strong>Sports Info</strong></td><td><code>v2.5.30</code></td><td>Univerzální sportovní widget pro více sportů a soutěží.</td><td><a href="./apps/Sports-Info/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Info" /></a></td></tr>
-    <tr><td><strong>Sideload Watch</strong></td><td><code>v0.2.12</code></td><td>Sleduje nové verze vybraných sideload aplikací z katalogu iOS-Hub.</td><td><a href="./apps/Sideload-Watch/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sideload Watch" /></a></td></tr>
-    <tr><td><strong>Home Dashboard</strong></td><td><code>v0.3.9</code></td><td>Dashboard pro monitoring webů, serverů, JSON API, GitHubu a lokální sítě.</td><td><a href="./apps/Home-Dashboard/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Home Dashboard" /></a></td></tr>
-    <tr><td><strong>Homebridge Status</strong></td><td><code>v0.1.0</code></td><td>Homebridge monitoring s LAN → VPN fallbackem, vlastním vzhledem, notifikacemi a více velikostmi widgetu.</td><td><a href="./apps/Homebridge-Status/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Homebridge Status" /></a></td></tr>
+    <tr><td><strong>Sideload Watch</strong></td><td><code>v0.2.25</code></td><td>Sleduje nové verze vybraných sideload aplikací z katalogu iOS-Hub.</td><td><a href="./apps/Sideload-Watch/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sideload Watch" /></a></td></tr>
+    <tr><td><strong>Home Dashboard</strong></td><td><code>v0.3.13</code></td><td>Dashboard pro monitoring webů, serverů, JSON API, GitHubu a lokální sítě.</td><td><a href="./apps/Home-Dashboard/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Home Dashboard" /></a></td></tr>
+    <tr><td><strong>Homebridge Status</strong></td><td><code>v0.1.13</code></td><td>Testovací Homebridge monitoring s LAN → VPN fallbackem, vlastním vzhledem, notifikacemi a více velikostmi widgetu.</td><td><a href="./apps/Homebridge-Status/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Homebridge Status" /></a></td></tr>
     <tr><td><strong>Sports Live</strong></td><td><code>připravujeme</code></td><td>Widget zaměřený na rychlé živé výsledky napříč sporty.</td><td><a href="./apps/Sports-Live/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Live" /></a></td></tr>
   </tbody>
 </table>

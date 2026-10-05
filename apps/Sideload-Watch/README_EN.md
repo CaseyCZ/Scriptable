@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/VERSION-v0.2.12-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sideload Watch version 0.2.12" />
+  <img src="https://img.shields.io/badge/VERSION-v0.2.25-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sideload Watch version 0.2.25" />
 </p>
 
 <p align="center">

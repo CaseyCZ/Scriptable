@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/VERSION-v0.3.9-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Home Dashboard version 0.3.9" />
+  <img src="https://img.shields.io/badge/VERSION-v0.3.13-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Home Dashboard version 0.3.13" />
 </p>
 
 <p align="center">

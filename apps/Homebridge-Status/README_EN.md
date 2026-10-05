@@ -35,4 +35,4 @@ On first launch the script attempts to migrate the main settings from the old `h
 
 ## Version
 
-Current testing version: **v0.1.1**
+Current testing version: **v0.1.13**

@@ -35,4 +35,4 @@ Při prvním spuštění se skript pokusí převzít základní nastavení ze st
 
 ## Verze
 
-Aktuální testovací verze: **v0.1.1**
+Aktuální testovací verze: **v0.1.13**
