@@ -1,0 +1,101 @@
+name: Move GitHub to footer once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/move-github-footer-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Match iOS Hub footer placement
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+
+          nav_github = '        <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub</a>\n'
+          if nav_github not in text:
+              raise SystemExit('Header GitHub link not found')
+          text = text.replace(nav_github, '', 1)
+
+          old_footer = '''    <footer><span data-cs="Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity." data-en="The community catalog is curated from public Scriptable projects and community recommendations.">Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a> · <a class="mutedLink" href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a> · <a class="mutedLink" href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a></footer>'''
+          new_footer = '''    <footer class="footer">
+      <div class="wrap footer-inner">
+        <span>© <span id="year"></span> Scriptable Apps</span>
+        <div class="footer-links">
+          <a href="https://caseycz.github.io/" target="_blank" rel="noopener">Website</a>
+          <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub · Scriptable</a>
+          <a href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a>
+          <a href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a>
+          <a href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a>
+          <button class="footer-link-button" type="button" data-cookie-settings>Cookie settings</button>
+        </div>
+      </div>
+    </footer>'''
+          if old_footer not in text:
+              raise SystemExit('Original footer not found')
+          text = text.replace(old_footer, new_footer, 1)
+
+          year_hook = "    applyTheme(theme);applyLayout(layout);setLanguage(lang);\n"
+          replacement = "    document.getElementById('year').textContent=new Date().getFullYear();\n" + year_hook
+          if year_hook not in text:
+              raise SystemExit('Year hook insertion point not found')
+          text = text.replace(year_hook, replacement, 1)
+          index.write_text(text, encoding='utf-8')
+
+          css = Path('ios-hub-visual.css')
+          styles = css.read_text(encoding='utf-8')
+          marker = '/* iOS Hub footer 1:1 */'
+          if marker not in styles:
+              styles += '''
+
+/* iOS Hub footer 1:1 */
+.footer{margin-top:38px;border-top:1px solid var(--border);padding:24px 0 36px;color:var(--muted);font-size:10px;text-align:center}
+.footer .wrap{width:min(1380px,calc(100% - 32px));margin:auto}
+.footer-inner{display:flex;align-items:center;justify-content:center;gap:14px;text-align:center;flex-direction:column}
+.footer-links{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+.footer a:hover{color:var(--accent)}
+.footer-link-button{padding:0;border:0;background:transparent;color:var(--muted);font:inherit;cursor:pointer}
+.footer-link-button:hover{color:var(--accent)}
+.footer .caseycz-cookie-settings-wrap{display:contents;margin:0}
+.footer .caseycz-cookie-settings{min-height:0;padding:0;border:0;background:transparent;color:var(--muted);font:inherit;text-decoration:none;opacity:1}
+.footer .caseycz-cookie-settings:hover{color:var(--accent)}
+@media(max-width:640px){.footer-inner{align-items:center}.footer-links{justify-content:center}}
+'''
+              css.write_text(styles, encoding='utf-8')
+          PY
+
+      - name: Validate inline JavaScript
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const html=fs.readFileSync('index.html','utf8');
+          const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(Boolean);
+          for(const code of scripts)new vm.Script(code);
+          console.log('Inline JavaScript OK');
+          NODE
+
+      - name: Remove one-time workflow
+        run: git rm .github/workflows/move-github-footer-once.yml
+
+      - name: Commit and push
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add -A
+          git commit -m "Match Scriptable footer to iOS Hub"
+          git push origin Master
