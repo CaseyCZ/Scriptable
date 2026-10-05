@@ -1,4 +1,4 @@
-/* Scriptable Apps — iOS Hub visual system 1:1 */
+/* Scriptable Apps — iOS Hub visual system 1:1 · header synced */
 :root{--action:#0376b5;--action2:#075985;--hero:#172554}
 html[data-theme="light"]{--page:#eef3f8;--border:#d7e0eb;--hero:#dbeafe}
 body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var(--page) 76%)}
@@ -44,7 +44,6 @@ body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var
 .settings-layout-seg button{min-height:38px;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--muted);font-size:15px;font-weight:850;cursor:pointer}
 .settings-layout-seg button:hover{border-color:var(--accent)}
 .settings-layout-seg button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-
 
 /* Same support dialog as iOS Hub */
 .support-backdrop{position:fixed;inset:0;z-index:1300;display:none;place-items:center;padding:20px;background:rgba(2,6,23,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
