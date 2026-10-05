@@ -23,7 +23,7 @@ body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var
 
 /* Exact iOS Hub settings panel */
 .settings-menu{position:relative}
-.settings-panel{position:fixed;z-index:1000;width:310px;padding:13px;border:1px solid var(--border);border-radius:16px;background:color-mix(in srgb,var(--panel) 98%,transparent);box-shadow:var(--shadow);display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.settings-panel{position:fixed;top:76px;right:16px;z-index:1000;width:310px;padding:13px;border:1px solid var(--border);border-radius:16px;background:color-mix(in srgb,var(--panel) 98%,transparent);box-shadow:var(--shadow);display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 .settings-panel.open{display:block}
 .settings-title{font-size:13px;font-weight:900;margin-bottom:13px}
 .settings-label{margin:12px 0 7px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em}
@@ -68,6 +68,8 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
   .nav-actions{gap:5px}
   .nav-app-primary{width:38px;padding:0;font-size:0}
   .nav-app-primary::before{content:"";font-size:15px}
+  .nav-app-primary>span{display:none}
+  .settings-panel{top:70px;right:10px;width:min(310px,calc(100vw - 20px))}
   .hero{padding:54px 0 30px}
   .hero h1{font-size:clamp(40px,14vw,61px)}
 }
