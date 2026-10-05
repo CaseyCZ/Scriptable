@@ -6,7 +6,6 @@ on:
     paths:
       - 'apps/Home-Dashboard/Home Dashboard.js'
       - '.github/scripts/build_home_dashboard_package.py'
-      - '.github/scripts/sync_release_metadata.py'
       - '.github/workflows/build-home-dashboard-package.yml'
   workflow_dispatch:
 
