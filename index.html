@@ -23,28 +23,56 @@
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{height:auto;min-height:440px}.features li{white-space:normal;overflow:visible;text-overflow:clip}.catalogBar{grid-template-columns:1fr}.catalogFilters{width:100%}.searchWrap{max-width:none}.catalogRight{width:100%;justify-content:space-between;gap:8px}.pagination{justify-content:flex-start}.pageBtn{min-width:30px;padding:0 6px}}
     @media(max-width:660px){.topbar{align-items:flex-start;flex-direction:column}.topActions{width:100%;flex-wrap:wrap}.topLink{flex:1}.settingsPanel{left:0;right:auto;top:112px;width:min(310px,100%)}.hero{padding-top:24px}.brand small{display:none}.grid{grid-template-columns:1fr}.card{max-width:none;height:auto;min-height:440px}.actions,.ourActions{grid-template-columns:1fr}.heroActions .btn{width:auto}.sectionHead{align-items:start;flex-direction:column}.catalogBar{display:block}.catalogFilters{width:100%;flex-direction:column;align-items:stretch;gap:8px}.filterWrap,.searchWrap{width:100%;max-width:none}.categorySelect,.searchInput{flex:1;min-width:0;width:100%}.catalogRight{width:100%;align-items:stretch;flex-direction:column;margin-top:8px}.pagination{width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.pageBtn{flex:0 0 32px}.pageInfo{white-space:normal}.catalogBottom{align-items:stretch;flex-direction:column}.catalogBottom .pagination{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.preview{height:155px;flex-basis:155px}body.layout-list .card{display:block;height:auto}body.layout-list .preview{height:145px;min-height:0}body.layout-list .features{grid-template-columns:1fr}}
   </style>
-  <link rel="stylesheet" href="ios-hub-visual.css?v=20261005">
+  <link rel="stylesheet" href="ios-hub-visual.css?v=20261005-1to1">
 </head>
 <body>
-  <div class="wrap">
-    <header class="topbar">
-      <div class="brand"><div class="brandIcon">⚡</div><div>Scriptable Apps<small>Scriptable · Widgets</small></div></div>
-      <div class="topActions">
-        <a class="topLink" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener"> <span data-cs="Scriptable pro iPhone" data-en="Scriptable for iPhone">Scriptable pro iPhone</span></a>
-        <a class="topLink" href="https://github.com/CaseyCZ/Scriptable/issues/new/choose" target="_blank" rel="noopener">🐞 <span data-cs="Nahlásit problém" data-en="Report issue">Nahlásit problém</span></a>
-        <div class="lang" aria-label="Language"><button id="langCs" class="active" type="button">CZ</button><button id="langEn" type="button">EN</button></div>
-        <button id="settingsBtn" class="iconBtn" type="button" aria-label="Settings" title="Nastavení">⚙</button>
-      </div>
-      <div id="settingsPanel" class="settingsPanel">
-        <div class="settingsTitle" data-cs="Nastavení" data-en="Settings">Nastavení</div>
-        <div class="settingsLabel" data-cs="VZHLED" data-en="APPEARANCE">VZHLED</div>
-        <div class="seg"><button id="themeDark" type="button">☾ <span data-cs="Tmavý" data-en="Dark">Tmavý</span></button><button id="themeLight" type="button">☀ <span data-cs="Světlý" data-en="Light">Světlý</span></button></div>
-        <div class="settingsLabel">LAYOUT</div>
-        <div class="layoutSeg"><button id="layoutGrid" type="button" title="Grid">▦</button><button id="layoutList" type="button" title="List">☷</button></div>
-      </div>
-    </header>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#top" aria-label="Scriptable Apps">
+        <span class="brand-mark">JS</span>
+        <span>Scriptable Apps<small>Scriptable · Widgets</small></span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#ourApps"><span data-cs="Naţe aplikace" data-en="Our apps">Naše aplikace</span></a>
+        <a href="#community"><span data-cs="Komunita" data-en="Community">Komunita</span></a>
+        <a href="https://scriptable.app" target="_blank" rel="noopener">Scriptable</a>
+        <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="settings-menu">
+          <button id="settingsBtn" class="icon-btn settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings" title="Settings">☙</button>
+          <div id="settingsPanel" class="settings-panel" role="dialog" aria-hidden="true">
+            <div class="settings-title"><span data-cs="Nastavení" data-en="Settings">Nastavení</span></div>
 
-    <main>
+            <div class="settings-label"><span data-cs="VZHLED" data-en="APPEARANCE">VZHLED</span></div>
+            <div class="settings-theme-seg">
+              <button id="themeDark" type="button">☾ <span data-cs="Tmavý" data-en="Dark">Tmavý</span></button>
+              <button id="themeLight" type="button">☀ <span data-cs="Světlý" data-en="Light">Světlý</span></button>
+            </div>
+
+            <div class="settings-label"><span data-cs="JAZYK" data-en="LANGUAGE">JAZYK</span></div>
+            <div class="settings-language-list">
+              <button id="langCs" type="button"><span class="flag">CZ</span><span>Čeɡtina</span></button>
+              <button id="langEn" type="button"><span class="flag">EN</span><span>English</span></button>
+            </div>
+
+            <div class="settings-label">LAYOUT</div>
+            <div class="settings-layout-seg">
+              <button id="layoutGrid" type="button" title="Grid">▧</button>
+              <button id="layoutList" type="button" title="List">☷</button>
+            </div>
+
+            <div class="settings-label"><span data-cs="NAHLÁSIT PROBLEM" data-en="REPORT ISSUE">NAHLÁSIT PROBLEM</span></div>
+            <a class="settings-report-link" href="https://github.com/CaseyCZ/Scriptable/issues/new/choose" target="_blank" rel="noopener"><span aria-hidden="true">👞</span><span data-cs="Nahlásit problém" data-en="Report issue">Nahlásit problém</span></a>
+          </div>
+        </div>
+        <a class="compact-btn nav-app-primary" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener"><span aria-hidden="true">Ῥ</span><span data-cs="Scriptable" data-en="Scriptable">Scriptable</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main id="top">
       <section class="hero">
         <div class="badge">📱 iPhone · Scriptable · Shortcuts</div>
         <h1 data-cs="Užitečné Scriptable aplikace na jednom místě" data-en="Useful Scriptable apps in one place">Užitečné Scriptable aplikace na jednom místě</h1>
