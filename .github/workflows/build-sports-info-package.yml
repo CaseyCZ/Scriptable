@@ -6,7 +6,6 @@ on:
     paths:
       - 'apps/Sports-Info/Sports Info.js'
       - '.github/scripts/build_sports_info_package.py'
-      - '.github/scripts/sync_release_metadata.py'
       - '.github/scripts/audit_sports_info_ui.py'
       - '.github/scripts/test_sports_info_layout.cjs'
       - '.github/workflows/build-sports-info-package.yml'
