@@ -1,34 +1,73 @@
-/* Scriptable Apps — visual system aligned with iOS Hub */
-:root{--action:#0376b5;--action2:#075985}
-html[data-theme="light"]{--page:#eef3f8;--border:#d7e0eb}
-body{background:radial-gradient(circle at 50% -10%,var(--hero1),var(--bg) 38%,var(--page) 76%)}
+/* Scriptable Apps — iOS Hub visual system 1:1 */
+:root{--action:#0376b5;--action2:#075985;--hero:#172554}
+html[data-theme="light"]{--page:#eef3f8;--border:#d7e0eb;--hero:#dbeafe}
+body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var(--page) 76%)}
 .wrap{width:min(1380px,calc(100% - 32px));margin:auto}
-.topbar{position:sticky;top:0;z-index:100;min-height:68px;padding:0;display:flex;align-items:center;gap:18px;justify-content:flex-start}
-.topbar::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:100vw;transform:translateX(-50%);z-index:-1;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--page) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+
+/* Exact iOS Hub header geometry and controls */
+.topbar{position:sticky;top:0;z-index:100;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--page) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.topbar-inner{min-height:68px;display:flex;align-items:center;gap:18px}
 .brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:-.03em;white-space:nowrap}
-.brandIcon{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--action2),var(--action));box-shadow:0 10px 28px rgba(14,165,233,.23);font-size:0}
-.brandIcon::after{content:"JS";font-size:11px;font-weight:900;letter-spacing:-.03em}
-.brand small{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.05em;margin-top:1px}
-.topActions{display:flex;align-items:center;gap:7px;margin-left:auto}
-.topLink,.iconBtn{height:38px;border:1px solid var(--border);background:color-mix(in srgb,var(--panel) 90%,transparent);border-radius:10px;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;font-size:11px;font-weight:850;cursor:pointer}
-.iconBtn{width:38px;padding:0;font-size:15px}
-.topLink:hover,.iconBtn:hover{border-color:var(--accent)}
-.lang{height:38px;display:flex;align-items:center;gap:4px;padding:3px;border:1px solid var(--border);border-radius:10px;background:color-mix(in srgb,var(--panel) 90%,transparent)}
-.lang button{height:30px;border-radius:7px;padding:0 9px;font-size:10px}
-.settingsPanel{right:0;top:52px;z-index:120;border-radius:16px}
+.brand-mark{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--action2),var(--action));box-shadow:0 10px 28px rgba(14,165,233,.23);font-size:12px}
+.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.05em;margin-top:1px}
+.nav{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nav a{padding:9px 10px;border-radius:9px;color:var(--muted);font-size:12px;font-weight:800}
+.nav a:hover{background:var(--panel2);color:var(--text)}
+.nav-actions{display:flex;align-items:center;gap:7px}
+.icon-btn,.compact-btn{height:38px;border:1px solid var(--border);background:color-mix(in srgb,var(--panel) 90%,transparent);border-radius:10px;color:var(--text)}
+.icon-btn{width:38px;display:grid;place-items:center;cursor:pointer;padding:0}
+.compact-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;font-size:11px;font-weight:850;cursor:pointer}
+.compact-btn:hover,.icon-btn:hover{border-color:var(--accent)}
+.nav-app-primary{background:linear-gradient(135deg,var(--action2),var(--action))!important;border-color:var(--action)!important;color:#fff!important;box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 22%,transparent)}
+.nav-app-primary:hover{border-color:color-mix(in srgb,#fff 55%,var(--accent))!important}
+
+/* Exact iOS Hub settings panel */
+.settings-menu{position:relative}
+.settings-panel{position:fixed;z-index:1000;width:310px;padding:13px;border:1px solid var(--border);border-radius:16px;background:color-mix(in srgb,var(--panel) 98%,transparent);box-shadow:var(--shadow);display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.settings-panel.open{display:block}
+.settings-title{font-size:13px;font-weight:900;margin-bottom:13px}
+.settings-label{margin:12px 0 7px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em}
+.settings-theme-seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.settings-theme-seg button{min-height:38px;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--muted);font-size:12px;font-weight:850;cursor:pointer}
+.settings-theme-seg button:hover{border-color:var(--accent)}
+.settings-theme-seg button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.settings-language-list{display:grid;gap:4px}
+.settings-language-list button{width:100%;min-height:40px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text);display:grid;grid-template-columns:26px minmax(0,1fr);align-items:center;gap:8px;padding:0 10px;text-align:left;font-size:11px;font-weight:800;cursor:pointer}
+.settings-language-list button:hover{background:var(--panel2);border-color:var(--border)}
+.settings-language-list button.active{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,var(--border));color:var(--accent)}
+.settings-language-list .flag{width:22px;height:15px;display:grid;place-items:center;border-radius:2px;background:var(--panel2);border:1px solid var(--border);font-size:9px;font-weight:900}
+.settings-report-link{min-height:40px;width:100%;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:var(--text);display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:11px;font-weight:850}
+.settings-report-link:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.settings-layout-seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.settings-layout-seg button{min-height:38px;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--muted);font-size:15px;font-weight:850;cursor:pointer}
+.settings-layout-seg button:hover{border-color:var(--accent)}
+.settings-layout-seg button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* iOS Hub hero / content sizing */
 .hero{padding:78px 0 46px;text-align:center}
-.badge{padding:7px 12px;font-size:11px;font-weight:900;letter-spacing:.04em}
-h1{font-size:clamp(43px,8vw,82px);line-height:.96;letter-spacing:-.065em;margin:22px auto 18px;max-width:900px}
-.lead{max-width:750px;font-size:clamp(15px,2vw,19px);line-height:1.6}
-.heroActions{margin-top:25px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb,var(--accent) 55%,var(--border));background:var(--accent-soft);color:var(--accent);padding:7px 12px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.04em}
+.hero h1{font-size:clamp(43px,8vw,82px);line-height:.96;letter-spacing:-.065em;margin:22px auto 18px;max-width:900px}
+.hero .lead{max-width:750px;margin:0 auto;color:var(--muted);font-size:clamp(15px,2vw,19px);line-height:1.6}
+.heroActions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:25px}
 .btn{min-height:42px;border-radius:11px;padding:0 14px;font-size:12px;font-weight:900}
-.sectionHead{margin:34px 0 16px;text-align:center;justify-content:center}
+.sectionHead{justify-content:center;text-align:center;margin:34px 0 16px}
 .sectionHead>div{width:100%}
 .sectionHead h2{font-size:29px;letter-spacing:-.04em}
 .sectionHead p{max-width:720px;margin:5px auto 0;line-height:1.55}
 .card{border-radius:18px}
 footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
-@media(max-width:900px){.topbar{gap:8px}.topActions{margin-left:auto}.topLink{padding:0 9px}}
-@media(max-width:660px){.wrap{width:min(100% - 20px,1180px)}.topbar{min-height:62px;align-items:center;flex-direction:row}.brand small{display:none}.brandIcon{width:36px;height:36px}.topActions{width:auto;flex-wrap:nowrap}.topActions .topLink{display:none}.lang{height:36px}.lang button{height:28px;padding:0 7px}.iconBtn{width:36px;height:36px}.settingsPanel{left:auto;right:0;top:48px;width:min(310px,calc(100vw - 20px))}.hero{padding:54px 0 30px}h1{font-size:clamp(40px,14vw,61px)}}
 
-/* deploy trigger 2026-10-05 */
+@media(max-width:900px){
+  .nav{display:none}
+}
+@media(max-width:640px){
+  .wrap{width:min(100% - 20px,1180px)}
+  .topbar-inner{gap:8px}
+  .brand small{display:none}
+  .brand-mark{width:36px;height:36px}
+  .nav-actions{gap:5px}
+  .nav-app-primary{width:38px;padding:0;font-size:0}
+  .nav-app-primary::before{content:"";font-size:15px}
+  .hero{padding:54px 0 30px}
+  .hero h1{font-size:clamp(40px,14vw,61px)}
+}
