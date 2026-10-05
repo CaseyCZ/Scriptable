@@ -6,7 +6,6 @@ on:
     paths:
       - 'apps/Sideload-Watch/Sideload Watch.js'
       - '.github/scripts/build_sideload_watch_package.py'
-      - '.github/scripts/sync_release_metadata.py'
       - '.github/workflows/build-sideload-watch-package.yml'
   workflow_dispatch:
 
