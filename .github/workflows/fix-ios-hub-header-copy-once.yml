@@ -1,0 +1,47 @@
+name: Fix iOS Hub header copy once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-ios-hub-header-copy-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Fix header text and symbols
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          replacements = {
+              'data-cs="Naţe aplikace"': 'data-cs="Naše aplikace"',
+              '>☙</button>': '>⚙</button>',
+              '<span>Čeɡtina</span>': '<span>Čeština</span>',
+              'data-cs="NAHLÁSIT PROBLEM"': 'data-cs="NAHLÁSIT PROBLÉM"',
+              '>NAHLÁSIT PROBLEM</span>': '>NAHLÁSIT PROBLÉM</span>',
+              '<span aria-hidden="true">👞</span>': '<span aria-hidden="true">🐞</span>',
+              '<span aria-hidden="true">Ῥ</span>': '<span aria-hidden="true"></span>',
+              'title="Grid">▧</button>': 'title="Grid">▦</button>',
+          }
+          for old, new in replacements.items():
+              s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Remove one-time workflow
+        run: git rm .github/workflows/fix-ios-hub-header-copy-once.yml
+      - name: Commit and push
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add -A
+          git commit -m "Fix Scriptable iOS Hub header copy"
+          git push origin Master
