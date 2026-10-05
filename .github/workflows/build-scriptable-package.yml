@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/LockScreenGenerator/LockScreenGenerator.js'
       - '.github/scripts/build_scriptable_package.py'
+      - '.github/scripts/sync_release_metadata.py'
       - '.github/workflows/build-scriptable-package.yml'
   workflow_dispatch:
 
@@ -26,8 +27,11 @@ jobs:
           cp 'apps/LockScreenGenerator/LockScreenGenerator.js' /tmp/LockScreenGenerator.mjs
           node --check /tmp/LockScreenGenerator.mjs
 
-      - name: Build package and sync release metadata
+      - name: Build package
         run: python .github/scripts/build_scriptable_package.py
+
+      - name: Sync README, website and version metadata
+        run: python .github/scripts/sync_release_metadata.py
 
       - name: Validate one-source-of-truth release
         run: |
@@ -39,7 +43,9 @@ jobs:
           src=(app/'LockScreenGenerator.js').read_text(encoding='utf-8')
           pkg=json.loads((app/'LockScreenGenerator.scriptable').read_text(encoding='utf-8'))
           app_readme=(app/'README.md').read_text(encoding='utf-8')
+          app_readme_en=(app/'README_EN.md').read_text(encoding='utf-8')
           root_readme=Path('README.md').read_text(encoding='utf-8')
+          root_readme_en=Path('README_EN.md').read_text(encoding='utf-8')
           site=Path('index.html').read_text(encoding='utf-8')
 
           vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
@@ -48,35 +54,33 @@ jobs:
 
           assert pkg['name']=='LockScreen Generator'
           assert pkg['script']==src, '.scriptable does not contain exact LockScreenGenerator.js'
-          assert f'version-{version}-0284c7' in app_readme, 'app README version mismatch'
-          assert f'| 🪄 **LockScreen Generator** | ✅ v{version} |' in root_readme, 'root README version mismatch'
+          assert json.loads((app/'version.json').read_text(encoding='utf-8'))['version']==version
+          assert f'VERZE-v{version}-38BDF8' in app_readme, 'CZ app README version mismatch'
+          assert f'VERSION-v{version}-38BDF8' in app_readme_en, 'EN app README version mismatch'
+          marker=f'<strong>LockScreen Generator</strong></td><td><code>v{version}</code>'
+          assert marker in root_readme, 'CZ root README version mismatch'
+          assert marker in root_readme_en, 'EN root README version mismatch'
           assert f"{{name:'LockScreen Generator',version:'{version}'" in site, 'website version mismatch'
           assert "install:'./apps/LockScreenGenerator/LockScreenGenerator.scriptable'" in site, 'website install path mismatch'
           assert 'https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/LockScreenGenerator/LockScreenGenerator.js' in src, 'updater is not pinned to Master'
 
-          # Regression guards for previous runtime failures.
           assert 'repr(' not in src, 'Python repr leaked into JavaScript'
           assert 'falsewindow.__updateReady' not in src, 'missing WebView statement separator'
           assert 'JSON.stringify(PHONE_TEXT.loading)' not in src, 'PHONE_TEXT evaluated in the wrong JS context'
           assert 'async function fetchCrypto(settings,value)' in src, 'crypto settings are not passed into fetchCrypto'
           assert 'fetchCrypto(settings,settings.cryptoCoins)' in src, 'crypto call does not pass settings'
-
-          # Shortcuts compatibility fallback: transparent overlay can still be returned as Base64.
           assert 'const overlayBase64=png.toBase64String()' in src, 'Shortcut overlay Base64 fallback missing'
           assert 'Script.setShortcutOutput(overlayBase64)' in src, 'Shortcut overlay Base64 fallback is not returned'
           assert 'Data.fromPNG(image)' in src, 'PNG image encoding missing'
           assert 'Script.setShortcutOutput(out)' not in src, 'Old temporary file-path output still present'
-
-          # v2.10.0 wallpaper source modes.
           assert 'wallpaperSource:"shortcut"' in src, 'Shortcut wallpaper mode default missing'
           assert 'const BACKGROUND_FILE = "LockScreenGenerator_background.png"' in src, 'Stored wallpaper file missing'
           assert 'Array.isArray(args.images)&&args.images.length?args.images[0]:null' in src, 'Shortcut Images input missing'
           assert 'Photos.fromLibrary()' in src, 'Generator photo picker missing'
           assert 'composeWallpaper(size,background,overlay)' in src, 'Internal wallpaper composition missing'
           assert 'Script.setShortcutOutput(path)' in src, 'Finished wallpaper path is not returned to Shortcuts'
-
           assert len(src)>20000
-          print(f'LockScreen Generator v{version}: JS + package + website + READMEs are synchronized')
+          print(f'LockScreen Generator v{version}: package, website and CZ/EN READMEs synchronized')
           PY
 
       - name: Commit synchronized release files
@@ -84,15 +88,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
-            apps/LockScreenGenerator/LockScreenGenerator.scriptable \
-            apps/LockScreenGenerator/README.md \
-            README.md \
-            index.html
+            'apps/LockScreenGenerator/LockScreenGenerator.scriptable' \
+            README.md README_EN.md index.html \
+            apps/*/README.md apps/*/README_EN.md apps/*/version.json
           if git diff --cached --quiet; then
-            echo "LockScreen release surfaces already synchronized"
+            echo "Release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync LockScreen release surfaces"
+          git commit -m "Sync Scriptable release metadata"
           git push origin HEAD:Master
-
-# v2.10.0 wallpaper source mode guards
