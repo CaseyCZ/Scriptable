@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/Homebridge-Status/Homebridge Status.js'
       - '.github/scripts/build_homebridge_status_package.py'
+      - '.github/scripts/sync_release_metadata.py'
       - '.github/workflows/build-homebridge-status-package.yml'
   workflow_dispatch:
 
@@ -26,8 +27,11 @@ jobs:
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
           node --check /tmp/HomebridgeStatus.mjs
 
-      - name: Build package and sync website
+      - name: Build package and keep website card hidden
         run: python .github/scripts/build_homebridge_status_package.py
+
+      - name: Sync README and version metadata
+        run: python .github/scripts/sync_release_metadata.py
 
       - name: Validate package parity
         run: |
@@ -39,8 +43,15 @@ jobs:
           pkg=json.loads((app/'Homebridge Status.scriptable').read_text(encoding='utf-8'))
           site=Path('index.html').read_text(encoding='utf-8')
           vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
-          assert vm and vm.group(1)=='0.1.13'
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
           assert pkg['script']==src
+          assert json.loads((app/'version.json').read_text(encoding='utf-8'))['version']==version
+          assert f'v{version}' in (app/'README.md').read_text(encoding='utf-8')
+          assert f'v{version}' in (app/'README_EN.md').read_text(encoding='utf-8')
+          marker=f'<strong>Homebridge Status</strong></td><td><code>v{version}</code>'
+          assert marker in Path('README.md').read_text(encoding='utf-8')
+          assert marker in Path('README_EN.md').read_text(encoding='utf-8')
           assert "{name:'Homebridge Status'" not in site
           assert 'w.setPadding(14,10,11,10)' in src, 'Small changed unexpectedly'
           assert 'w.setPadding(11,10,9,10)' in src, 'Medium changed unexpectedly'
@@ -52,7 +63,7 @@ jobs:
           assert '/api/status/rpi/throttled' in src
           assert 'fallbackUrl' in src
           assert 'accessoryRectangular' in src and 'accessoryInline' in src and 'accessoryCircular' in src
-          print('Homebridge Status v0.1.13: Large centered 2x2 API layout; public card hidden')
+          print(f'Homebridge Status v{version}: package and CZ/EN README metadata synchronized; public card hidden')
           PY
 
       - name: Commit synchronized release files
@@ -61,10 +72,11 @@ jobs:
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
             'apps/Homebridge-Status/Homebridge Status.scriptable' \
-            index.html
+            README.md README_EN.md index.html \
+            apps/*/README.md apps/*/README_EN.md apps/*/version.json
           if git diff --cached --quiet; then
             echo "Homebridge Status release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Sync private Homebridge Status package"
+          git commit -m "Sync Homebridge Status release surfaces"
           git push origin HEAD:Master
