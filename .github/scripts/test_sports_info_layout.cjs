@@ -70,7 +70,10 @@ for(const align of ['left','center','right']){
   assert.equal(cell.children.at(-1).spacer===true,align!=='right');
 }
 const html=a.html(a.merge({...a.DEFAULTS,language:'cs'}));
-const ui=html.match(/<script>([\s\S]*?)<\/script>/)[1];new vm.Script(ui);
+const scriptStart=html.indexOf('<script>');
+const scriptEnd=html.indexOf('</script>',scriptStart+8);
+assert.ok(scriptStart>=0&&scriptEnd>scriptStart,'settings HTML contains inline script');
+const ui=html.slice(scriptStart+8,scriptEnd);new vm.Script(ui);
 assert.ok(ui.includes('AUTO_WIDTH_INPUTS'));
 assert.ok(html.includes("setLayoutAuto('small','match')"));
 assert.ok(html.includes("setLayoutAuto('medium','match')"));

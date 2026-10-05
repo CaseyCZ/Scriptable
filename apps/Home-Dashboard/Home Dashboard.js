@@ -185,13 +185,9 @@ function githubHeaders(){const h={"Accept":"application/vnd.github+json","X-GitH
 async function checkGitHub(m,defaultTimeout){const started=Date.now(),timeout=clamp(Number(m.timeout)||Number(defaultTimeout)||6,2,30),repo=String(m.githubRepo||"").trim();try{if(!/^[^/\s]+\/[^/\s]+$/.test(repo))throw new Error("Invalid repository");let url=`https://api.github.com/repos/${repo}`,value="",ok=true;if(m.githubMode==="actions")url+=`/actions/runs?per_page=1`;else if(m.githubMode==="release")url+=`/releases/latest`;const r=new Request(url);r.timeoutInterval=timeout;r.headers=githubHeaders();const data=await r.loadJSON();const status=Number(r.response?.statusCode||200);ok=status>=200&&status<400;if(m.githubMode==="actions"){const run=Array.isArray(data?.workflow_runs)?data.workflow_runs[0]:null;if(run){const state=String(run.conclusion||run.status||"unknown");value=state;ok=ok&&!['failure','cancelled','timed_out','action_required','stale','startup_failure'].includes(state)}else value="no runs"}else if(m.githubMode==="release"){value=String(data?.tag_name||data?.name||"no release")}else value=String(data?.default_branch||data?.full_name||repo);return{id:m.id,name:m.name,icon:m.icon,kind:"github",ok,status,latency:Date.now()-started,value,checkedAt:Date.now(),cached:false}}catch(e){return{id:m.id,name:m.name,icon:m.icon,kind:"github",ok:false,status:0,latency:Date.now()-started,value:"",checkedAt:Date.now(),cached:false,error:String(e?.message||e).slice(0,120)}}}
 async function checkOne(m,defaultTimeout){if(m.type==="github")return await checkGitHub(m,defaultTimeout);const started=Date.now(),timeout=clamp(Number(m.timeout)||Number(defaultTimeout)||6,2,30);try{const r=new Request(m.url);r.method=m.method||"GET";r.timeoutInterval=timeout;r.headers=parseHeaders(m.headers);let value="";if(m.type==="json"){const data=await r.loadJSON();value=m.jsonPath?getPath(data,m.jsonPath):data}else await r.load();const status=Number(r.response?.statusCode||200);let ok=status>=200&&status<400;if(ok&&m.type==="json"&&m.expected!=="")ok=String(value)===String(m.expected);return{id:m.id,name:m.name,icon:m.icon,kind:m.type,ok,status,latency:Date.now()-started,value:m.type==="json"?valueText(value):"",checkedAt:Date.now(),cached:false}}catch(e){return{id:m.id,name:m.name,icon:m.icon,kind:m.type,ok:false,status:0,latency:Date.now()-started,value:"",checkedAt:Date.now(),cached:false,error:String(e?.message||e).slice(0,120)}}}
 function decodeHtmlText(v){
+  const entities={nbsp:" ",amp:"&",quot:'"',"#39":"'",lt:"<",gt:">"};
   return String(v||"")
-    .replace(/&nbsp;/gi," ")
-    .replace(/&amp;/gi,"&")
-    .replace(/&quot;/gi,'"')
-    .replace(/&#39;/gi,"'")
-    .replace(/&lt;/gi,"<")
-    .replace(/&gt;/gi,">")
+    .replace(/&(nbsp|amp|quot|#39|lt|gt);/gi,(match,name)=>entities[String(name).toLowerCase()]??match)
     .replace(/\s+/g," ")
     .trim()
 }
