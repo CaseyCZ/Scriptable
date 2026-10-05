@@ -36,7 +36,6 @@
         <a href="#ourApps"><span data-cs="Naše aplikace" data-en="Our apps" data-de="Unsere Apps" data-es="Nuestras apps" data-fr="Nos apps">Naše aplikace</span></a>
         <a href="#community"><span data-cs="Komunita" data-en="Community" data-de="Community" data-es="Comunidad" data-fr="Communauté">Komunita</span></a>
         <a href="https://scriptable.app" target="_blank" rel="noopener">Scriptable</a>
-        <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub</a>
       </nav>
       <div class="nav-actions">
         <div class="settings-menu">
@@ -98,7 +97,19 @@
       </section>
     </main>
 
-    <footer><span data-cs="Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity." data-en="The community catalog is curated from public Scriptable projects and community recommendations.">Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a> · <a class="mutedLink" href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a> · <a class="mutedLink" href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a></footer>
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <span>© <span id="year"></span> Scriptable Apps</span>
+        <div class="footer-links">
+          <a href="https://caseycz.github.io/" target="_blank" rel="noopener">Website</a>
+          <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub · Scriptable</a>
+          <a href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a>
+          <a href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a>
+          <a href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a>
+          <button class="footer-link-button" type="button" data-cookie-settings>Cookie settings</button>
+        </div>
+      </div>
+    </footer>
   </div>
 
 
@@ -274,6 +285,7 @@
     document.getElementById('themeDark').addEventListener('click',()=>applyTheme('dark'));document.getElementById('themeLight').addEventListener('click',()=>applyTheme('light'));document.getElementById('layoutGrid').addEventListener('click',()=>applyLayout('grid'));document.getElementById('layoutList').addEventListener('click',()=>applyLayout('list'));
     document.getElementById('settingsBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('settingsPanel').classList.toggle('open')});document.getElementById('settingsPanel').addEventListener('click',e=>e.stopPropagation());document.addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
     let supportReturnFocus=null;function openSupport(){const modal=document.getElementById('supportModal');supportReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;modal?.classList.add('open');document.body.classList.add('modal-open');modal?.setAttribute('aria-hidden','false');requestAnimationFrame(()=>modal?.querySelector('[data-support-close]')?.focus())}function closeSupport(){const modal=document.getElementById('supportModal');const wasOpen=modal?.classList.contains('open');modal?.classList.remove('open');document.body.classList.remove('modal-open');modal?.setAttribute('aria-hidden','true');if(wasOpen&&supportReturnFocus){const target=supportReturnFocus;supportReturnFocus=null;requestAnimationFrame(()=>target.focus?.())}}document.querySelectorAll('[data-support-open]').forEach(btn=>btn.addEventListener('click',openSupport));document.querySelectorAll('[data-support-close]').forEach(btn=>btn.addEventListener('click',closeSupport));document.getElementById('supportModal')?.addEventListener('click',e=>{if(e.target.id==='supportModal')closeSupport()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSupport()});
+    document.getElementById('year').textContent=new Date().getFullYear();
     applyTheme(theme);applyLayout(layout);setLanguage(lang);
   </script>
 </body>

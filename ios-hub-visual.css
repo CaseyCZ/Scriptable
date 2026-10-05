@@ -85,3 +85,17 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
   .hero{padding:54px 0 30px}
   .hero h1{font-size:clamp(40px,14vw,61px)}
 }
+
+
+/* iOS Hub footer 1:1 */
+.footer{margin-top:38px;border-top:1px solid var(--border);padding:24px 0 36px;color:var(--muted);font-size:10px;text-align:center}
+.footer .wrap{width:min(1380px,calc(100% - 32px));margin:auto}
+.footer-inner{display:flex;align-items:center;justify-content:center;gap:14px;text-align:center;flex-direction:column}
+.footer-links{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+.footer a:hover{color:var(--accent)}
+.footer-link-button{padding:0;border:0;background:transparent;color:var(--muted);font:inherit;cursor:pointer}
+.footer-link-button:hover{color:var(--accent)}
+.footer .caseycz-cookie-settings-wrap{display:contents;margin:0}
+.footer .caseycz-cookie-settings{min-height:0;padding:0;border:0;background:transparent;color:var(--muted);font:inherit;text-decoration:none;opacity:1}
+.footer .caseycz-cookie-settings:hover{color:var(--accent)}
+@media(max-width:640px){.footer-inner{align-items:center}.footer-links{justify-content:center}}
