@@ -5,6 +5,7 @@ on:
     branches: [Master]
     paths:
       - '.github/workflows/_sports-live-backup-oneoff.yml'
+      - '.github/scripts/_sports_live_backup_oneoff.py'
 
 permissions:
   contents: write
