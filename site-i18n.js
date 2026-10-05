@@ -1,3 +1,4 @@
+// Scriptable Apps UI translations — CZ / EN / DE / ES / FR
 (() => {
   'use strict';
 
