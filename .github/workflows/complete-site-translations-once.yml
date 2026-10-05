@@ -1,0 +1,50 @@
+name: Complete site translations once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/complete-site-translations-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Complete UI translations
+        run: python .github/scripts/complete-site-translations-once.py
+
+      - name: Validate JavaScript
+        run: |
+          node --check site-i18n.js
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess, tempfile
+          html = Path('index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
+          if not scripts:
+              raise SystemExit('inline script not found')
+          with tempfile.NamedTemporaryFile('w', suffix='.js', encoding='utf-8', delete=False) as f:
+              f.write(scripts[-1])
+              name = f.name
+          subprocess.run(['node','--check',name], check=True)
+          PY
+
+      - name: Remove one-time helper
+        run: |
+          git rm .github/workflows/complete-site-translations-once.yml
+          git rm .github/scripts/complete-site-translations-once.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add -A
+          git commit -m "Complete Scriptable site translations"
+          git push origin Master
