@@ -12,54 +12,25 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Test ESPN scoreboard windows and team schedules
+      - name: Test ESPN single-day scoreboards
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json, urllib.request, urllib.error, datetime
-
+          import json, urllib.request, datetime
           base='https://site.api.espn.com/apis/site/v2/sports'
           leagues=[('hockey','nhl'),('basketball','nba'),('baseball','mlb')]
           today=datetime.date.today()
-
           def get(url):
               req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
-              with urllib.request.urlopen(req,timeout=20) as r:
-                  return json.load(r)
-
+              with urllib.request.urlopen(req,timeout=20) as r:return json.load(r)
           for sport,league in leagues:
               print('\n===',sport,league,'===')
-              teams=get(f'{base}/{sport}/{league}/teams?limit=500')
-              arr=teams.get('sports',[{}])[0].get('leagues',[{}])[0].get('teams',[])
-              first=(arr[0].get('team') if arr else {}) or {}
-              tid=str(first.get('id',''))
-              print('teams:',len(arr),'first team:',tid,first.get('displayName'))
-
-              for past,future in [(7,10),(10,14),(14,14),(20,28),(20,30),(20,60),(30,90)]:
-                  start=(today-datetime.timedelta(days=past)).strftime('%Y%m%d')
-                  end=(today+datetime.timedelta(days=future)).strftime('%Y%m%d')
-                  url=f'{base}/{sport}/{league}/scoreboard?dates={start}-{end}&limit=1000'
+              for off in [-7,-3,0,3,7,14,30]:
+                  day=(today+datetime.timedelta(days=off)).strftime('%Y%m%d')
+                  u=f'{base}/{sport}/{league}/scoreboard?dates={day}&limit=100'
                   try:
-                      board=get(url)
-                      events=board.get('events',[])
-                      scoped=[]
-                      for e in events:
-                          comp=(e.get('competitions') or [{}])[0]
-                          if any(str((c.get('team') or {}).get('id',''))==tid for c in comp.get('competitors',[])):
-                              scoped.append(e)
-                      print(f'window -{past}/+{future}: events={len(events)} team={len(scoped)} sample={[e.get("date") for e in scoped[:3]]}')
+                      d=get(u); print(day,'events=',len(d.get('events',[])))
                   except Exception as ex:
-                      print(f'window -{past}/+{future}: ERROR {ex!r}')
-
-              for u in [
-                  f'{base}/{sport}/{league}/teams/{tid}/schedule',
-                  f'{base}/{sport}/{league}/teams/{tid}/schedule?season={today.year}',
-                  f'{base}/{sport}/{league}/teams/{tid}/schedule?season={today.year+1}',
-              ]:
-                  try:
-                      d=get(u); ev=d.get('events',[])
-                      print('team schedule events=',len(ev),'url=',u,'sample=',[e.get('date') for e in ev[:5]])
-                  except Exception as ex:
-                      print('team schedule ERROR:',u,repr(ex))
+                      print(day,'ERROR',repr(ex))
           PY
