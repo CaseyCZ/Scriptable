@@ -1,0 +1,98 @@
+name: Fix Sports Live Homebridge look once
+
+on:
+  push:
+    paths:
+      - '.github/.sports-live-homebridge-look-run'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Apply Homebridge Status visual system
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('apps/Sports-Live/Sports-Live,js')
+          s=p.read_text(encoding='utf-8')
+
+          start=s.index('function dark(s){')
+          end=s.index('\nfunction esc(v){', start)
+
+          new=r'''function widgetColors(s){
+  if(s.theme==="dark")return{bg:new Color("0B1020"),card:new Color("141B2D"),text:new Color("F8FAFC"),muted:new Color("94A3B8"),accent:new Color(s.accent||DEFAULTS.accent),ok:new Color("34C759"),warn:new Color("FF9F0A"),fail:new Color("FF453A")};
+  if(s.theme==="light")return{bg:new Color("F5F7FB"),card:new Color("FFFFFF"),text:new Color("111827"),muted:new Color("6B7280"),accent:new Color(s.accent||DEFAULTS.accent),ok:new Color("34C759"),warn:new Color("FF9F0A"),fail:new Color("FF453A")};
+  return{bg:Color.dynamic(new Color("F5F7FB"),new Color("0B1020")),card:Color.dynamic(new Color("FFFFFF"),new Color("141B2D")),text:Color.dynamic(new Color("111827"),new Color("F8FAFC")),muted:Color.dynamic(new Color("6B7280"),new Color("94A3B8")),accent:new Color(s.accent||DEFAULTS.accent),ok:new Color("34C759"),warn:new Color("FF9F0A"),fail:new Color("FF453A")}
+}
+function dark(s){return s.theme==="dark"||(s.theme==="auto"&&Device.isUsingDarkAppearance())}
+function textColor(s){return widgetColors(s).text}
+function mutedColor(s){return widgetColors(s).muted}
+function accentColor(s){return widgetColors(s).accent}
+async function applyBackground(w,s,c=widgetColors(s)){if(s.backgroundMode==="image"&&fm.fileExists(backgroundPath)){try{w.backgroundImage=fm.readImage(backgroundPath);return}catch(_){}}if(s.backgroundMode==="color"){w.backgroundColor=new Color(s.backgroundColor);return}w.backgroundColor=c.bg}
+function addText(st,v,size,s,bold=false,color=null){const t=st.addText(String(v??""));t.font=bold?Font.boldSystemFont(size):Font.systemFont(size);t.textColor=color||textColor(s);t.lineLimit=1;t.minimumScaleFactor=.65;return t}
+function addSemiText(st,v,size,s,color=null){const t=st.addText(String(v??""));t.font=Font.semiboldSystemFont(size);t.textColor=color||textColor(s);t.lineLimit=1;t.minimumScaleFactor=.65;return t}
+function addSymbol(st,name,size,color){try{const sf=SFSymbol.named(name);sf.applyFont(Font.semiboldSystemFont(size));const im=st.addImage(sf.image);im.imageSize=new Size(size,size);im.tintColor=color;return im}catch(_){return null}}
+function logoCachePath(url,key){const safe=String(key||"logo").replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,48)||"logo";let h=2166136261;for(const ch of String(url||"")){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return fm.joinPath(fm.cacheDirectory(),`SportsLive_${safe}_${(h>>>0).toString(36)}.png`)}
+async function loadLogo(url,key){if(!url)return null;const p=logoCachePath(url,key);try{if(fm.fileExists(p))return fm.readImage(p);const r=new Request(url);r.timeoutInterval=API_TIMEOUT;const i=await r.loadImage();fm.writeImage(p,i);return i}catch(_){return null}}
+function fmtDate(s,iso,withYear=false){const d=new Date(iso);return d.toLocaleDateString(s.language||"en",{day:"2-digit",month:"2-digit",...(withYear?{year:"numeric"}:{})})}
+function fmtTime(s,iso){return new Date(iso).toLocaleTimeString(s.language||"en",{hour:"2-digit",minute:"2-digit"})}
+function matchLabel(s,e){if(e.state==="in")return `${tx(s,"liveNow")} · ${e.gameStatus||""}`.trim();const d=new Date(e.gameDate),n=new Date(),tm=new Date(n);tm.setDate(n.getDate()+1);if(d.toDateString()===n.toDateString())return `${tx(s,"today")} · ${fmtTime(s,e.gameDate)}`;if(d.toDateString()===tm.toDateString())return `${tx(s,"tomorrow")} · ${fmtTime(s,e.gameDate)}`;return `${fmtDate(s,e.gameDate,true)} · ${fmtTime(s,e.gameDate)}`}
+function recordLine(s,r){const bits=[];if(r?.wins!=="")bits.push(`${tx(s,"wins")}: ${r.wins}`);if((s.sportId==="football"||s.sportId==="floorball")&&r?.draws!=="")bits.push(`${tx(s,"draws")}: ${r.draws}`);if(r?.losses!=="")bits.push(`${tx(s,"losses")}: ${r.losses}`);return bits.join(" · ")||"–"}
+function rankLine(s,r){return r?.rank?`${tx(s,"rank")}: ${r.rank}`:""}
+function displayPair(g,s){return s.homeFirst?[g.homeTeam,g.awayTeam]:[g.awayTeam,g.homeTeam]}
+function scoreText(g,s){if(!s.showLive)return"VS";const [a,b]=displayPair(g,s),sa=a?.score,sb=b?.score;if((sa===""||sa==null)&&(sb===""||sb==null))return"VS";return `${sa===""||sa==null?"–":sa} : ${sb===""||sb==null?"–":sb}`}
+function sportsHeader(w,s,d,c,size=15){const h=w.addStack();h.centerAlignContent();addSymbol(h,"trophy.fill",size,c.accent);h.addSpacer(6);const title=s.teamName||APP_NAME;addText(h,title,size,s,true,c.text);h.addSpacer();const right=d?.current?.state==="in"?tx(s,"liveNow"):leagueName(s);addSemiText(h,right,8,s,d?.current?.state==="in"?c.ok:c.muted);return h}
+function noGameCard(w,s,d,c){w.addSpacer(7);const card=w.addStack();card.layoutVertically();card.backgroundColor=c.card;card.cornerRadius=12;card.setPadding(12,9,12,9);const r=card.addStack();r.addSpacer();addSymbol(r,d.reason==="team"?"person.crop.circle.badge.questionmark":"calendar.badge.exclamationmark",24,d.reason==="team"?c.accent:c.warn);r.addSpacer();card.addSpacer(7);const t=addText(card,d.reason==="team"?tx(s,"noTeam"):tx(s,"noGame"),10,s,true,c.text);t.centerAlignText();return card}
+async function sportTeamCard(parent,t,s,c,wide=false){const card=parent.addStack();card.layoutVertically();card.backgroundColor=c.card;card.cornerRadius=12;card.setPadding(wide?8:7,wide?9:7,wide?8:7,wide?9:7);if(wide)card.size=new Size(136,0);const nameRow=card.addStack();nameRow.addSpacer();addSemiText(nameRow,t.short||t.name,wide?9:8,s,c.muted);nameRow.addSpacer();card.addSpacer(wide?5:4);const core=card.addStack();core.centerAlignContent();core.addSpacer();const img=await loadLogo(t.logo,t.id||t.abbr||t.name);if(img){const v=core.addImage(img);v.imageSize=new Size(wide?36:29,wide?36:29)}else addSymbol(core,"sportscourt.fill",wide?28:23,c.muted);if(s.showLive){core.addSpacer(wide?8:6);addText(core,(t.score===""||t.score==null)?"–":String(t.score),wide?24:18,s,true,c.text)}core.addSpacer();if(s.showStats){card.addSpacer(wide?5:3);const rr=card.addStack();rr.addSpacer();addText(rr,recordLine(s,t.record),wide?8:7,s,false,c.muted);rr.addSpacer();const rank=rankLine(s,t.record);if(rank){card.addSpacer(2);const qr=card.addStack();qr.addSpacer();addText(qr,rank,7,s,false,c.muted);qr.addSpacer()}}return card}
+async function addSmallWidgetData(w,s,d,c){sportsHeader(w,s,d,c,13);if(!d.current){noGameCard(w,s,d,c);return}const g=d.current,[left,right]=displayPair(g,s);w.addSpacer(7);const card=w.addStack();card.layoutVertically();card.backgroundColor=c.card;card.cornerRadius=12;card.setPadding(7,7,7,7);const status=card.addStack();status.addSpacer();addSemiText(status,matchLabel(s,g),8,s,g.state==="in"?c.ok:c.muted);status.addSpacer();card.addSpacer(5);const row=card.addStack();row.centerAlignContent();const li=await loadLogo(left.logo,left.id||left.abbr||left.name);if(li){const v=row.addImage(li);v.imageSize=new Size(32,32)}else addSymbol(row,"sportscourt.fill",27,c.muted);row.addSpacer();const mid=row.addStack();mid.layoutVertically();mid.centerAlignContent();const sc=addText(mid,scoreText(g,s),17,s,true,g.state==="in"?c.ok:c.text);sc.centerAlignText();mid.addSpacer(2);const versus=addText(mid,`${left.short||left.name} · ${right.short||right.name}`,7,s,false,c.muted);versus.centerAlignText();row.addSpacer();const ri=await loadLogo(right.logo,right.id||right.abbr||right.name);if(ri){const v=row.addImage(ri);v.imageSize=new Size(32,32)}else addSymbol(row,"sportscourt.fill",27,c.muted);if(s.showStats){card.addSpacer(5);const mine=teamIs(left,s)?left:right;const rr=card.addStack();rr.addSpacer();addText(rr,recordLine(s,mine.record),8,s,false,c.muted);rr.addSpacer()}if(s.showNext&&g.nextGames?.length){w.addSpacer();const n=g.nextGames[0],foot=w.addStack();foot.centerAlignContent();addSemiText(foot,tx(s,"nextGames"),7,s,c.muted);foot.addSpacer(5);const im=await loadLogo(n.opponent.logo,n.opponent.id||n.opponent.name);if(im){const v=foot.addImage(im);v.imageSize=new Size(13,13)}foot.addSpacer(4);addText(foot,`${fmtDate(s,n.gameDate)} · ${n.opponent.short||n.opponent.name}`,7,s,false,c.muted)}}
+async function addMediumWidgetData(w,s,d,c){sportsHeader(w,s,d,c,15);if(!d.current){noGameCard(w,s,d,c);return}const g=d.current,[left,right]=displayPair(g,s);w.addSpacer(8);const meta=w.addStack();meta.centerAlignContent();meta.addSpacer();addSemiText(meta,matchLabel(s,g),9,s,g.state==="in"?c.ok:c.muted);if(g.venue){meta.addSpacer(7);addText(meta,`· ${g.venue}`,8,s,false,c.muted)}meta.addSpacer();w.addSpacer(6);const teams=w.addStack();await sportTeamCard(teams,left,s,c,true);teams.addSpacer(7);await sportTeamCard(teams,right,s,c,true);w.addSpacer();const footer=w.addStack();footer.centerAlignContent();const score=scoreText(g,s);if(score!=="VS"){addSemiText(footer,score,9,s,g.state==="in"?c.ok:c.text);footer.addSpacer(8)}if(s.showNext&&g.nextGames?.length){addText(footer,tx(s,"nextGames"),8,s,false,c.muted);for(const n of g.nextGames.slice(0,Math.min(3,s.nextCount))){footer.addSpacer(7);const im=await loadLogo(n.opponent.logo,n.opponent.id||n.opponent.name);if(im){const v=footer.addImage(im);v.imageSize=new Size(13,13)}footer.addSpacer(3);addText(footer,fmtDate(s,n.gameDate),8,s,false,c.muted)}}return w}
+async function widget(s,family){const d=await prepareData(s),c=widgetColors(s),w=new ListWidget();await applyBackground(w,s,c);w.setPadding(family==="small"?14:11,10,family==="small"?11:9,10);w.refreshAfterDate=new Date(Date.now()+s.refreshMinutes*60000);try{const u=URLScheme.forRunningScript();w.url=u+(u.includes("?")?"&":"?")+`sportsLiveFamily=${encodeURIComponent(family)}`}catch(_){}if(family==="small")await addSmallWidgetData(w,s,d,c);else if(family==="medium")await addMediumWidgetData(w,s,d,c);else{sportsHeader(w,s,d,c,16);w.addSpacer();const card=w.addStack();card.backgroundColor=c.card;card.cornerRadius=12;card.setPadding(12,12,12,12);const t=addText(card,tx(s,"widgetHelp"),13,s,true,c.text);t.centerAlignText();w.addSpacer()}Script.setWidget(w);return w}
+'''
+
+          s=s[:start]+new+s[end:]
+          s=s.replace('// Sports Live v0.2.5','// Sports Live v0.2.6',1)
+          s=s.replace('const APP_VERSION = "0.2.5";','const APP_VERSION = "0.2.6";',1)
+          s=s.replace('// Settings follow the CaseyCZ / Homebridge style; widget layout remains Sports Live.','// Settings and widget visual system follow the CaseyCZ / Homebridge Status style.',1)
+          s=s.replace('Small a Medium zachovávají původní vzhled Sports Live. Large zatím není podporován.','Small a Medium používají stejný vizuální systém jako Homebridge Status. Large zatím není podporován.',1)
+          s=s.replace('Tady měníš pouze vzhled. Rozložení widgetu zatím zůstává stejné jako v původním Sports Live.','Vzhled widgetu používá stejné karty, barvy a typografii jako Homebridge Status.',1)
+          s=s.replace('Small and Medium keep the original Sports Live layout. Large is not supported yet.','Small and Medium use the same visual system as Homebridge Status. Large is not supported yet.',1)
+          s=s.replace('Only appearance settings change here. The widget layout stays close to the original Sports Live design for now.','The widget uses the same cards, colors and typography as Homebridge Status.',1)
+          s=s.replace('Small und Medium behalten das ursprüngliche Sports-Live-Layout. Large wird noch nicht unterstützt.','Small und Medium verwenden dasselbe visuelle System wie Homebridge Status. Large wird noch nicht unterstützt.',1)
+          s=s.replace('Hier ändert sich nur die Darstellung. Das Widget-Layout bleibt vorerst wie beim ursprünglichen Sports Live.','Das Widget verwendet dieselben Karten, Farben und dieselbe Typografie wie Homebridge Status.',1)
+          s=s.replace('Small y Medium conservan el diseño original de Sports Live. Large todavía no está soportado.','Small y Medium usan el mismo sistema visual que Homebridge Status. Large todavía no está soportado.',1)
+          s=s.replace('Aquí solo cambia la apariencia. El diseño del widget se mantiene cercano al Sports Live original por ahora.','El widget usa las mismas tarjetas, colores y tipografía que Homebridge Status.',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Validate Sports Live
+        shell: bash
+        run: |
+          node --check 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'const APP_VERSION = "0.2.6";' 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'function widgetColors(s)' 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'function sportsHeader(w,s,d,c,size=15)' 'apps/Sports-Live/Sports-Live,js'
+          grep -F 'Homebridge Status style' 'apps/Sports-Live/Sports-Live,js'
+
+      - name: Remove one-time files
+        run: |
+          git rm .github/workflows/fix-sports-live-homebridge-look-once.yml
+          git rm .github/.sports-live-homebridge-look-run
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add -A
+          git commit -m "Match Sports Live widget to Homebridge Status"
+          git push origin Master
