@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: orange; icon-glyph: trophy;
 // ============================================================
-// Sports Live v0.2.1
+// Sports Live v0.2.2
 // CaseyCZ Scriptable Apps
 // Single-team live widget using the same multi-provider data layer as Sports Info.
 // Settings follow the CaseyCZ / Homebridge style; widget layout remains Sports Live.
 // ============================================================
 
 const APP_NAME = "Sports Live";
-const APP_VERSION = "0.2.1";
+const APP_VERSION = "0.2.2";
 const SETTINGS_FILE = "SportsLive_settings.json";
 const CACHE_FILE = "SportsLive_cache.json";
 const BACKGROUND_FILE = "SportsLive_background.jpg";
@@ -214,7 +214,7 @@ function cacheKey(s){return `${s.sportId}|${s.leagueId}|${s.teamId||s.teamName}`
 function readCache(){try{return fm.fileExists(cachePath)?JSON.parse(fm.readString(cachePath)):{} }catch(_){return{}}}
 function writeCache(key,data){try{const all=readCache();all[key]={ts:Date.now(),data};fm.writeString(cachePath,JSON.stringify(all))}catch(e){console.log(e)}}
 function cached(key){const all=readCache(),x=all[key];return x?.data?Object.assign({},x.data,{source:"cache"}):null}
-async function prepareData(s){if(!s.teamId&&!s.teamName)return{source:"error",reason:"team",current:null,nextGames:[]};const key=cacheKey(s);try{const [events,rows]=await Promise.all([eventsFor(s),tableFor(s)]),all=events.filter(e=>eventMatchesTeam(e,s)).sort((a,b)=>new Date(a.date)-new Date(b.date)),now=Date.now();if(!all.length)throw new Error("No team events");const live=all.filter(e=>e.state==="in"),future=all.filter(e=>e.state!=="in"&&!e.completed&&e.state!=="post"&&new Date(e.date).getTime()>now-4*3600000),done=all.filter(e=>e.completed||e.state==="post").sort((a,b)=>new Date(b.date)-new Date(a.date)),current=live[0]||future[0]||done[0]||null;if(!current)throw new Error("No current event");const my=teamIs(current.home,s)?current.home:current.away,op=teamIs(current.home,s)?current.away:current.home,nextGames=future.filter(e=>e.id!==current.id).slice(0,s.nextCount).map(e=>{const opponent=teamIs(e.home,s)?e.away:e.home;return{gameDate:e.date,opponent}});const data={source:"online",current:{id:current.id,gameDate:current.date,gameStatus:current.status||"",state:current.state,venue:current.venue||"",homeTeam:Object.assign({},current.home,{record:recOf(current.home,rows)}),awayTeam:Object.assign({},current.away,{record:recOf(current.away,rows)}),myTeam:my,opponent:op,nextGames},nextGames};writeCache(key,data);return data}catch(e){console.log(e);return cached(key)||{source:"error",reason:String(e),current:null,nextGames:[]}}}
+async function prepareData(s){if(!s.teamId&&!s.teamName)return{source:"error",reason:"team",current:null,nextGames:[]};const key=cacheKey(s);try{const events=await eventsFor(s);let rows=[];try{rows=await tableFor(s)}catch(e){console.log(e)}const all=events.filter(e=>eventMatchesTeam(e,s)).sort((a,b)=>new Date(a.date)-new Date(b.date)),now=Date.now();if(!all.length)throw new Error("No team events");const live=all.filter(e=>e.state==="in"),future=all.filter(e=>e.state!=="in"&&!e.completed&&e.state!=="post"&&new Date(e.date).getTime()>now-4*3600000),done=all.filter(e=>e.completed||e.state==="post").sort((a,b)=>new Date(b.date)-new Date(a.date)),current=live[0]||future[0]||done[0]||null;if(!current)throw new Error("No current event");const my=teamIs(current.home,s)?current.home:current.away,op=teamIs(current.home,s)?current.away:current.home,nextGames=future.filter(e=>e.id!==current.id).slice(0,s.nextCount).map(e=>{const opponent=teamIs(e.home,s)?e.away:e.home;return{gameDate:e.date,opponent}});const data={source:"online",current:{id:current.id,gameDate:current.date,gameStatus:current.status||"",state:current.state,venue:current.venue||"",homeTeam:Object.assign({},current.home,{record:recOf(current.home,rows)}),awayTeam:Object.assign({},current.away,{record:recOf(current.away,rows)}),myTeam:my,opponent:op,nextGames},nextGames};writeCache(key,data);return data}catch(e){console.log(e);return cached(key)||{source:"error",reason:String(e),current:null,nextGames:[]}}}
 
 function dark(s){return s.theme==="dark"||(s.theme==="auto"&&Device.isUsingDarkAppearance())}
 function textColor(s){return dark(s)?Color.white():Color.black()}
