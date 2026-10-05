@@ -1,0 +1,111 @@
+name: Sports Live file backup one-off
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/_sports-live-backup-oneoff.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Replace text backup with file backup
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('apps/Sports-Live/Sports-Live,js')
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('// Sports Live v0.3.1','// Sports Live v0.3.2',1)
+          s=s.replace('const APP_VERSION = "0.3.1";','const APP_VERSION = "0.3.2";',1)
+
+          # Keep labels localized, but make it clear these are real backup files.
+          replacements={
+            'export:"Exportovat",import:"Importovat"':'export:"Uložit zálohu",import:"Importovat zálohu"',
+            'copied:"Nastavení bylo zkopírováno."':'copied:"Záloha byla uložena do souboru."',
+            'export:"Export",import:"Import"':'export:"Save backup",import:"Import backup"',
+            'copied:"Settings copied."':'copied:"Backup file saved."',
+            'export:"Exportieren",import:"Importieren"':'export:"Backup speichern",import:"Backup importieren"',
+            'copied:"Einstellungen kopiert."':'copied:"Backup-Datei gespeichert."',
+            'export:"Exportar",import:"Importar"':'export:"Guardar copia",import:"Importar copia"',
+            'copied:"Ajustes copiados."':'copied:"Archivo de copia guardado."'
+          }
+          for a,b in replacements.items():
+            s=s.replace(a,b,1)
+
+          # Remove the raw JSON editor from Backup & maintenance.
+          pattern=r'<div class="screen" id="maintenance">.*?</div>\n\n<script>'
+          new='''<div class="screen" id="maintenance">${back}<div class="screenTitle">💾 ${esc(L.maintenance)}</div><div class="card"><div class="actionGrid"><button class="actionBtn full" onclick="exportJSON()">💾 ${esc(L.export)}</button><button class="actionBtn secondary full" onclick="importJSON()">📥 ${esc(L.import)}</button><button class="actionBtn secondary" onclick="clearCache()">🧹 ${esc(L.clearCache)}</button><button class="actionBtn secondary" onclick="resetPart('appearance')">🎨 ${esc(L.resetAppearance)}</button><button class="actionBtn secondary" onclick="resetPart('team')">🏆 ${esc(L.resetTeam)}</button><button class="actionBtn danger" onclick="resetPart('all')">↺ ${esc(L.resetAll)}</button></div><div id="toolStatus" class="status"></div></div></div>
+
+<script>'''
+          s,n=re.subn(pattern,new,s,count=1,flags=re.S)
+          if n!=1:
+            raise SystemExit(f'maintenance block replacements: {n}')
+
+          old='function exportJSON(){emit(\'export\',{settings:collect()})}function importJSON(){emit(\'import\',{raw:document.getElementById(\'jsonBox\').value})}'
+          newjs='function exportJSON(){emit(\'export\',{settings:collect()})}function importJSON(){emit(\'importFile\',{settings:collect()})}'
+          if old not in s:
+            raise SystemExit('web backup handlers not found')
+          s=s.replace(old,newjs,1)
+
+          old_export='else if(m.action==="export"){cur=merge(m.settings||cur);saveSettings(cur);Pasteboard.copyString(JSON.stringify(cur,null,2));await send(web,{action:"status",ok:true,text:tx(cur,"copied")})}'
+          new_export='''else if(m.action==="export"){
+        cur=merge(m.settings||cur);saveSettings(cur);
+        const now=new Date(),pad=n=>String(n).padStart(2,"0");
+        const stamp=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
+        const backup={app:APP_NAME,version:APP_VERSION,exportedAt:now.toISOString(),settings:cur};
+        await DocumentPicker.exportString(JSON.stringify(backup,null,2),`Sports Live backup ${stamp}.json`);
+        await send(web,{action:"status",ok:true,text:tx(cur,"copied")})
+      }'''
+          if old_export not in s:
+            raise SystemExit('native export handler not found')
+          s=s.replace(old_export,new_export,1)
+
+          old_import='else if(m.action==="import"){try{cur=merge(JSON.parse(m.raw||""));if(!cur.language)cur.language=s.language||lang();saveSettings(cur);await send(web,{action:"status",ok:true,text:tx(cur,"imported")});await send(web,{action:"replace",settings:cur})}catch(_){await send(web,{action:"status",ok:false,text:tx(cur,"invalid")})}}'
+          new_import='''else if(m.action==="importFile"){
+        try{
+          const path=await DocumentPicker.openFile();
+          if(!path)throw new Error(tx(cur,"invalid"));
+          const raw=FileManager.local().readString(path);
+          const parsed=JSON.parse(raw||"");
+          const incoming=parsed&&parsed.app===APP_NAME&&parsed.settings?parsed.settings:parsed;
+          if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error(tx(cur,"invalid"));
+          cur=merge(incoming);if(!cur.language)cur.language=s.language||lang();saveSettings(cur);
+          await send(web,{action:"status",ok:true,text:tx(cur,"imported")});await send(web,{action:"replace",settings:cur})
+        }catch(_){await send(web,{action:"status",ok:false,text:tx(cur,"invalid")})}
+      }'''
+          if old_import not in s:
+            raise SystemExit('native import handler not found')
+          s=s.replace(old_import,new_import,1)
+
+          if 'textarea id="jsonBox"' in s:
+            raise SystemExit('json editor still present')
+          if "DocumentPicker.exportString" not in s or "DocumentPicker.openFile" not in s:
+            raise SystemExit('DocumentPicker backup functions missing')
+
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Live/Sports-Live,js' /tmp/SportsLive.mjs
+          node --check /tmp/SportsLive.mjs
+
+      - name: Commit update and remove one-off workflow
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git rm .github/workflows/_sports-live-backup-oneoff.yml
+          git add 'apps/Sports-Live/Sports-Live,js'
+          git commit -m "Use file backup and restore in Sports Live"
+          git push origin HEAD:Master
