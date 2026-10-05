@@ -22,65 +22,15 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import base64
           import re
-
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
-
-          header = '''<body>
-  <header class="topbar">
-    <div class="wrap topbar-inner">
-      <a class="brand" href="#top" aria-label="Scriptable Apps">
-        <span class="brand-mark">JS</span>
-        <span>Scriptable Apps<small>Scriptable · Widgets</small></span>
-      </a>
-      <nav class="nav" aria-label="Primary">
-        <a href="#ourApps"><span data-cs="Naše aplikace" data-en="Our apps">Naše aplikace</span></a>
-        <a href="#community"><span data-cs="Komunita" data-en="Community">Komunita</span></a>
-        <a href="https://scriptable.app" target="_blank" rel="noopener">Scriptable</a>
-        <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub</a>
-      </nav>
-      <div class="nav-actions">
-        <div class="settings-menu">
-          <button id="settingsBtn" class="icon-btn settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings" title="Settings">⚙</button>
-          <div id="settingsPanel" class="settings-panel" role="dialog" aria-hidden="true">
-            <div class="settings-title"><span data-cs="Nastavení" data-en="Settings">Nastavení</span></div>
-
-            <div class="settings-label"><span data-cs="VZHLED" data-en="APPEARANCE">VZHLED</span></div>
-            <div class="settings-theme-seg">
-              <button id="themeDark" type="button">☾ <span data-cs="Tmavý" data-en="Dark">Tmavý</span></button>
-              <button id="themeLight" type="button">☀ <span data-cs="Světlý" data-en="Light">Světlý</span></button>
-            </div>
-
-            <div class="settings-label"><span data-cs="JAZYK" data-en="LANGUAGE">JAZYK</span></div>
-            <div class="settings-language-list">
-              <button id="langCs" type="button"><span class="flag">CZ</span><span>Čeština</span></button>
-              <button id="langEn" type="button"><span class="flag">EN</span><span>English</span></button>
-            </div>
-
-            <div class="settings-label">LAYOUT</div>
-            <div class="settings-layout-seg">
-              <button id="layoutGrid" type="button" title="Grid">▦</button>
-              <button id="layoutList" type="button" title="List">☷</button>
-            </div>
-
-            <div class="settings-label"><span data-cs="NAHLÁSIT PROBLÉM" data-en="REPORT ISSUE">NAHLÁSIT PROBLÉM</span></div>
-            <a class="settings-report-link" href="https://github.com/CaseyCZ/Scriptable/issues/new/choose" target="_blank" rel="noopener"><span aria-hidden="true">🐞</span><span data-cs="Nahlásit problém" data-en="Report issue">Nahlásit problém</span></a>
-          </div>
-        </div>
-        <a class="compact-btn nav-app-primary" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener"><span aria-hidden="true"></span><span data-cs="Scriptable" data-en="Scriptable">Scriptable</span></a>
-      </div>
-    </div>
-  </header>
-
-  <div class="wrap">
-    <main id="top">'''
-
+          header = base64.b64decode('PGJvZHk+CiAgPGhlYWRlciBjbGFzcz0idG9wYmFyIj4KICAgIDxkaXYgY2xhc3M9IndyYXAgdG9wYmFyLWlubmVyIj4KICAgICAgPGEgY2xhc3M9ImJyYW5kIiBocmVmPSIjdG9wIiBhcmlhLWxhYmVsPSJTY3JpcHRhYmxlIEFwcHMiPgogICAgICAgIDxzcGFuIGNsYXNzPSJicmFuZC1tYXJrIj5KUzwvc3Bhbj4KICAgICAgICA8c3Bhbj5TY3JpcHRhYmxlIEFwcHM8c21hbGw+U2NyaXB0YWJsZSDCtyBXaWRnZXRzPC9zbWFsbD48L3NwYW4+CiAgICAgIDwvYT4KICAgICAgPG5hdiBjbGFzcz0ibmF2IiBhcmlhLWxhYmVsPSJQcmltYXJ5Ij4KICAgICAgICA8YSBocmVmPSIj b3VyQXBwcyI+PHNwYW4gZGF0YS1jcz0iTmHFo2UgYXBsaWthY2UiIGRhdGEtZW49Ik91ciBhcHBzIj5O YcWhZSBhcGxpa2FjZTwvc3Bhbj48L2E+CiAgICAgICAgPGEgaHJlZj0iI2NvbW11bml0eSI+PHNwYW4gZGF0YS1jcz0iS29tdW5pdGEiIGRhdGEtZW49IkNvbW11bml0eSI+S29tdW5pdGE8L3NwYW4+PC9hPgogICAgICAgIDxhIGhyZWY9Imh0dHBzOi8vc2NyaXB0YWJsZS5hcHAiIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIj5TY3JpcHRhYmxlPC9hPgogICAgICAgIDxhIGhyZWY9Imh0dHBzOi8vZ2l0aHViLmNvbS9DYXNleUNaL1NjcmlwdGFibGUiIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIj5HaXRIdWI8L2E+CiAgICAgIDwvbmF2PgogICAgICA8ZGl2IGNsYXNzPSJuYXYtYWN0aW9ucyI+CiAgICAgICAgPGRpdiBjbGFzcz0ic2V0dGluZ3MtbWVudSI+CiAgICAgICAgICA8YnV0dG9uIGlkPSJzZXR0aW5nc0J0biIgY2xhc3M9Imljb24tYnRuIHNldHRpbmdzLWJ1dHRvbiIgdHlwZT0iYnV0dG9uIiBhcmlhLWhhc3BvcHVwPSJkaWFsb2ciIGFyaWEtZXhwYW5kZWQ9ImZhbHNlIiBhcmlhLWNvbnRyb2xzPSJzZXR0aW5nc1BhbmVsIiBhcmlhLWxhYmVsPSJTZXR0aW5ncyIgdGl0bGU9IlNldHRpbmdzIj7imJk8L2J1dHRvbj4KICAgICAgICAgIDxkaXYgaWQ9InNldHRpbmdzUGFuZWwiIGNsYXNzPSJzZXR0aW5ncy1wYW5lbCIgcm9sZT0iZGlhbG9nIiBhcmlhLWhpZGRlbj0idHJ1ZSI+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InNldHRpbmdzLXRpdGxlIj48c3BhbiBkYXRhLWNzPSJOYXN0YXZlbsOtIiBkYXRhLWVuPSJTZXR0aW5ncyI+TmFzdGF2ZW7DrTwvc3Bhbj48L2Rpdj4KCiAgICAgICAgICAgIDxkaXYgY2xhc3M9InNldHRpbmdzLWxhYmVsIj48c3BhbiBkYXRhLWNzPSJWWkhMRUQiIGRhdGEtZW49IkFQUEVBUkFOQ0UiPlZaSExFRDwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0ic2V0dGluZ3MtdGhlbWUtc2VnIj4KICAgICAgICAgICAgICA8YnV0dG9uIGlkPSJ0aGVtZURhcmsiIHR5cGU9ImJ1dHRvbiI+4pi+IDxzcGFuIGRhdGEtY3M9IlRtYXbDvSIgZGF0YS1lbj0iRGFyayI+VG1hdsO9PC9zcGFuPjwvYnV0dG9uPgogICAgICAgICAgICAgIDxidXR0b24gaWQ9InRoZW1lTGlnaHQiIHR5cGU9ImJ1dHRvbiI+4piAIDxzcGFuIGRhdGEtY3M9IlN2xJt0bMO9IiBkYXRhLWVuPSJMaWdodCI+U3bEm3Rsw708L3NwYW4+PC9idXR0b24+CiAgICAgICAgICAgIDwvZGl2PgoKICAgICAgICAgICAgPGRpdiBjbGFzcz0ic2V0dGluZ3MtbGFiZWwiPjxzcGFuIGRhdGEtY3M9IkpBWllLIiBkYXRhLWVuPSJMQU5HVUFHRSI+SkFaWUs8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InNldHRpbmdzLWxhbmd1YWdlLWxpc3QiPgogICAgICAgICAgICAgIDxidXR0b24gaWQ9ImxhbmdDcyIgdHlwZT0iYnV0dG9uIj48c3BhbiBjbGFzcz0iZmxhZyI+Q1o8L3NwYW4+PHNwYW4+xIxlyaF0aW5hPC9zcGFuPjwvYnV0dG9uPgogICAgICAgICAgICAgIDxidXR0b24gaWQ9ImxhbmdFbiIgdHlwZT0iYnV0dG9uIj48c3BhbiBjbGFzcz0iZmxhZyI+RU48L3NwYW4+PHNwYW4+RW5nbGlzaDwvc3Bhbj48L2J1dHRvbj4KICAgICAgICAgICAgPC9kaXY+CgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJzZXR0aW5ncy1sYWJlbCI+TEFZT1VUPC9kaXY+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InNldHRpbmdzLWxheW91dC1zZWciPgogICAgICAgICAgICAgIDxidXR0b24gaWQ9ImxheW91dEdyaWQiIHR5cGU9ImJ1dHRvbiIgdGl0bGU9IkdyaWQiPuKWpzwvYnV0dG9uPgogICAgICAgICAgICAgIDxidXR0b24gaWQ9ImxheW91dExpc3QiIHR5cGU9ImJ1dHRvbiIgdGl0bGU9Ikxpc3QiPuKYtzwvYnV0dG9uPgogICAgICAgICAgICA8L2Rpdj4KCiAgICAgICAgICAgIDxkaXYgY2xhc3M9InNldHRpbmdzLWxhYmVsIj48c3BhbiBkYXRhLWNzPSJOQUhMw4FTSVQgUFJPQkxFTSIgZGF0YS1lbj0iUkVQT1JUIElTU1VFIj5OQUhMw4FTSVQgUFJPQkxFTTwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgPGEgY2xhc3M9InNldHRpbmdzLXJlcG9ydC1saW5rIiBocmVmPSJodHRwczovL2dpdGh1Yi5jb20vQ2FzZXlDWi9TY3JpcHRhYmxlL2lzc3Vlcy9uZXcvY2hvb3NlIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciI+PHNwYW4gYXJpYS1oaWRkZW49InRydWUiPvCfkZ48L3NwYW4+PHNwYW4gZGF0YS1jcz0iTmFobMOhc2l0IHByb2Jsw6ltIiBkYXRhLWVuPSJSZXBvcnQgaXNzdWUiPk5haGzDoXNpdCBwcm9ibMOpbTwvc3Bhbj48L2E+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj4KICAgICAgICA8YSBjbGFzcz0iY29tcGFjdC1idG4gbmF2LWFwcC1wcmltYXJ5IiBocmVmPSJodHRwczovL2FwcHMuYXBwbGUuY29tL2FwcC9zY3JpcHRhYmxlL2lkMTQwNTQ1OTE4OCIgdGFyZ2V0PSJfYmxhbmsiIHJlbD0ibm9vcGVuZXIiPjxzcGFuIGFyaWEtaGlkZGVuPSJ0cnVlIj7hv6w8L3NwYW4+PHNwYW4gZGF0YS1jcz0iU2NyaXB0YWJsZSIgZGF0YS1lbj0iU2NyaXB0YWJsZSI+U2NyaXB0YWJsZTwvc3Bhbj48L2E+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgPC9oZWFkZXI+CgogIDxkaXYgY2xhc3M9IndyYXAiPgogICAgPG1haW4gaWQ9InRvcCI+').decode('utf-8')
           pattern = re.compile(r'<body>\s*<div class="wrap">\s*<header class="topbar">.*?</header>\s*<main>', re.S)
           text, count = pattern.subn(header, text, count=1)
           if count != 1:
               raise SystemExit(f'header replacement count={count}')
-
           text = re.sub(r'ios-hub-visual\.css\?v=[^"\']+', 'ios-hub-visual.css?v=20261005-1to1', text, count=1)
           path.write_text(text, encoding='utf-8')
           PY
