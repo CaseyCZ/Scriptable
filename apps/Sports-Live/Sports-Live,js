@@ -2,18 +2,18 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: orange; icon-glyph: trophy;
 // ============================================================
-// Sports Live v0.2.0
+// Sports Live v0.2.1
 // CaseyCZ Scriptable Apps
 // Single-team live widget using the same multi-provider data layer as Sports Info.
 // Settings follow the CaseyCZ / Homebridge style; widget layout remains Sports Live.
 // ============================================================
 
 const APP_NAME = "Sports Live";
-const APP_VERSION = "0.2.0";
+const APP_VERSION = "0.2.1";
 const SETTINGS_FILE = "SportsLive_settings.json";
 const CACHE_FILE = "SportsLive_cache.json";
 const BACKGROUND_FILE = "SportsLive_background.jpg";
-const API_TIMEOUT = 8;
+const API_TIMEOUT = 7;
 const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Live/Sports-Live%2Cjs";
 const UPDATE_MIN_BYTES = 22000;
 
@@ -100,7 +100,7 @@ function range(a,b){const x=new Date(),y=new Date();x.setDate(x.getDate()+a);y.s
 async function requestJSON(url,headers=null){const r=new Request(url);r.timeoutInterval=API_TIMEOUT;if(headers)r.headers=headers;return await r.loadJSON()}
 async function getString(url){const r=new Request(url);r.timeoutInterval=API_TIMEOUT;return await r.loadString()}
 const BROWSER_HEADERS={"User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148","Accept":"application/json","Accept-Language":"en-US,en;q=0.9"};
-function normEvent(e){try{const c=(e.competitions||[])[0]||{},arr=c.competitors||[],h=arr.find(x=>x.homeAway==="home")||arr[0]||{},a=arr.find(x=>x.homeAway==="away")||arr[1]||{},st=e.status?.type||{};const team=x=>({id:String(x.team?.id||""),name:x.team?.displayName||x.team?.name||"",short:x.team?.shortDisplayName||x.team?.abbreviation||x.team?.displayName||"",abbr:x.team?.abbreviation||"",logo:x.team?.logo||"",score:x.score==null?"":String(x.score)});return{id:String(e.id||""),date:e.date||c.date||"",state:st.state||"",completed:!!st.completed,status:st.shortDetail||st.detail||st.description||"",venue:c.venue?.fullName||"",home:team(h),away:team(a)}}catch(_){return null}}
+function normEvent(e){try{const c=(e.competitions||[])[0]||{},arr=c.competitors||[],h=arr.find(x=>x.homeAway==="home")||arr[0]||{},a=arr.find(x=>x.homeAway==="away")||arr[1]||{},st=e.status?.type||{};const team=x=>({id:String(x.team?.id||""),name:x.team?.displayName||x.team?.name||"",short:x.team?.shortDisplayName||x.team?.abbreviation||x.team?.displayName||"",abbr:x.team?.abbreviation||"",logo:x.team?.logo||"",score:x.score==null?"":String(x.score)});return{id:String(e.id||""),date:e.date||c.date||"",state:st.state||"",completed:!!st.completed,status:st.shortDetail||st.detail||st.description||"",home:team(h),away:team(a)}}catch(_){return null}}
 function sourceLabel(s){const m=league(s);return m.provider==="soccer"?"OneFootball + ESPN + FotMob":m.provider==="livesport"?"Livesport · bez klíče":m.provider==="floorball"?(s.sportsApiKey?"SportsAPI Pro":"Florbal"):m.provider==="sofa"?"SofaScore":"ESPN"}
 async function espnScoreboard(s,dates){const m=league(s),base=s.apiEspnBase||DEFAULTS.apiEspnBase,d=await requestJSON(`${base}/apis/site/v2/sports/${encodeURIComponent(m.espnSport)}/${encodeURIComponent(m.espnLeague)}/scoreboard?dates=${encodeURIComponent(dates)}&limit=100`);return(d.events||[]).map(normEvent).filter(Boolean)}
 async function espnTeams(s){const m=league(s),base=s.apiEspnBase||DEFAULTS.apiEspnBase,d=await requestJSON(`${base}/apis/site/v2/sports/${encodeURIComponent(m.espnSport)}/${encodeURIComponent(m.espnLeague)}/teams?limit=500`),r=d.sports?.[0]?.leagues?.[0]?.teams||[];return r.map(x=>x.team||x).map(t=>({id:String(t.id||""),name:t.displayName||t.name||"",short:t.shortDisplayName||t.abbreviation||t.displayName||"",logo:t.logos?.[0]?.href||t.logo||""})).filter(x=>x.id&&x.name).sort((a,b)=>a.name.localeCompare(b.name))}
@@ -189,8 +189,20 @@ async function scoreboardFor(s,dates,needs=null){const m=league(s);if(m.provider
 async function teamsFor(s){const m=league(s);if(m.provider==="soccer"){try{const meta=await oneFootballMeta(s),a=meta.table.map(x=>({id:x.id,name:x.name,short:x.short,logo:x.logo}));if(a.length)return a}catch(_){}try{const a=await espnTeams(s);if(a.length)return a}catch(_){}const rows=fotmobRows(await fotmobLeague(s));return rows.map(x=>({id:x.id,name:x.name,short:x.short,logo:`https://images.fotmob.com/image_resources/logo/teamlogo/${x.id}.png` })).sort((a,b)=>a.name.localeCompare(b.name))}if(m.provider==="livesport")return(await livesportBundle(s)).teams;if(m.provider==="floorball"){const d=await floorballBundle(s),map=new Map();for(const x of d.table||[])map.set(x.id,{id:x.id,name:x.name,short:x.short,logo:`https://api.sofascore.com/api/v1/team/${x.id}/image`});for(const e of d.events||[])for(const t of[e.home,e.away])if(t.id)map.set(t.id,{id:t.id,name:t.name,short:t.short,logo:t.logo});return[...map.values()].sort((a,b)=>a.name.localeCompare(b.name))}if(m.provider==="sofa"){const d=await sofaBundle(s),map=new Map();for(const x of d.table)map.set(x.id,{id:x.id,name:x.name,short:x.short,logo:`https://api.sofascore.com/api/v1/team/${x.id}/image`});for(const e of d.events)for(const t of[e.home,e.away])if(t.id)map.set(t.id,{id:t.id,name:t.name,short:t.short,logo:t.logo});return[...map.values()].sort((a,b)=>a.name.localeCompare(b.name))}return await espnTeams(s)}
 async function standingsFor(s){const m=league(s);if(m.provider==="soccer"){try{const a=(await oneFootballMeta(s)).table;if(a.length)return a}catch(_){}try{const a=await espnStandings(s);if(a.length)return a}catch(_){}return fotmobRows(await fotmobLeague(s))}if(m.provider==="livesport")return(await livesportBundle(s)).table;if(m.provider==="floorball")return(await floorballBundle(s)).table;if(m.provider==="sofa")return(await sofaBundle(s)).table;return await espnStandings(s)}
 function unique(a){const m=new Map();for(const e of a||[])if(e?.id)m.set(e.id,e);return[...m.values()].sort((x,y)=>new Date(x.date)-new Date(y.date))}
-async function eventsFor(s){const slow=s.sportId==="football"||s.sportId==="floorball",dates=range(slow?-21:-14,slow?75:45),needs={recent:2,upcoming:Math.max(2,(Number(s.nextCount)||4)+1)};return unique(await scoreboardFor(s,dates,needs))}
-async function tableFor(s){try{return await standingsFor(s)}catch(e){console.log(e);return[]}}
+function sportsLiveEventWindow(s,needs,level=0){
+  const slow=s.sportId==="football"||s.sportId==="floorball",past=Math.max(slow?14:7,needs.recent*(slow?10:4)),baseFuture=Math.max(slow?28:10,needs.upcoming*(slow?14:7));
+  const future=level<=0?baseFuture:level===1?Math.max(baseFuture,30):Math.max(baseFuture,60);
+  return range(-past,future)
+}
+async function eventsFor(s){
+  const needs={recent:5,upcoming:clamp(Number(s.nextCount)||4,1,8)};
+  let all=[];
+  for(let level=0;level<3&&!all.length;level++){
+    try{all=unique(await scoreboardFor(s,sportsLiveEventWindow(s,needs,level),needs))}catch(e){if(level===2)throw e}
+  }
+  return all
+}
+async function tableFor(s){return await standingsFor(s)}
 
 function norm(v){try{return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}catch(_){return String(v||"").trim().toLowerCase()}}
 function eventMatchesTeam(e,s){if(!s.teamId&&!s.teamName)return false;const wanted=norm(s.teamName);for(const t of[e.home,e.away]){const name=norm(t?.name||t?.short);if((s.teamId&&String(t?.id||"")===String(s.teamId))||(wanted&&(name===wanted||name.includes(wanted)||wanted.includes(name))))return true}return false}
