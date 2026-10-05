@@ -1,0 +1,195 @@
+name: Refactor Sports Live v0.2 once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/refactor-sports-live-v2-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Refactor Sports Live from Sports Info data layer
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          live_path = Path('apps/Sports-Live/Sports-Live,js')
+          info_path = Path('apps/Sports-Info/Sports Info.js')
+          live = live_path.read_text(encoding='utf-8')
+          info = info_path.read_text(encoding='utf-8')
+
+          def between(text, start, end):
+              a = text.index(start)
+              b = text.index(end, a)
+              return text[a:b]
+
+          def replace_between(text, start, end, replacement):
+              a = text.index(start)
+              b = text.index(end, a)
+              return text[:a] + replacement + text[b:]
+
+          # Version and header.
+          live = live.replace('// Sports Live v0.1.0', '// Sports Live v0.2.0', 1)
+          live = live.replace('const APP_VERSION = "0.1.0";', 'const APP_VERSION = "0.2.0";', 1)
+          live = live.replace('// Single-team live widget. Settings and data model follow Sports Info.\n// Widget layout intentionally stays close to the original Sports Live script.',
+                              '// Single-team live widget using the same multi-provider data layer as Sports Info.\n// Settings follow the CaseyCZ / Homebridge style; widget layout remains Sports Live.', 1)
+
+          # Exact sport/league catalog from Sports Info, including all provider mappings.
+          sports_block = between(info, 'const SPORTS = [', '\n\nconst T = {')
+          live = replace_between(live, 'const SPORTS = [', '\n\nconst T = {', sports_block)
+
+          # Keep Sports Live-specific settings, but use the same provider configuration as Sports Info.
+          old_defaults = between(live, 'const DEFAULTS=', ';\nconst fm=')
+          new_defaults = '''const DEFAULTS={language:null,sportId:"basketball",leagueId:"nba",teamId:"",teamName:"",showLive:true,showStats:true,showNext:true,homeFirst:false,nextCount:4,theme:"auto",accent:"#38bdf8",backgroundMode:"theme",backgroundColor:"#223A70",refreshMinutes:15,apiEspnBase:"https://site.api.espn.com",apiFotmobBase:"https://www.fotmob.com/api/data",apiOneFootballFeedBase:"https://feedmonster.onefootball.com",apiOneFootballScoresBase:"https://api.onefootball.com",apiSofaBase:"https://api.sofascore.com/api/v1",apiSportsApiBase:"https://v2.floorball.sportsapipro.com",sportsApiKey:""}'''
+          live = live.replace(old_defaults, new_defaults, 1)
+
+          # Source label now reflects the real Sports Info fallback chain.
+          old_source = 'function sourceName(s){return league(s)?.provider==="livesport"?tx(s,"sourceLivesport"):tx(s,"sourceEspn")}'
+          new_source = '''function sourceName(s){const m=league(s);if(m.provider==="soccer")return "OneFootball → ESPN → FotMob";if(m.provider==="livesport")return "Livesport";if(m.provider==="floorball")return s.sportsApiKey?"SofaScore → SportsAPI Pro":"SofaScore";if(m.provider==="sofa")return "SofaScore";return "ESPN"}'''
+          if old_source not in live:
+              raise SystemExit('sourceName anchor not found')
+          live = live.replace(old_source, new_source, 1)
+
+          # Merge settings: same API endpoints as Sports Info; language defaults silently to device language.
+          merge_start = 'function merge(raw){'
+          merge_end = '\nfunction loadSettings()'
+          new_merge = '''function merge(raw){const s=Object.assign(clone(DEFAULTS),raw||{});if(!["cs","en","de","es"].includes(s.language))s.language=lang();if(!SPORTS.some(x=>x.id===s.sportId))s.sportId=DEFAULTS.sportId;const ls=leaguesForSport(s.sportId);if(!ls.some(x=>x.id===s.leagueId))s.leagueId=ls[0]?.id||DEFAULTS.leagueId;s.teamId=String(s.teamId||"");s.teamName=String(s.teamName||"");s.nextCount=clamp(Number(s.nextCount)||4,1,4);s.refreshMinutes=clamp(Number(s.refreshMinutes)||15,5,60);if(!["auto","dark","light"].includes(s.theme))s.theme="auto";if(!["theme","color","image"].includes(s.backgroundMode))s.backgroundMode="theme";if(!/^#[0-9a-fA-F]{6}$/.test(String(s.backgroundColor||"")))s.backgroundColor=DEFAULTS.backgroundColor;if(!/^#[0-9a-fA-F]{6}$/.test(String(s.accent||"")))s.accent=DEFAULTS.accent;for(const k of["apiEspnBase","apiFotmobBase","apiOneFootballFeedBase","apiOneFootballScoresBase","apiSofaBase","apiSportsApiBase"])s[k]=String(s[k]||DEFAULTS[k]).replace(/\\/+$/,"");s.sportsApiKey=String(s.sportsApiKey||"").trim();return s}'''
+          live = replace_between(live, merge_start, merge_end, new_merge)
+
+          # No first-launch language popup: language is changed inside Settings like Homebridge Status.
+          first_start = 'async function firstLanguage(s){'
+          first_end = '\n\nfunction dateKey(d)'
+          live = replace_between(live, first_start, first_end,
+              'async function firstLanguage(s){if(!s.language){s.language=lang();saveSettings(s)}return s}')
+
+          # Replace the limited ESPN/Livesport data layer with the exact Sports Info provider stack.
+          provider_block = between(info, 'function dateKey(d){', '\nfunction cacheRead(k){')
+          # Preserve venue from ESPN for the existing Sports Live widget header.
+          provider_block = provider_block.replace(
+              'status:st.shortDetail||st.detail||st.description||"",home:team(h),away:team(a)',
+              'status:st.shortDetail||st.detail||st.description||"",venue:c.venue?.fullName||"",home:team(h),away:team(a)'
+          )
+          wrappers = '''\nasync function eventsFor(s){const slow=s.sportId==="football"||s.sportId==="floorball",dates=range(slow?-21:-14,slow?75:45),needs={recent:2,upcoming:Math.max(2,(Number(s.nextCount)||4)+1)};return unique(await scoreboardFor(s,dates,needs))}\nasync function tableFor(s){try{return await standingsFor(s)}catch(e){console.log(e);return[]}}\n'''
+          live = replace_between(live, 'function dateKey(d){', '\nfunction norm(v){', provider_block + wrappers)
+
+          # Robust cross-provider team matching (IDs may differ between OneFootball/ESPN/FotMob).
+          old_norm = 'function norm(v){return String(v||"").trim().toLowerCase()}'
+          new_norm = 'function norm(v){try{return String(v||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}catch(_){return String(v||"").trim().toLowerCase()}}'
+          live = live.replace(old_norm, new_norm, 1)
+          old_match = 'function eventMatchesTeam(e,s){if(!s.teamId&&!s.teamName)return false;for(const t of[e.home,e.away])if((s.teamId&&String(t.id)===String(s.teamId))||(s.teamName&&norm(t.name)===norm(s.teamName)))return true;return false}'
+          new_match = 'function eventMatchesTeam(e,s){if(!s.teamId&&!s.teamName)return false;const wanted=norm(s.teamName);for(const t of[e.home,e.away]){const name=norm(t?.name||t?.short);if((s.teamId&&String(t?.id||"")===String(s.teamId))||(wanted&&(name===wanted||name.includes(wanted)||wanted.includes(name))))return true}return false}'
+          live = live.replace(old_match, new_match, 1)
+          old_team_is = 'function teamIs(t,s){return (s.teamId&&String(t?.id)===String(s.teamId))||(s.teamName&&norm(t?.name)===norm(s.teamName))}'
+          new_team_is = 'function teamIs(t,s){const a=norm(t?.name||t?.short),b=norm(s.teamName);return (s.teamId&&String(t?.id||"")===String(s.teamId))||(b&&(a===b||a.includes(b)||b.includes(a)))}'
+          live = live.replace(old_team_is, new_team_is, 1)
+          old_table_row = 'function tableRow(t,rows=[]){return rows.find(x=>String(x.id)===String(t?.id))||rows.find(x=>norm(x.name)===norm(t?.name))||null}'
+          new_table_row = 'function tableRow(t,rows=[]){const n=norm(t?.name||t?.short);return rows.find(x=>String(x.id)===String(t?.id))||rows.find(x=>{const q=norm(x.name||x.short);return n&&(q===n||q.includes(n)||n.includes(q))})||null}'
+          live = live.replace(old_table_row, new_table_row, 1)
+
+          # Translation labels for Homebridge-style Behavior screen and accurate provider description.
+          live = live.replace('widget:"Widget",appearance:"Vzhled",data:"Data a diagnostika"', 'widget:"Widget",appearance:"Vzhled",behavior:"Chování",behaviorSub:"Obnova widgetu a jazyk.",data:"Data a diagnostika"', 1)
+          live = live.replace('widget:"Widget",appearance:"Appearance",data:"Data & diagnostics"', 'widget:"Widget",appearance:"Appearance",behavior:"Behavior",behaviorSub:"Widget refresh and language.",data:"Data & diagnostics"', 1)
+          live = live.replace('widget:"Widget",appearance:"Darstellung",data:"Daten & Diagnose"', 'widget:"Widget",appearance:"Darstellung",behavior:"Verhalten",behaviorSub:"Widget-Aktualisierung und Sprache.",data:"Daten & Diagnose"', 1)
+          live = live.replace('widget:"Widget",appearance:"Apariencia",data:"Datos y diagnóstico"', 'widget:"Widget",appearance:"Apariencia",behavior:"Comportamiento",behaviorSub:"Actualización del widget e idioma.",data:"Datos y diagnóstico"', 1)
+          live = live.replace('Sports Live používá stejné mapování soutěží jako Sports Info: ESPN a Livesport, bez vlastního API klíče.', 'Sports Live používá stejnou datovou vrstvu jako Sports Info: fotbal OneFootball → ESPN → FotMob, ostatní soutěže ESPN / Livesport a připravené fallbacky SofaScore / SportsAPI Pro.')
+          live = live.replace('Sports Live uses the same competition mapping as Sports Info: ESPN and Livesport, with no personal API key.', 'Sports Live uses the same data layer as Sports Info: football OneFootball → ESPN → FotMob, other competitions via ESPN / Livesport, with SofaScore / SportsAPI Pro fallbacks available.')
+          live = live.replace('Sports Live nutzt dieselbe Wettbewerbszuordnung wie Sports Info: ESPN und Livesport ohne eigenen API-Key.', 'Sports Live nutzt dieselbe Datenschicht wie Sports Info: Fußball OneFootball → ESPN → FotMob, weitere Wettbewerbe über ESPN / Livesport sowie SofaScore / SportsAPI-Pro-Fallbacks.')
+          live = live.replace('Sports Live usa el mismo mapa de competiciones que Sports Info: ESPN y Livesport, sin API personal.', 'Sports Live usa la misma capa de datos que Sports Info: fútbol OneFootball → ESPN → FotMob, otras competiciones con ESPN / Livesport y fallbacks SofaScore / SportsAPI Pro.')
+
+          # Main screen: language is no longer a shortcut beside Load Teams.
+          old_actions = '<div class="actionGrid"><button class="actionBtn" onclick="loadTeams()">👥 ${esc(L.loadTeams)}</button><button class="actionBtn secondary" onclick="showScreen(\'language\')">🌐 ${esc(L.language)}</button></div>'
+          new_actions = '<div class="actionGrid" style="grid-template-columns:1fr"><button class="actionBtn" onclick="loadTeams()">👥 ${esc(L.loadTeams)}</button></div>'
+          if old_actions not in live:
+              raise SystemExit('home language action anchor not found')
+          live = live.replace(old_actions, new_actions, 1)
+
+          # Settings list follows Homebridge: Widget / Appearance / Behavior / Data / Maintenance.
+          old_nav = '${nav("widget","📱",L.widget)}${nav("appearance","🎨",L.appearance)}${nav("data","🌐",L.data,sourceName(s))}${nav("maintenance","💾",L.maintenance)}'
+          new_nav = '${nav("widget","📱",L.widget)}${nav("appearance","🎨",L.appearance)}${nav("behavior","⚙️",L.behavior,L.language)}${nav("data","🌐",L.data,sourceName(s))}${nav("maintenance","💾",L.maintenance)}'
+          if old_nav not in live:
+              raise SystemExit('settings nav anchor not found')
+          live = live.replace(old_nav, new_nav, 1)
+
+          # Behavior screen contains refresh and language; Data screen is provider/diagnostics only.
+          data_screen_start = '<div class="screen" id="data">'
+          behavior_screen = '''<div class="screen" id="behavior">${back}<div class="screenTitle">⚙️ ${esc(L.behavior)}</div><div class="screenSub">${esc(L.behaviorSub)}</div><div class="card"><div class="field"><label>${esc(L.refresh)}</label><input id="refreshMinutes" type="number" min="5" max="60" value="${s.refreshMinutes}"></div><div class="field"><label>${esc(L.language)}</label><select id="languageSelect"><option value="cs" ${s.language==="cs"?"selected":""}>🇨🇿 Čeština</option><option value="en" ${s.language==="en"?"selected":""}>🇬🇧 English</option><option value="de" ${s.language==="de"?"selected":""}>🇩🇪 Deutsch</option><option value="es" ${s.language==="es"?"selected":""}>🇪🇸 Español</option></select></div></div></div>\n'''
+          live = live.replace(data_screen_start, behavior_screen + data_screen_start, 1)
+          refresh_field = '<div class="field"><label>${esc(L.refresh)}</label><input id="refreshMinutes" type="number" min="5" max="60" value="${s.refreshMinutes}"></div>'
+          # Remove only the duplicate from Data screen (Behavior now owns it).
+          data_pos = live.index(data_screen_start)
+          refresh_pos = live.find(refresh_field, data_pos)
+          if refresh_pos >= 0:
+              live = live[:refresh_pos] + live[refresh_pos+len(refresh_field):]
+
+          # Remove the old standalone language screen.
+          lang_start = '<div class="screen" id="language">'
+          if lang_start in live:
+              a = live.index(lang_start)
+              b = live.index('\n<script>', a)
+              live = live[:a] + live[b:]
+
+          # Ensure collection reads language in its new Settings location.
+          collect_anchor = "function collect(){const z={...state};for(const k of['sportId','leagueId','teamId','backgroundMode','backgroundColor','accent'])"
+          collect_repl = "function collect(){const z={...state};const langEl=document.getElementById('languageSelect');if(langEl)z.language=langEl.value;for(const k of['sportId','leagueId','teamId','backgroundMode','backgroundColor','accent'])"
+          if collect_anchor not in live:
+              raise SystemExit('collect anchor not found')
+          live = live.replace(collect_anchor, collect_repl, 1)
+
+          # Language selector now saves from Behavior; keep reload so all labels update immediately.
+          old_listener = "document.getElementById('languageSelect').addEventListener('change',e=>emit('language',{language:e.target.value,settings:collect()}));"
+          new_listener = "document.getElementById('languageSelect')?.addEventListener('change',e=>emit('language',{language:e.target.value,settings:{...collect(),language:e.target.value}}));"
+          live = live.replace(old_listener, new_listener, 1)
+
+          live_path.write_text(live, encoding='utf-8')
+          print('Sports Live refactored:', len(live), 'bytes')
+          PY
+
+      - name: Validate Sports Live syntax and architecture
+        shell: bash
+        run: |
+          cp 'apps/Sports-Live/Sports-Live,js' /tmp/SportsLive.mjs
+          node --check /tmp/SportsLive.mjs
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('apps/Sports-Live/Sports-Live,js').read_text(encoding='utf-8')
+          checks=[
+            'const APP_VERSION = "0.2.0"',
+            'OneFootball → ESPN → FotMob',
+            'async function scoreboardFor(s,dates,needs=null)',
+            'async function teamsFor(s)',
+            'async function standingsFor(s)',
+            'async function fotmobLeague(s)',
+            'async function oneFootballBundle(s,needs={recent:1,upcoming:1})',
+            'async function livesportBundle(s)',
+            'async function sofaBundle(s)',
+            'async function sportsApiBundle(s)',
+            'id="behavior"',
+            'id="languageSelect"',
+          ]
+          for marker in checks:
+              assert marker in p, marker
+          assert "showScreen('language')" not in p
+          assert 'Choose language / Vyber jazyk' not in p
+          print('Sports Live v0.2.0 architecture validated')
+          PY
+
+      - name: Remove one-time workflow
+        run: git rm .github/workflows/refactor-sports-live-v2-once.yml
+
+      - name: Commit and push
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add 'apps/Sports-Live/Sports-Live,js'
+          git commit -m "Align Sports Live with Sports Info data and settings"
+          git push origin Master
