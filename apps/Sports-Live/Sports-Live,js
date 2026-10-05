@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: orange; icon-glyph: trophy;
 // ============================================================
-// Sports Live v0.2.3
+// Sports Live v0.2.4
 // CaseyCZ Scriptable Apps
 // Single-team live widget using the same multi-provider data layer as Sports Info.
 // Settings follow the CaseyCZ / Homebridge style; widget layout remains Sports Live.
 // ============================================================
 
 const APP_NAME = "Sports Live";
-const APP_VERSION = "0.2.3";
+const APP_VERSION = "0.2.4";
 const SETTINGS_FILE = "SportsLive_settings.json";
 const CACHE_FILE = "SportsLive_cache.json";
 const BACKGROUND_FILE = "SportsLive_background.jpg";
@@ -194,7 +194,21 @@ function sportsLiveEventWindow(s,needs,level=0){
   const future=level<=0?baseFuture:level===1?Math.max(baseFuture,30):Math.max(baseFuture,60);
   return range(-past,future)
 }
+async function espnTeamSchedule(s){
+  const m=league(s),base=s.apiEspnBase||DEFAULTS.apiEspnBase;
+  let teamId=String(s.teamId||"");
+  if(!teamId&&s.teamName){
+    const wanted=norm(s.teamName),teams=await espnTeams(s);
+    const hit=teams.find(t=>{const n=norm(t.name||t.short);return n===wanted||n.includes(wanted)||wanted.includes(n)});
+    teamId=String(hit?.id||"")
+  }
+  if(!teamId)return[];
+  const d=await requestJSON(`${base}/apis/site/v2/sports/${encodeURIComponent(m.espnSport)}/${encodeURIComponent(m.espnLeague)}/teams/${encodeURIComponent(teamId)}/schedule`);
+  return unique((d.events||[]).map(normEvent).filter(Boolean))
+}
 async function eventsFor(s){
+  const m=league(s);
+  if(m.provider==="espn")return await espnTeamSchedule(s);
   const needs={recent:5,upcoming:clamp(Number(s.nextCount)||4,1,8)};
   let all=unique(await scoreboardFor(s,sportsLiveEventWindow(s,needs,0),needs));
   for(let level=1;level<=2;level++){
