@@ -20,7 +20,7 @@ replacements = {
 for old, new in replacements.items():
     s = s.replace(old, new, 1)
 
-maintenance_pattern = r'<div class="screen" id="maintenance">.*?</div>\n\n<script>'
+maintenance_pattern = r'<div class="screen" id="maintenance">.*?<script>'
 maintenance_new = '''<div class="screen" id="maintenance">${back}<div class="screenTitle">💾 ${esc(L.maintenance)}</div><div class="card"><div class="actionGrid"><button class="actionBtn full" onclick="exportJSON()">💾 ${esc(L.export)}</button><button class="actionBtn secondary full" onclick="importJSON()">📥 ${esc(L.import)}</button><button class="actionBtn secondary" onclick="clearCache()">🧹 ${esc(L.clearCache)}</button><button class="actionBtn secondary" onclick="resetPart('appearance')">🎨 ${esc(L.resetAppearance)}</button><button class="actionBtn secondary" onclick="resetPart('team')">🏆 ${esc(L.resetTeam)}</button><button class="actionBtn danger" onclick="resetPart('all')">↺ ${esc(L.resetAll)}</button></div><div id="toolStatus" class="status"></div></div></div>
 
 <script>'''
