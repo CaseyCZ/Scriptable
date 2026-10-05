@@ -37,6 +37,6 @@ jobs:
         run: |
           git config user.name "Lukáš"
           git config user.email "kyselalukas@seznam.cz"
-          git add index.html .github/workflows/sync-ios-hub-visual-once.yml
+          git add index.html
           git commit -m "Align Scriptable visual style with iOS Hub"
           git push origin Master
