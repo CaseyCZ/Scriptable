@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta id="themeColor" name="theme-color" content="#0b1020">
+  <meta id="themeColor" name="theme-color" content="#070b14">
   <meta name="description" content="Scriptable Apps – užitečné iPhone nástroje a vybrané komunitní projekty ke stažení.">
   <title>Scriptable Apps</title>
 <!-- Google Analytics loads only after explicit consent. -->
@@ -33,8 +33,8 @@
         <span>Scriptable Apps<small>Scriptable · Widgets</small></span>
       </a>
       <nav class="nav" aria-label="Primary">
-        <a href="#ourApps"><span data-cs="Naše aplikace" data-en="Our apps">Naše aplikace</span></a>
-        <a href="#community"><span data-cs="Komunita" data-en="Community">Komunita</span></a>
+        <a href="#ourApps"><span data-cs="Naše aplikace" data-en="Our apps" data-de="Unsere Apps" data-es="Nuestras apps" data-fr="Nos apps">Naše aplikace</span></a>
+        <a href="#community"><span data-cs="Komunita" data-en="Community" data-de="Community" data-es="Comunidad" data-fr="Communauté">Komunita</span></a>
         <a href="https://scriptable.app" target="_blank" rel="noopener">Scriptable</a>
         <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub</a>
       </nav>
@@ -42,31 +42,34 @@
         <div class="settings-menu">
           <button id="settingsBtn" class="icon-btn settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings" title="Settings">⚙</button>
           <div id="settingsPanel" class="settings-panel" role="dialog" aria-hidden="true">
-            <div class="settings-title"><span data-cs="Nastavení" data-en="Settings">Nastavení</span></div>
+            <div class="settings-title"><span data-cs="Nastavení" data-en="Settings" data-de="Einstellungen" data-es="Ajustes" data-fr="Paramètres">Nastavení</span></div>
 
-            <div class="settings-label"><span data-cs="VZHLED" data-en="APPEARANCE">VZHLED</span></div>
+            <div class="settings-label"><span data-cs="VZHLED" data-en="APPEARANCE" data-de="DARSTELLUNG" data-es="APARIENCIA" data-fr="APPARENCE">VZHLED</span></div>
             <div class="settings-theme-seg">
-              <button id="themeDark" type="button">☾ <span data-cs="Tmavý" data-en="Dark">Tmavý</span></button>
-              <button id="themeLight" type="button">☀ <span data-cs="Světlý" data-en="Light">Světlý</span></button>
+              <button id="themeDark" type="button">☾ <span data-cs="Tmavý" data-en="Dark" data-de="Dunkel" data-es="Oscuro" data-fr="Sombre">Tmavý</span></button>
+              <button id="themeLight" type="button">☀ <span data-cs="Světlý" data-en="Light" data-de="Hell" data-es="Claro" data-fr="Clair">Světlý</span></button>
             </div>
 
-            <div class="settings-label"><span data-cs="JAZYK" data-en="LANGUAGE">JAZYK</span></div>
+            <div class="settings-label"><span data-cs="JAZYK" data-en="LANGUAGE" data-de="SPRACHE" data-es="IDIOMA" data-fr="LANGUE">JAZYK</span></div>
             <div class="settings-language-list">
-              <button id="langCs" type="button"><span class="flag">CZ</span><span>Čeština</span></button>
-              <button id="langEn" type="button"><span class="flag">EN</span><span>English</span></button>
+              <button id="langCs" type="button" data-language="cs"><img src="assets/flags/cz.svg" alt=""><span>Čeština</span></button>
+              <button id="langEn" type="button" data-language="en"><img src="assets/flags/gb.svg" alt=""><span>English</span></button>
+              <button id="langDe" type="button" data-language="de"><img src="assets/flags/de.svg" alt=""><span>Deutsch</span></button>
+              <button id="langEs" type="button" data-language="es"><img src="assets/flags/es.svg" alt=""><span>Español</span></button>
+              <button id="langFr" type="button" data-language="fr"><img src="assets/flags/fr.svg" alt=""><span>Français</span></button>
             </div>
 
-            <div class="settings-label">LAYOUT</div>
+            <div class="settings-label"><span data-cs="ROZLOŽENÍ" data-en="LAYOUT" data-de="LAYOUT" data-es="DISEÑO" data-fr="MISE EN PAGE">ROZLOŽENÍ</span></div>
             <div class="settings-layout-seg">
               <button id="layoutGrid" type="button" title="Grid">▦</button>
               <button id="layoutList" type="button" title="List">☷</button>
             </div>
 
-            <div class="settings-label"><span data-cs="NAHLÁSIT PROBLÉM" data-en="REPORT ISSUE">NAHLÁSIT PROBLÉM</span></div>
-            <a class="settings-report-link" href="https://github.com/CaseyCZ/Scriptable/issues/new/choose" target="_blank" rel="noopener"><span aria-hidden="true">🐞</span><span data-cs="Nahlásit problém" data-en="Report issue">Nahlásit problém</span></a>
+            <div class="settings-label"><span data-cs="NAHLÁSIT PROBLÉM" data-en="REPORT ISSUE" data-de="PROBLEM MELDEN" data-es="INFORMAR DE UN PROBLEMA" data-fr="SIGNALER UN PROBLÈME">NAHLÁSIT PROBLÉM</span></div>
+            <a class="settings-report-link" href="https://github.com/CaseyCZ/Scriptable/issues/new/choose" target="_blank" rel="noopener"><span aria-hidden="true">🐞</span><span data-cs="Nahlásit problém" data-en="Report issue" data-de="Problem melden" data-es="Informar de un problema" data-fr="Signaler un problème">Nahlásit problém</span></a>
           </div>
         </div>
-        <a class="compact-btn nav-app-primary" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener"><span aria-hidden="true"></span><span data-cs="Scriptable" data-en="Scriptable">Scriptable</span></a>
+        <button class="compact-btn nav-support-primary" type="button" data-support-open><img class="compact-brand-icon" src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="" referrerpolicy="no-referrer"><span class="support-label" data-cs="Podpořit" data-en="Support" data-de="Unterstützen" data-es="Apoyar" data-fr="Soutenir">Podpořit</span></button>
       </div>
     </div>
   </header>
@@ -98,6 +101,17 @@
     <footer><span data-cs="Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity." data-en="The community catalog is curated from public Scriptable projects and community recommendations.">Komunitní katalog čerpá z veřejných Scriptable projektů a doporučení komunity.</span> · <a class="mutedLink" href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a> · <a class="mutedLink" href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a> · <a class="mutedLink" href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a></footer>
   </div>
 
+
+  <div id="supportModal" class="support-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="supportTitle">
+    <div class="support-dialog">
+      <button class="support-close" type="button" data-support-close aria-label="Close">×</button>
+      <div class="badge" data-cs="PODPOŘIT PROJEKT" data-en="SUPPORT THE PROJECT" data-de="PROJEKT UNTERSTÜTZEN" data-es="APOYAR EL PROYECTO" data-fr="SOUTENIR LE PROJET">PODPOŘIT PROJEKT</div>
+      <h2 id="supportTitle" data-cs="Podpoř další vývoj." data-en="Support further development." data-de="Unterstütze die weitere Entwicklung." data-es="Apoya el desarrollo futuro." data-fr="Soutenez le développement futur.">Podpoř další vývoj.</h2>
+      <p data-cs="Pokud ti Scriptable Apps šetří čas, můžeš podpořit další vývoj přes Buy Me a Coffee." data-en="If Scriptable Apps saves you time, you can support further development through Buy Me a Coffee." data-de="Wenn dir Scriptable Apps Zeit spart, kannst du die weitere Entwicklung über Buy Me a Coffee unterstützen." data-es="Si Scriptable Apps te ahorra tiempo, puedes apoyar el desarrollo futuro mediante Buy Me a Coffee." data-fr="Si Scriptable Apps vous fait gagner du temps, vous pouvez soutenir son développement via Buy Me a Coffee.">Pokud ti Scriptable Apps šetří čas, můžeš podpořit další vývoj přes Buy Me a Coffee.</p>
+      <a href="https://www.buymeacoffee.com/caseycz" target="_blank" rel="noopener"><img class="support-qr" src="https://caseycz.github.io/support-qr.svg" alt="Buy Me a Coffee QR code"></a>
+      <a class="btn primary" style="width:100%" href="https://www.buymeacoffee.com/caseycz" target="_blank" rel="noopener"><span data-cs="Otevřít Buy Me a Coffee" data-en="Open Buy Me a Coffee" data-de="Buy Me a Coffee öffnen" data-es="Abrir Buy Me a Coffee" data-fr="Ouvrir Buy Me a Coffee">Otevřít Buy Me a Coffee</span></a>
+    </div>
+  </div>
   <script src="./community-extra.js"></script>
   <script>
     const PAGE_SIZE=20;
@@ -217,8 +231,10 @@
       'TeslaData Widget':[['Baterie, nabíjení, zámky, teplota, sentry a stav vozu','Battery, charging, locks, temperature, sentry and vehicle state'],['Podporuje TeslaFi, TeslaLogger, Tronity i vlastní JSON','Supports TeslaFi, TeslaLogger, Tronity and custom JSON'],['Medium může zobrazit mapu polohy + vlastní themes','Medium can show a location map plus custom themes']]
     };
 
+    const SUPPORTED_LANGS=['cs','en','de','es','fr'];
     const savedLang=localStorage.getItem('siteLang');
-    let lang=['cs','en'].includes(savedLang)?savedLang:((navigator.language||'').toLowerCase().startsWith('cs')?'cs':'en');
+    const browserLang=(navigator.language||'en').slice(0,2).toLowerCase();
+    let lang=SUPPORTED_LANGS.includes(savedLang)?savedLang:(SUPPORTED_LANGS.includes(browserLang)?browserLang:'en');
     let theme=localStorage.getItem('siteTheme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');
     let layout=localStorage.getItem('siteLayout')||'grid';
     let communityPage=0;
@@ -228,18 +244,18 @@
     const CATEGORY_LABELS={all:{cs:'Vše',en:'All'},sport:{cs:'Sport',en:'Sport'},weather:{cs:'Počasí',en:'Weather'},news:{cs:'Zprávy',en:'News'},calendar:{cs:'Kalendář',en:'Calendar'},finance:{cs:'Finance',en:'Finance'},space:{cs:'Vesmír',en:'Space'},tools:{cs:'Nástroje',en:'Tools'},reading:{cs:'Čtení',en:'Reading'},cars:{cs:'Auta',en:'Cars'},gaming:{cs:'Hry',en:'Gaming'},music:{cs:'Hudba',en:'Music'},social:{cs:'Sociální',en:'Social'},mobile:{cs:'Mobil',en:'Mobile'},health:{cs:'Zdraví',en:'Health'},travel:{cs:'Cestování',en:'Travel'},art:{cs:'Design',en:'Design'}};
     const tr=(cs,en)=>lang==='cs'?cs:en;
 
-    function applyTheme(next){theme=next==='light'?'light':'dark';localStorage.setItem('siteTheme',theme);document.documentElement.dataset.theme=theme;document.getElementById('themeDark').classList.toggle('active',theme==='dark');document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeColor').content=theme==='dark'?'#0b1020':'#f8fafc'}
+    function applyTheme(next){theme=next==='light'?'light':'dark';localStorage.setItem('siteTheme',theme);document.documentElement.dataset.theme=theme;document.getElementById('themeDark').classList.toggle('active',theme==='dark');document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeColor').content=theme==='dark'?'#070b14':'#eef3f8'}
     function applyLayout(next){layout=next==='list'?'list':'grid';localStorage.setItem('siteLayout',layout);document.body.classList.toggle('layout-list',layout==='list');document.getElementById('layoutGrid').classList.toggle('active',layout==='grid');document.getElementById('layoutList').classList.toggle('active',layout==='list')}
-    function setLanguage(next){lang=next;localStorage.setItem('siteLang',lang);document.documentElement.lang=lang;document.querySelectorAll('[data-cs]').forEach(el=>el.textContent=el.dataset[lang]);const search=document.getElementById('communitySearch');if(search)search.placeholder=search.dataset[lang==='cs'?'placeholderCs':'placeholderEn'];document.getElementById('langCs').classList.toggle('active',lang==='cs');document.getElementById('langEn').classList.toggle('active',lang==='en');renderAll()}
+    function setLanguage(next){lang=SUPPORTED_LANGS.includes(next)?next:'en';localStorage.setItem('siteLang',lang);document.documentElement.lang=lang;document.querySelectorAll('[data-cs]').forEach(el=>{el.textContent=el.getAttribute('data-'+lang)||el.getAttribute('data-en')||el.getAttribute('data-cs')||el.textContent});const search=document.getElementById('communitySearch');if(search)search.placeholder=search.getAttribute('data-placeholder-'+lang)||search.getAttribute('data-placeholder-en')||search.getAttribute('data-placeholder-cs')||'';document.querySelectorAll('[data-language]').forEach(btn=>btn.classList.toggle('active',btn.dataset.language===lang));renderAll()}
 
     async function copyCode(file,id){const status=document.getElementById(id);status.textContent=tr('Kopíruji…','Copying…');try{const response=await fetch(file,{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);await navigator.clipboard.writeText(await response.text());status.textContent=tr('✓ Kód zkopírován','✓ Code copied')}catch(_){status.textContent=tr('⚠️ Kopírování selhalo','⚠️ Copy failed')}}
     async function installRemote(file,filename,name,id){const status=document.getElementById(id);status.textContent=tr('Připravuji instalaci…','Preparing installation…');try{if(/\.scriptable(?:$|\?)/i.test(filename||file)){const a=document.createElement('a');a.href=file;a.download=filename||'script.scriptable';document.body.appendChild(a);a.click();a.remove();status.textContent=tr('✓ Otevírám v Scriptable','✓ Opening in Scriptable');return}const response=await fetch(file,{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);const code=await response.text();if(!code.trim())throw new Error('Empty script');const originalName=((filename||name||'Script').replace(/\.js$/i,'').trim()||'Script');const color=((code.match(/^\s*\/\/\s*icon-color:\s*([^;\r\n]+);/mi)||[])[1]||'deep-blue').trim();const glyph=((code.match(/^\s*\/\/\s*icon-glyph:\s*([^;\r\n]+);/mi)||[])[1]||'code').trim();const pkg={always_run_in_app:false,icon:{color,glyph},name:originalName,script:code,share_sheet_inputs:[]};const blob=new Blob([JSON.stringify(pkg,null,2)],{type:'application/octet-stream'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=originalName.replace(/[\\/:*?"<>|]/g,'-')+'.scriptable';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);status.textContent=tr('✓ Připraveno pro Scriptable','✓ Ready for Scriptable')}catch(_){status.textContent=tr('⚠️ Instalace selhala – otevírám originál','⚠️ Install failed – opening original');window.open(file,'_blank','noopener')}}
 
     function isGenericCommunityFeatures(items){if(!Array.isArray(items)||items.length!==3)return false;const joined=items.join('|').toLowerCase();return joined.includes('open-source projekt')||joined.includes('open-source project')||joined.includes('stahování přímo od autora')||joined.includes('direct download from the author')}
     function researchedFeatures(app,rawFeatures){const details=FEATURE_DETAILS[app.name];if(details)return details.map(pair=>pair[lang==='cs'?0:1]);if(!isGenericCommunityFeatures(rawFeatures))return rawFeatures;const desc=(app.description&&app.description[lang]?app.description[lang]:'').replace(/[.!?]+$/,'');const tagLine=(app.tags||[]).slice(0,3).join(' · ');return [desc,tagLine?tr(`Zaměření: ${tagLine}`,`Focus: ${tagLine}`):tr('Scriptable widget','Scriptable widget'),tr(`Původní projekt autora ${app.author}`,`Original project by ${app.author}`)]}
-    function cardHtml(app,index,external){const rawFeatures=(app.features&&app.features[lang])||[];const visibleFeatures=external?researchedFeatures(app,rawFeatures):rawFeatures;const features=visibleFeatures.length?`<ul class="features">${visibleFeatures.map(x=>`<li title="${String(x).replace(/"/g,'&quot;')}">${x}</li>`).join('')}</ul>`:'';const tags=app.tags.map(x=>`<span class="tag">${x}</span>`).join('');const statusId=(external?'externalStatus':'ourStatus')+index;const imgClass=external?'':' ourPreview';const badge=external?`<div class="externalBadge">${tr('Jiný vývojář','Third-party')}</div>`:`<div class="version">v${app.version}</div>`;const author=external?`<div class="author">${tr('Autor','Author')}: ${app.author}</div>`:'';const actions=external?`<button class="btn primary" type="button" onclick='installRemote(${JSON.stringify(app.file)},${JSON.stringify(app.filename)},${JSON.stringify(app.name)},${JSON.stringify(statusId)})'>${tr('📲 Instalovat','📲 Install')}</button><a class="btn secondary" href="${app.source}" target="_blank" rel="noopener">${tr('↗ Projekt','↗ Project')}</a>`:`<a class="btn primary" href="${app.install}" download>${tr('📲 Instalovat','📲 Install')}</a>`;return `<article class="card"><div class="preview${imgClass}"><img src="${app.preview}" alt="${app.name} preview" loading="lazy" onerror="this.style.display='none'">${badge}</div><div class="body"><div class="titleRow"><div class="appIcon">${app.icon}</div><div class="appTitle"><h3 title="${app.name}">${app.name}</h3><p>${app.description[lang]}</p>${author}</div></div><div class="tags">${tags}</div>${features}<div class="actions ${external?'':'ourActions'}">${actions}</div><div id="${statusId}" class="status"></div></div></article>`}
+    function cardHtml(app,index,external){const rawFeatures=(app.features&&app.features[lang])||app.features?.en||app.features?.cs||[];const visibleFeatures=external?researchedFeatures(app,rawFeatures):rawFeatures;const features=visibleFeatures.length?`<ul class="features">${visibleFeatures.map(x=>`<li title="${String(x).replace(/"/g,'&quot;')}">${x}</li>`).join('')}</ul>`:'';const tags=app.tags.map(x=>`<span class="tag">${x}</span>`).join('');const statusId=(external?'externalStatus':'ourStatus')+index;const imgClass=external?'':' ourPreview';const badge=external?`<div class="externalBadge">${tr('Jiný vývojář','Third-party')}</div>`:`<div class="version">v${app.version}</div>`;const author=external?`<div class="author">${tr('Autor','Author')}: ${app.author}</div>`:'';const actions=external?`<button class="btn primary" type="button" onclick='installRemote(${JSON.stringify(app.file)},${JSON.stringify(app.filename)},${JSON.stringify(app.name)},${JSON.stringify(statusId)})'>${tr('📲 Instalovat','📲 Install')}</button><a class="btn secondary" href="${app.source}" target="_blank" rel="noopener">${tr('↗ Projekt','↗ Project')}</a>`:`<a class="btn primary" href="${app.install}" download>${tr('📲 Instalovat','📲 Install')}</a>`;return `<article class="card"><div class="preview${imgClass}"><img src="${app.preview}" alt="${app.name} preview" loading="lazy" onerror="this.style.display='none'">${badge}</div><div class="body"><div class="titleRow"><div class="appIcon">${app.icon}</div><div class="appTitle"><h3 title="${app.name}">${app.name}</h3><p>${app.description?.[lang]||app.description?.en||app.description?.cs||''}</p>${author}</div></div><div class="tags">${tags}</div>${features}<div class="actions ${external?'':'ourActions'}">${actions}</div><div id="${statusId}" class="status"></div></div></article>`}
 
-    function categoryLabel(category){const x=CATEGORY_LABELS[category]||{cs:category,en:category};return x[lang]||category}
+    function categoryLabel(category){const x=CATEGORY_LABELS[category]||{cs:category,en:category};return x[lang]||x.en||x.cs||category}
     function normalizeSearch(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
     function filteredCommunityApps(){let rows=communityCategory==='all'?communityApps:communityApps.filter(app=>app.category===communityCategory);const q=normalizeSearch(communitySearch);if(!q)return rows;return rows.filter(app=>{const haystack=[app.name,app.author,app.category,...(app.tags||[]),app.description?.cs,app.description?.en,...(app.features?.cs||[]),...(app.features?.en||[])].filter(Boolean).join(' ');return normalizeSearch(haystack).includes(q)})}
     function renderCategoryFilter(){const select=document.getElementById('categoryFilter');const present=new Set(communityApps.map(app=>app.category));const options=CATEGORY_ORDER.filter(x=>x==='all'||present.has(x));select.innerHTML=options.map(x=>`<option value="${x}">${categoryLabel(x)}</option>`).join('');select.value=communityCategory}
@@ -251,9 +267,10 @@
     function renderCommunity(){const filtered=filteredCommunityApps();const start=communityPage*PAGE_SIZE;const rows=filtered.slice(start,start+PAGE_SIZE);document.getElementById('communityGrid').innerHTML=rows.length?rows.map((app,i)=>cardHtml(app,start+i,true)).join(''):`<div class="emptyState">${tr('Pro tento filtr nebo hledání nebyl nalezen žádný projekt.','No projects matched this filter or search.')}</div>`;renderPagination()}
     function renderAll(){document.getElementById('ourCount').textContent=ourApps.length+' '+tr(ourApps.length===1?'aplikace':'aplikací',ourApps.length===1?'app':'apps');document.getElementById('ourGrid').innerHTML=ourApps.map((app,i)=>cardHtml(app,i,false)).join('');renderCategoryFilter();const search=document.getElementById('communitySearch');if(search)search.value=communitySearch;updateCommunityCount();renderCommunity()}
 
-    document.getElementById('langCs').addEventListener('click',()=>setLanguage('cs'));document.getElementById('langEn').addEventListener('click',()=>setLanguage('en'));
+    document.querySelectorAll('[data-language]').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.language)));
     document.getElementById('themeDark').addEventListener('click',()=>applyTheme('dark'));document.getElementById('themeLight').addEventListener('click',()=>applyTheme('light'));document.getElementById('layoutGrid').addEventListener('click',()=>applyLayout('grid'));document.getElementById('layoutList').addEventListener('click',()=>applyLayout('list'));
     document.getElementById('settingsBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('settingsPanel').classList.toggle('open')});document.getElementById('settingsPanel').addEventListener('click',e=>e.stopPropagation());document.addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
+    let supportReturnFocus=null;function openSupport(){const modal=document.getElementById('supportModal');supportReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;modal?.classList.add('open');document.body.classList.add('modal-open');modal?.setAttribute('aria-hidden','false');requestAnimationFrame(()=>modal?.querySelector('[data-support-close]')?.focus())}function closeSupport(){const modal=document.getElementById('supportModal');const wasOpen=modal?.classList.contains('open');modal?.classList.remove('open');document.body.classList.remove('modal-open');modal?.setAttribute('aria-hidden','true');if(wasOpen&&supportReturnFocus){const target=supportReturnFocus;supportReturnFocus=null;requestAnimationFrame(()=>target.focus?.())}}document.querySelectorAll('[data-support-open]').forEach(btn=>btn.addEventListener('click',openSupport));document.querySelectorAll('[data-support-close]').forEach(btn=>btn.addEventListener('click',closeSupport));document.getElementById('supportModal')?.addEventListener('click',e=>{if(e.target.id==='supportModal')closeSupport()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSupport()});
     applyTheme(theme);applyLayout(layout);setLanguage(lang);
   </script>
 </body>

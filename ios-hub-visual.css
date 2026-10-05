@@ -5,7 +5,7 @@ body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var
 .wrap{width:min(1380px,calc(100% - 32px));margin:auto}
 
 /* Exact iOS Hub header geometry and controls */
-.topbar{position:sticky;top:0;z-index:100;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--page) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.topbar{position:sticky;top:0;z-index:100;display:block;padding:0;gap:0;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--page) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .topbar-inner{min-height:68px;display:flex;align-items:center;gap:18px}
 .brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:-.03em;white-space:nowrap}
 .brand-mark{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--action2),var(--action));box-shadow:0 10px 28px rgba(14,165,233,.23);font-size:12px}
@@ -18,8 +18,10 @@ body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var
 .icon-btn{width:38px;display:grid;place-items:center;cursor:pointer;padding:0}
 .compact-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;font-size:11px;font-weight:850;cursor:pointer}
 .compact-btn:hover,.icon-btn:hover{border-color:var(--accent)}
-.nav-app-primary{background:linear-gradient(135deg,var(--action2),var(--action))!important;border-color:var(--action)!important;color:#fff!important;box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 22%,transparent)}
-.nav-app-primary:hover{border-color:color-mix(in srgb,#fff 55%,var(--accent))!important}
+.nav-support-primary{background:linear-gradient(135deg,var(--action2),var(--action))!important;border-color:var(--action)!important;color:#fff!important;box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 22%,transparent)}
+.nav-support-primary:hover{border-color:color-mix(in srgb,#fff 55%,var(--accent))!important}
+.compact-brand-icon{width:14px;height:14px;display:block;object-fit:contain}
+.settings-language-list img{width:22px;height:15px;border-radius:2px;display:block;object-fit:cover}
 
 /* Exact iOS Hub settings panel */
 .settings-menu{position:relative}
@@ -42,6 +44,17 @@ body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var
 .settings-layout-seg button{min-height:38px;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--muted);font-size:15px;font-weight:850;cursor:pointer}
 .settings-layout-seg button:hover{border-color:var(--accent)}
 .settings-layout-seg button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+
+/* Same support dialog as iOS Hub */
+.support-backdrop{position:fixed;inset:0;z-index:1300;display:none;place-items:center;padding:20px;background:rgba(2,6,23,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.support-backdrop.open{display:grid}
+.support-dialog{position:relative;width:min(420px,100%);padding:22px;border:1px solid var(--border);border-radius:24px;background:linear-gradient(180deg,var(--panel),var(--input));box-shadow:0 30px 100px rgba(0,0,0,.45);text-align:center}
+.support-close{position:absolute;right:14px;top:14px;width:36px;height:36px;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--muted);font-size:20px;cursor:pointer}
+.support-dialog h2{margin:14px 42px 8px;letter-spacing:-.04em}
+.support-dialog p{color:var(--muted);font-size:12px;line-height:1.5}
+.support-qr{width:min(260px,100%);display:block;margin:16px auto;padding:9px;border-radius:18px;background:#fff;border:1px solid var(--border)}
+body.modal-open{overflow:hidden}
 
 /* iOS Hub hero / content sizing */
 .hero{padding:78px 0 46px;text-align:center}
@@ -66,9 +79,9 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
   .brand small{display:none}
   .brand-mark{width:36px;height:36px}
   .nav-actions{gap:5px}
-  .nav-app-primary{width:38px;padding:0;font-size:0}
-  .nav-app-primary::before{content:"";font-size:15px}
-  .nav-app-primary>span{display:none}
+  .nav-support-primary{width:38px;padding:0}
+  .nav-support-primary .support-label{display:none}
+  .compact-brand-icon{width:15px;height:15px}
   .settings-panel{top:70px;right:10px;width:min(310px,calc(100vw - 20px))}
   .hero{padding:54px 0 30px}
   .hero h1{font-size:clamp(40px,14vw,61px)}
