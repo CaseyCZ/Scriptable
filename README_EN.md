@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  A collection of custom <strong>Scriptable</strong> apps and iPhone widgets with a public catalog.
+  A collection of <strong>Scriptable</strong> apps and iPhone widgets — some are original projects, while others are based on public Scriptable scripts that we significantly modified and expanded.
 </p>
 
 <p align="center">
@@ -26,14 +26,25 @@
     <tr><td><strong>Sports Info</strong></td><td><code>v2.5.41</code></td><td>A universal sports widget for multiple sports and competitions.</td><td><a href="./apps/Sports-Info/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Info" /></a></td></tr>
     <tr><td><strong>Sideload Watch</strong></td><td><code>v0.2.25</code></td><td>Tracks new versions of selected sideload apps from the iOS-Hub catalog.</td><td><a href="./apps/Sideload-Watch/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Sideload Watch" /></a></td></tr>
     <tr><td><strong>Home Dashboard</strong></td><td><code>v0.3.13</code></td><td>A dashboard for websites, servers, JSON APIs, GitHub and the local network.</td><td><a href="./apps/Home-Dashboard/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Home Dashboard" /></a></td></tr>
-    <tr><td><strong>Homebridge Status</strong></td><td><code>v0.1.13</code></td><td>Testing Homebridge monitor with automatic LAN → VPN fallback, customizable appearance, notifications and multiple widget sizes.</td><td><a href="./apps/Homebridge-Status/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Homebridge Status" /></a></td></tr>
-    <tr><td><strong>Sports Live</strong></td><td><code>planned</code></td><td>A widget focused on quick live scores across sports.</td><td><a href="./apps/Sports-Live/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Live" /></a></td></tr>
+    <tr><td><strong>Homebridge Status</strong></td><td><code>v0.1.13</code></td><td>Homebridge monitoring with automatic LAN → VPN fallback, customizable appearance, notifications and multiple widget sizes.</td><td><a href="./apps/Homebridge-Status/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Homebridge Status" /></a></td></tr>
+    <tr><td><strong>Sports Live</strong></td><td><code>v0.3.3</code></td><td>A development widget for a fast live overview of one selected team across sports.</td><td><a href="./apps/Sports-Live/"><img src="https://img.shields.io/badge/Open-Project-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Live" /></a></td></tr>
   </tbody>
 </table>
 
 ## About
 
 Scriptable Apps are practical tools for everyday iPhone use. Each app has its own README and an overview of its main features.
+
+## Origin and credits
+
+For projects that started from an existing public script, we credit the original reference and authors directly in the app README:
+
+- **LockScreen Generator** — based on [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) by [ajatkj / Ankit Jain](https://github.com/ajatkj).
+- **Homebridge Status** — based on [homebridgeStatusWidget](https://github.com/lwitzani/homebridgeStatusWidget) by [lwitzani](https://github.com/lwitzani).
+- **Sports Live** — originally based on [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **thisisevanfox & Nicolas-kings**.
+- **Sports Info** — our own multi-sport implementation, designed using the architecture of our LockScreen Generator as a reference.
+
+These projects were subsequently substantially redesigned and expanded beyond their original references; details are documented in each app README.
 
 <p>
   <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable for iPhone" /></a>
