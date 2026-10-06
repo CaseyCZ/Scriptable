@@ -68,6 +68,25 @@ jobs:
       - name: Sync release metadata
         run: python .github/scripts/sync_release_metadata.py
 
+      - name: Render settings WebView JavaScript
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const src=fs.readFileSync('apps/Sports-Info/Sports Info.js','utf8');
+          const marker='let SETTINGS=await firstLanguage(loadSettings());';
+          const i=src.indexOf(marker); if(i<0)throw new Error('main marker missing');
+          const fm={documentsDirectory:()=>'/tmp',cacheDirectory:()=>'/tmp',joinPath:(a,b)=>a+'/'+b,fileExists:()=>false,readString:()=>'',writeString:()=>{},remove:()=>{},readImage:()=>null,writeImage:()=>{},listContents:()=>[]};
+          const ctx={console,FileManager:{local:()=>fm,iCloud:()=>fm},Device:{locale:()=> 'cs-CZ',isUsingDarkAppearance:()=>true,screenSize:()=>({width:390,height:844})},config:{runsInWidget:false},args:{queryParameters:{}},module:{filename:'/tmp/Sports Info.js'}};
+          vm.createContext(ctx);
+          vm.runInContext(src.slice(0,i)+'\nglobalThis.__AUDIT_HTML=html(merge({...DEFAULTS,language:"cs"}));',ctx);
+          fs.writeFileSync('/tmp/sports-settings.html',ctx.__AUDIT_HTML);
+          const scriptStart=ctx.__AUDIT_HTML.indexOf('<script>');
+          const scriptEnd=ctx.__AUDIT_HTML.indexOf('</script>',scriptStart+8);
+          if(scriptStart<0||scriptEnd<=scriptStart)throw new Error('settings script missing');
+          fs.writeFileSync('/tmp/sports-settings-ui.js',ctx.__AUDIT_HTML.slice(scriptStart+8,scriptEnd));
+          NODE
+          node --check /tmp/sports-settings-ui.js
+
       - name: Audit settings UI wiring
         run: python .github/scripts/audit_sports_info_ui.py
 
