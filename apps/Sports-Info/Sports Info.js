@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.33
+// Sports Info v2.5.34
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.33";
+const APP_VERSION = "2.5.34";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -222,7 +222,7 @@ async function sportsApiBundle(s){const m=league(s),key=`bundle:${m.id}`;if(SPOR
 
 const SOFA_MEM={};
 const SOFA_HEADERS=Object.assign({},BROWSER_HEADERS,{"Referer":"https://www.sofascore.com/"});
-async function sofaJSON(s,path){const base=s.apiSofaBase||DEFAULTS.apiSofaBase;return await requestJSON(`${base}${path}`,SOFA_HEADERS)}
+async function sofaJSON(s,path){const primary=s.apiSofaBase||DEFAULTS.apiSofaBase,bases=[primary,"https://www.sofascore.com/api/v1"].filter((x,i,a)=>x&&a.indexOf(x)===i);let err=null;for(const base of bases)try{return await requestJSON(`${String(base).replace(/\/+$/,"")}${path}`,SOFA_HEADERS)}catch(e){err=e}throw err||new Error("SofaScore request failed")}
 function sofaTournamentList(d){let list=d?.uniqueTournaments||d?.tournaments||d?.data?.uniqueTournaments||d?.data?.tournaments||d?.data||[];if(!Array.isArray(list))list=[];return list.map(x=>x?.uniqueTournament||x?.tournament||x).filter(x=>x?.id)}
 function normKey(v){try{return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}catch(_){return String(v||"").toLowerCase()}}
 function pickSofaTournament(list,m){const queries=String(m.sofaQuery||m.query||m.sportsApiQuery||"").split("|").map(normKey).filter(Boolean);let best=null,bestScore=-1;for(const t of list){const n=normKey(`${t.name||""} ${t.slug||""} ${t.category?.name||""}`);let score=0;for(const q of queries){if(n===q)score=Math.max(score,100);else if(n.includes(q))score=Math.max(score,80+q.length);else{const words=q.split(" ").filter(x=>x.length>2),hits=words.filter(x=>n.includes(x)).length;score=Math.max(score,hits*12)}}if(score>bestScore){bestScore=score;best=t}}return bestScore>0?best:null}
