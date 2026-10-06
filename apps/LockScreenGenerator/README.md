@@ -26,6 +26,10 @@
 
 **LockScreen Generator** umožňuje sestavit tapetu podle toho, co chceš na Lock Screenu opravdu vidět. Obsah, pořadí, vzhled i jednotlivé moduly lze upravit přímo v aplikaci.
 
+## Původ a poděkování
+
+Při vzniku projektu jsme použili [**LSWeather**](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) od [**ajatkj (Ankit Jain)**](https://github.com/ajatkj) jako předlohu pro princip generování dynamické Lock Screen tapety pomocí Scriptable a Shortcuts. Současný **LockScreen Generator** byl následně výrazně přepracován a rozšířen o vlastní uživatelské rozhraní, moduly, lokalizace, automatický layout, diagnostiku a další funkce.
+
 ## Hlavní funkce
 
 - 📅 kalendář a připomínky
