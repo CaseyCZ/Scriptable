@@ -1,44 +1,108 @@
-name: Apply Sports Info Livesport fix
+name: Probe Czech hockey Livesport standings
 
 on:
   push:
-    branches:
-      - Master
+    branches: [Master]
     paths:
       - '.github/workflows/probe-sofascore-floorball.yml'
 
-permissions:
-  contents: write
-
 jobs:
-  patch:
+  probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Master
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: Master
-          fetch-depth: 0
 
-      - name: Apply Sports Info patch
-        run: python .github/scripts/patch-sports-info-livesport.py
-
-      - name: Validate JavaScript syntax
-        run: |
-          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
-          node --check /tmp/SportsInfo.mjs
-
-      - name: Verify v2.5.40 markers
+      - name: Verify Sports Info v2.5.40 mapping
         run: |
           grep -F 'const APP_VERSION = "2.5.40";' 'apps/Sports-Info/Sports Info.js'
-          grep -F 'id:"floorball.cz",provider:"livesport"' 'apps/Sports-Info/Sports Info.js'
+          grep -F 'id:"hockey.cz",provider:"livesport"' 'apps/Sports-Info/Sports Info.js'
           grep -F 'global.flashscore.ninja/1/x/feed/to_' 'apps/Sports-Info/Sports Info.js'
-          grep -F 'Livesport OK · ${d.events.length} events · ${d.table.length} rows' 'apps/Sports-Info/Sports Info.js'
 
-      - name: Commit Sports Info v2.5.40
+      - name: Fetch current Tipsport Extraliga table through the same Livesport feed
+        shell: bash
         run: |
-          git config user.name 'CaseyCZ'
-          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
-          git add 'apps/Sports-Info/Sports Info.js'
-          git commit -m 'Fix Livesport standings and Czech floorball source'
-          git push origin HEAD:Master
+          set -euo pipefail
+          UA='Mozilla/5.0 (iPhone; CPU iPhone OS like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148'
+          curl -fsSL \
+            -H "User-Agent: $UA" \
+            -H 'Accept-Language: en-US,en;q=0.9,cs;q=0.8' \
+            -H 'Referer: https://www.livesport.com/' \
+            'https://www.livesport.com/hockey/czech-republic/extraliga/' \
+            -o /tmp/extraliga.html
+
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          html=Path('/tmp/extraliga.html').read_text('utf-8','ignore')
+          patterns=[
+              r'cjs\.initialFeeds\["summary-results"\]\s*=\s*\{\s*data:\s*`([\s\S]*?)`',
+              r'cjs\.initialFeeds\["summary-fixtures"\]\s*=\s*\{\s*data:\s*`([\s\S]*?)`',
+          ]
+          match=next((re.search(p,html) for p in patterns if re.search(p,html)),None)
+          if not match:
+              raise SystemExit('summary-results/summary-fixtures feed not found')
+          feed=match.group(1)
+          head=feed.split('¬~AA÷')[0]
+          meta={}
+          for part in head.split('¬'):
+              if '÷' in part:
+                  key,value=part.split('÷',1)
+                  meta[key]=value
+          tournament=meta.get('ZE','')
+          stage=meta.get('ZC','')
+          if not tournament or not stage:
+              raise SystemExit(f'Livesport table ids missing: ZE={tournament!r} ZC={stage!r}')
+          url=f'https://global.flashscore.ninja/1/x/feed/to_{tournament}_{stage}_1'
+          Path('/tmp/table_url').write_text(url)
+          print('Tournament ID:',tournament)
+          print('Stage ID:',stage)
+          print('Table feed:',url)
+          PY
+
+          TABLE_URL=$(cat /tmp/table_url)
+          curl -fsSL \
+            -H "User-Agent: $UA" \
+            -H 'Accept: */*' \
+            -H 'Accept-Language: cs-CZ,cs;q=0.9,en;q=0.8' \
+            -H 'Referer: https://www.livesport.cz/' \
+            -H 'Origin: https://www.livesport.cz' \
+            -H 'x-fsign: SW9D1eZo' \
+            "$TABLE_URL" \
+            -o /tmp/extraliga-table.txt
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          raw=Path('/tmp/extraliga-table.txt').read_text('utf-8','ignore')
+          rows=[]
+          seen=set()
+          for record in raw.split('~'):
+              fields={}
+              for part in record.split('¬'):
+                  if '÷' in part:
+                      key,value=part.split('÷',1)
+                      fields[key]=value
+              team_id=fields.get('TI')
+              name=fields.get('TN')
+              if team_id and name and team_id not in seen:
+                  seen.add(team_id)
+                  rows.append({
+                      'rank': fields.get('TR',''),
+                      'name': name,
+                      'played': fields.get('TM',''),
+                      'wins': fields.get('TW',''),
+                      'losses': fields.get('TL',''),
+                      'score': fields.get('TG',''),
+                      'points': fields.get('TP',''),
+                  })
+          print('Parsed standings rows:',len(rows))
+          for row in rows:
+              print(f"{row['rank']:>2} {row['name']} | GP {row['played']} | W {row['wins']} | L {row['losses']} | {row['score']} | PTS {row['points']}")
+          if len(rows) < 12:
+              raise SystemExit(f'Expected at least 12 Extraliga standings rows, got {len(rows)}')
+          if not any('Liberec' in row['name'] for row in rows):
+              raise SystemExit('Expected Liberec in Czech Extraliga standings')
+          print('CZECH HOCKEY STANDINGS LIVE TEST: OK')
+          PY
