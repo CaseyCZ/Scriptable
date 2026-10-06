@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/VERZE-v2.5.32-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Info verze 2.5.32" />
+  <img src="https://img.shields.io/badge/VERZE-v2.5.33-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Info verze 2.5.33" />
 </p>
 
 <p align="center">
