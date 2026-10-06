@@ -1,0 +1,86 @@
+name: Patch Sports Info Czech floorball
+
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-sports-info-floorball.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Patch Czech floorball provider
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('apps/Sports-Info/Sports Info.js')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = [
+              (
+                  '// Sports Info v2.5.37',
+                  '// Sports Info v2.5.39',
+              ),
+              (
+                  'const APP_VERSION = "2.5.37";',
+                  'const APP_VERSION = "2.5.39";',
+              ),
+              (
+                  '{id:"floorball.cz",provider:"livesport",lsPath:"/floorball/czech-republic/livesport-superliga/",flag:"🇨🇿",cs:"Livesport Superliga",en:"Czech Livesport Superliga",de:"Tschechische Livesport Superliga",es:"Livesport Superliga Checa"}',
+                  '{id:"floorball.cz",provider:"floorball",lsPath:"/floorball/czech-republic/livesport-superliga/",sofaId:829,sofaSport:"floorball",sportsApiQuery:"Superliga Czechia",flag:"🇨🇿",cs:"Livesport Superliga",en:"Czech Livesport Superliga",de:"Tschechische Livesport Superliga",es:"Livesport Superliga Checa"}',
+              ),
+              (
+                  'm.provider==="floorball"?(s.sportsApiKey?"SportsAPI Pro":"Florbal")',
+                  'm.provider==="floorball"?(s.sportsApiKey?"SofaScore + SportsAPI Pro":"SofaScore · bez klíče")',
+              ),
+              (
+                  'if(m.provider==="floorball"){if(s.sportsApiKey){await limited(()=>sportsApiResolve(s),7500,"SportsAPI Pro");return "SportsAPI Pro OK"}throw new Error("No floorball source mapping")}',
+                  'if(m.provider==="floorball"){const d=await limited(()=>floorballBundle(s),9000,"Floorball");return `SofaScore OK · ${d.events.length} events · ${d.table.length} rows${s.sportsApiKey?" · SportsAPI fallback ready":""}`}',
+              ),
+          ]
+
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly one match, found {count}: {old[:100]}')
+              text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Verify patch
+        shell: bash
+        run: |
+          grep -F 'const APP_VERSION = "2.5.39";' 'apps/Sports-Info/Sports Info.js'
+          grep -F 'id:"floorball.cz",provider:"floorball"' 'apps/Sports-Info/Sports Info.js'
+          grep -F 'sofaId:829' 'apps/Sports-Info/Sports Info.js'
+
+      - name: Commit patch
+        shell: bash
+        run: |
+          if git diff --quiet -- 'apps/Sports-Info/Sports Info.js'; then
+            echo 'No changes to commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'apps/Sports-Info/Sports Info.js'
+          git commit -m 'Fix Czech floorball via SofaScore'
+          git push origin HEAD:Master
