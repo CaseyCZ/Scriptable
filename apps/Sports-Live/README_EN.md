@@ -10,22 +10,27 @@
 <h1 align="center">🔴 Sports Live</h1>
 
 <p align="center">
-  A planned <strong>Scriptable</strong> widget focused on a fast overview of live scores across sports.
+  A <strong>Scriptable</strong> sports widget focused on a fast overview of one selected team.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/VERSION-PLANNED-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Live planned" />
+  <img src="https://img.shields.io/badge/VERSION-v0.3.3-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Live version 0.3.3" />
 </p>
 
 <p align="center">
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Website-Catalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable catalog" /></a>
+  <a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download Sports Live JavaScript" /></a>
 </p>
 
 ## About
 
-**Sports Live** is planned as a simpler companion to Sports Info. The goal is to show games being played right now and the most important live information without opening a full detailed sports overview.
+**Sports Live** is a simpler companion to Sports Info. It focuses on one selected team and quickly shows live status, the nearest game, upcoming schedule and basic team information. It uses the same multi-provider data layer as Sports Info, while its visual system follows Homebridge Status.
 
-## Planned sports
+## Origin and credits
+
+Sports Live originally started from [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **thisisevanfox & Nicolas-kings (Nicolasking007)**. We used the original NBA widget as a reference and starting point. The current Sports Live was then substantially redesigned into a multi-sport app with its own data sources, sport/competition/team selection, new settings and the CaseyCZ Scriptable Apps visual style.
+
+## Supported sports
 
 - ⚽ football
 - 🏒 hockey
@@ -33,15 +38,19 @@
 - 🥅 floorball
 - ⚾ baseball
 
-## Planned features
+## Main features
 
-- 🔴 fast live overview
-- ⏱️ current score and match progress
-- ⭐ favorite leagues or teams
-- 📱 layouts designed for Scriptable widgets
-- 🌍 multilingual UI in the same CaseyCZ style
+- 🔴 live status for the selected team
+- ⏭️ nearest game and upcoming schedule
+- 📊 basic team statistics
+- 🎯 sport, competition and single-team selection
+- 📱 Small / Medium widgets
+- 🎨 custom theme, colors and background image
+- 🌍 multilingual UI
+- 🔄 in-app updates through Scriptable
+- 🧰 diagnostics, cache and settings backup
 
-> Sports Live is still in development. The install package will be published when the app is ready for normal use.
+> Sports Live is still under development. The current JavaScript source is available in the repository; a standalone `.scriptable` install package has not been published yet.
 
 ## Support
 
