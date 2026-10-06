@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.38
+// Sports Info v2.5.37
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.38";
+const APP_VERSION = "2.5.37";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -594,7 +594,7 @@ async function settings(s){
   return cur
 }
 function cmp(a,b){const A=String(a).split('.').map(Number),B=String(b).split('.').map(Number);for(let i=0;i<Math.max(A.length,B.length);i++){if((A[i]||0)>(B[i]||0))return 1;if((A[i]||0)<(B[i]||0))return-1}return 0}
-async function updater(s){try{let src="";try{const api="https://api.github.com/repos/CaseyCZ/Scriptable/contents/apps/Sports-Info/Sports%20Info.js?ref=Master&t="+Date.now(),d=await requestJSON(api,{"User-Agent":"Scriptable Sports Info","Accept":"application/vnd.github+json"});if(d?.content)src=Data.fromBase64String(String(d.content).replace(/\s/g,"")).toRawString()}catch(e){console.log("GitHub Contents update fallback: "+e)}if(!src||src.length<UPDATE_MIN_BYTES){const sep=UPDATE_SOURCE_URL.includes("?")?"&":"?";src=await getString(`${UPDATE_SOURCE_URL}${sep}t=${Date.now()}`)}if(!src||src.length<UPDATE_MIN_BYTES)throw new Error("Bad source");const m=src.match(/const APP_VERSION\s*=\s*"([^"]+)"/);if(!m)throw new Error("No version");const v=m[1];if(cmp(v,APP_VERSION)<=0)return{ok:true,text:`${tx(s,"current")} v${APP_VERSION}`};const a=new Alert();a.title=APP_NAME;a.message=`${tx(s,"available")}: v${v}`;a.addAction(tx(s,"apply"));a.addCancelAction(tx(s,"cancel"));if(await a.presentAlert()!==0)return{ok:true,text:`v${APP_VERSION} → v${v}`};const target=module.filename;if(!target)throw new Error("Current script path unavailable");const managers=[FileManager.local(),FileManager.iCloud()];let targetFm=null;for(const x of managers){try{if(x.fileExists(target)){targetFm=x;break}}catch(_){}}if(!targetFm)throw new Error(`Current script file not found: ${target}`);try{if(targetFm===managers[1]&&!targetFm.isFileDownloaded(target))await targetFm.downloadFileFromiCloud(target)}catch(_){}const b=/\.js$/i.test(target)?target.replace(/\.js$/i,`_backup_v${APP_VERSION}.js`):target+`_backup_v${APP_VERSION}.js`;try{targetFm.writeString(b,targetFm.readString(target))}catch(_){}targetFm.writeString(target,src);return{ok:true,text:tx(s,"updatedOk")}}catch(e){console.log(e);return{ok:false,text:`${tx(s,"updateFail")} ${String(e?.message||e).slice(0,90)}`}}
+async function updater(s){try{const sep=UPDATE_SOURCE_URL.includes("?")?"&":"?";const src=await getString(`${UPDATE_SOURCE_URL}${sep}t=${Date.now()}`);if(!src||src.length<UPDATE_MIN_BYTES)throw new Error("Bad source");const m=src.match(/const APP_VERSION\s*=\s*"([^"]+)"/);if(!m)throw new Error("No version");const v=m[1];if(cmp(v,APP_VERSION)<=0)return{ok:true,text:`${tx(s,"current")} v${APP_VERSION}`};const a=new Alert();a.title=APP_NAME;a.message=`${tx(s,"available")}: v${v}`;a.addAction(tx(s,"apply"));a.addCancelAction(tx(s,"cancel"));if(await a.presentAlert()!==0)return{ok:true,text:`v${APP_VERSION} → v${v}`};const target=module.filename;if(!target)throw new Error("Current script path unavailable");const managers=[FileManager.local(),FileManager.iCloud()];let targetFm=null;for(const x of managers){try{if(x.fileExists(target)){targetFm=x;break}}catch(_){}}if(!targetFm)throw new Error(`Current script file not found: ${target}`);try{if(targetFm===managers[1]&&!targetFm.isFileDownloaded(target))await targetFm.downloadFileFromiCloud(target)}catch(_){}const b=/\.js$/i.test(target)?target.replace(/\.js$/i,`_backup_v${APP_VERSION}.js`):target+`_backup_v${APP_VERSION}.js`;try{targetFm.writeString(b,targetFm.readString(target))}catch(_){}targetFm.writeString(target,src);return{ok:true,text:tx(s,"updatedOk")}}catch(e){console.log(e);return{ok:false,text:tx(s,"updateFail")}}}
 
 let SETTINGS=await firstLanguage(loadSettings());
 const PREVIEW_FAMILY=String(args.queryParameters?.sportsPreview||"");
