@@ -28,7 +28,7 @@
 
 ## Origin and credits
 
-Sports Live originally started from [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **thisisevanfox & Nicolas-kings (Nicolasking007)**. We used the original NBA widget as a reference and starting point. The current Sports Live was then substantially redesigned into a multi-sport app with its own data sources, sport/competition/team selection, new settings and the CaseyCZ Scriptable Apps visual style.
+Sports Live originally started from [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **Nicolas-kings**, which in turn builds on the original [**NBA MyTeam widget**](https://github.com/thisisevanfox/nba-my-team-ios-widget) by [**thisisevanfox**](https://github.com/thisisevanfox). The ONE-NBA source header itself credits **thisisevanfox & Nicolas-kings** as authors. We used that NBA codebase as a reference and starting point; the current Sports Live was then substantially redesigned into a multi-sport app with its own data sources, sport/competition/team selection, new settings and the CaseyCZ Scriptable Apps visual style.
 
 ## Supported sports
 
