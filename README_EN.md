@@ -41,7 +41,7 @@ For projects that started from an existing public script, we credit the original
 
 - **LockScreen Generator** — based on [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) by [ajatkj / Ankit Jain](https://github.com/ajatkj).
 - **Homebridge Status** — based on [homebridgeStatusWidget](https://github.com/lwitzani/homebridgeStatusWidget) by [lwitzani](https://github.com/lwitzani).
-- **Sports Live** — originally based on [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **thisisevanfox & Nicolas-kings**.
+- **Sports Live** — based on [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **Nicolas-kings**, which builds on the [NBA MyTeam widget](https://github.com/thisisevanfox/nba-my-team-ios-widget) by [thisisevanfox](https://github.com/thisisevanfox); the ONE-NBA source header credits both **thisisevanfox & Nicolas-kings**.
 - **Sports Info** — our own multi-sport implementation, designed using the architecture of our LockScreen Generator as a reference.
 
 These projects were subsequently substantially redesigned and expanded beyond their original references; details are documented in each app README.
