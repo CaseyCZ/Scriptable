@@ -1,8 +1,10 @@
 # Homebridge Status
 
-> **Testing build:** the app is intentionally hidden from the public website catalog for now. The install package remains in the repository for private testing.
-
 Homebridge Status is a Scriptable widget for monitoring Homebridge in the shared CaseyCZ Scriptable Apps style.
+
+## Origin and credits
+
+Homebridge Status is based on [**homebridgeStatusWidget**](https://github.com/lwitzani/homebridgeStatusWidget) by [**lwitzani**](https://github.com/lwitzani), whose Homebridge API logic was used as the original foundation and reference. The current version was then extensively redesigned and expanded with its own interface, LAN → VPN fallback, multiple widget sizes, notifications, custom settings and additional features.
 
 ## Main features
 
@@ -35,4 +37,4 @@ On first launch the script attempts to migrate the main settings from the old `h
 
 ## Version
 
-Current testing version: **v0.1.13**
+Current version: **v0.1.13**
