@@ -1,0 +1,49 @@
+name: Probe SofaScore floorball API
+
+on:
+  push:
+    paths:
+      - '.github/workflows/probe-sofascore-floorball.yml'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe endpoints
+        shell: bash
+        run: |
+          set -u
+          H='User-Agent: Mozilla/5.0'
+          echo '=== /unique-tournament/829/seasons ==='
+          curl -sS -L -H "$H" -w '\nHTTP %{http_code}\n' 'https://api.sofascore.com/api/v1/unique-tournament/829/seasons' | head -c 5000
+          echo
+          echo '=== floorball tournaments matching Czech / 829 ==='
+          curl -sS -L -H "$H" 'https://api.sofascore.com/api/v1/sport/floorball/unique-tournaments' -o /tmp/tournaments.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/tournaments.json'))
+          def walk(x):
+              if isinstance(x,dict):
+                  if x.get('id')==829 or 'czech' in str(x.get('category',{})).lower() or 'superliga' in str(x.get('name','')).lower():
+                      print(json.dumps(x,ensure_ascii=False)[:3000])
+                  for v in x.values(): walk(v)
+              elif isinstance(x,list):
+                  for v in x: walk(v)
+          walk(d)
+          PY
+          for date in 2026-09-26 2026-10-04 2026-10-06 2026-10-11; do
+            echo "=== scheduled $date matching Czech / 829 ==="
+            curl -sS -L -H "$H" "https://api.sofascore.com/api/v1/sport/floorball/scheduled-events/$date" -o /tmp/events.json || true
+            python3 - <<'PY'
+          import json
+          try:d=json.load(open('/tmp/events.json'))
+          except Exception as e:
+              print('json error',e); raise SystemExit
+          for e in d.get('events',[]):
+              u=((e.get('tournament') or {}).get('uniqueTournament') or {})
+              cat=(u.get('category') or (e.get('tournament') or {}).get('category') or {})
+              if u.get('id')==829 or 'czech' in str(cat).lower() or 'extraliga' in str(u.get('name','')).lower() or 'superliga' in str(u.get('name','')).lower():
+                  out={'event':e.get('id'),'startTimestamp':e.get('startTimestamp'),'uniqueTournament':u,'season':e.get('season'),'tournament':e.get('tournament'),'home':e.get('homeTeam'),'away':e.get('awayTeam')}
+                  print(json.dumps(out,ensure_ascii=False)[:5000])
+          PY
+          done
