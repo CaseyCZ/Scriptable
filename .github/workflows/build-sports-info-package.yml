@@ -173,3 +173,5 @@ jobs:
           fi
           git commit -m "Sync Sports Info release surfaces"
           git push origin HEAD:Master
+
+# Manual audit trigger for Czech floorball provider fix.
