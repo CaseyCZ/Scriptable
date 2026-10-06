@@ -1,12 +1,14 @@
 # Homebridge Status
 
-> **Testing build:** aplikace je zatím záměrně skrytá z veřejného webového katalogu. Instalační soubor zůstává v repozitáři pro soukromé testování.
-
 Homebridge Status je Scriptable widget pro přehled stavu Homebridge v jednotném stylu CaseyCZ Scriptable Apps.
+
+## Původ a poděkování
+
+Homebridge Status vychází z projektu [**homebridgeStatusWidget**](https://github.com/lwitzani/homebridgeStatusWidget) od [**lwitzani**](https://github.com/lwitzani), jehož Homebridge API logika byla použita jako základ a předloha. Současná verze byla následně výrazně přepracována a rozšířena o vlastní rozhraní, LAN → VPN fallback, více velikostí widgetů, notifikace, vlastní nastavení a další funkce.
 
 ## Hlavní funkce
 
-- zachovává ověřené Homebridge UI API z původního `homebridgeStatusWidget`,
+- zachovává ověřenou Homebridge UI API logiku z původního `homebridgeStatusWidget`,
 - primární LAN adresa + automatický fallback na druhou VPN adresu,
 - při každém novém obnovení se znovu preferuje LAN,
 - ukazuje Homebridge, Plugins a Node.js update status,
@@ -35,4 +37,4 @@ Při prvním spuštění se skript pokusí převzít základní nastavení ze st
 
 ## Verze
 
-Aktuální testovací verze: **v0.1.13**
+Aktuální verze: **v0.1.13**
