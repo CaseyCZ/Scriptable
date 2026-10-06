@@ -26,6 +26,10 @@
 
 **Sports Info** zobrazuje sportovní data v jednom widgetu a umožňuje vybrat sport, soutěž a oblíbený tým. Rozložení se automaticky přizpůsobuje velikosti widgetu a jednotlivým sekcím.
 
+## Původ a předloha
+
+**Sports Info** je vlastní multi-sport implementace. Při vzniku jsme použili architekturu a některé principy našeho **LockScreen Generatoru** jako předlohu pro strukturu aplikace, nastavení a responzivní rozhraní. Sportovní datová vrstva, podpora více sportů a soutěží, tabulky, diagnostika a další funkce byly následně vyvíjeny samostatně pro Sports Info.
+
 ## Podporované sporty
 
 - ⚽ fotbal
