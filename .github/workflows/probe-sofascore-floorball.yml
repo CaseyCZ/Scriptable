@@ -140,3 +140,5 @@ async function livesportBundle(s){
           git add 'apps/Sports-Info/Sports Info.js'
           git commit -m 'Fix Livesport standings and Czech floorball source'
           git push origin HEAD:Master
+
+# retrigger
