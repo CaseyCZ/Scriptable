@@ -1,0 +1,44 @@
+name: Apply Sports Info Livesport fix
+
+on:
+  push:
+    branches:
+      - Master
+    paths:
+      - '.github/workflows/probe-sofascore-floorball.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Apply Sports Info patch
+        run: python .github/scripts/patch-sports-info-livesport.py
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Info/Sports Info.js' /tmp/SportsInfo.mjs
+          node --check /tmp/SportsInfo.mjs
+
+      - name: Verify v2.5.40 markers
+        run: |
+          grep -F 'const APP_VERSION = "2.5.40";' 'apps/Sports-Info/Sports Info.js'
+          grep -F 'id:"floorball.cz",provider:"livesport"' 'apps/Sports-Info/Sports Info.js'
+          grep -F 'global.flashscore.ninja/1/x/feed/to_' 'apps/Sports-Info/Sports Info.js'
+          grep -F 'Livesport OK · ${d.events.length} events · ${d.table.length} rows' 'apps/Sports-Info/Sports Info.js'
+
+      - name: Commit Sports Info v2.5.40
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git add 'apps/Sports-Info/Sports Info.js'
+          git commit -m 'Fix Livesport standings and Czech floorball source'
+          git push origin HEAD:Master
