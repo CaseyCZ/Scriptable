@@ -10,22 +10,27 @@
 <h1 align="center">🔴 Sports Live</h1>
 
 <p align="center">
-  Připravovaný widget pro <strong>Scriptable</strong> zaměřený na rychlý přehled živých výsledků napříč sporty.
+  Sportovní widget pro <strong>Scriptable</strong> zaměřený na rychlý přehled jednoho vybraného týmu.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/VERZE-P%C5%98IPRAVUJEME-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Live připravujeme" />
+  <img src="https://img.shields.io/badge/VERZE-v0.3.3-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Sports Live verze 0.3.3" />
 </p>
 
 <p align="center">
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable katalog" /></a>
+  <a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout Sports Live JavaScript" /></a>
 </p>
 
 ## O aplikaci
 
-**Sports Live** bude jednodušší doplněk ke Sports Info. Cílem je rychle ukázat právě hrané zápasy a nejdůležitější live informace bez nutnosti otevírat detailní sportovní přehled.
+**Sports Live** je jednodušší doplněk ke Sports Info. Zaměřuje se na jeden vybraný tým a rychle zobrazuje live stav, nejbližší zápas, další program a základní týmové informace. Používá stejnou multi-provider datovou vrstvu jako Sports Info a vizuální systém navazuje na Homebridge Status.
 
-## Plánované sporty
+## Původ a poděkování
+
+Sports Live původně vychází ze skriptu [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **thisisevanfox & Nicolas-kings (Nicolasking007)**. Původní NBA widget jsme použili jako předlohu a výchozí bod. Současný Sports Live byl následně zásadně přepracován na vícesportovní aplikaci s vlastními datovými zdroji, výběrem sportu, soutěže a týmu, novým nastavením a vzhledem CaseyCZ Scriptable Apps.
+
+## Podporované sporty
 
 - ⚽ fotbal
 - 🏒 hokej
@@ -33,15 +38,19 @@
 - 🥅 florbal
 - ⚾ baseball
 
-## Plánované funkce
+## Hlavní funkce
 
-- 🔴 rychlý live přehled
-- ⏱️ aktuální stav a průběh zápasu
-- ⭐ možnost zvýraznit oblíbené soutěže nebo týmy
-- 📱 přizpůsobení pro Scriptable widgety
-- 🌍 vícejazyčné prostředí ve stejném CaseyCZ stylu
+- 🔴 live stav vybraného týmu
+- ⏭️ nejbližší zápas a další program
+- 📊 základní statistiky týmu
+- 🎯 výběr sportu, soutěže a jednoho týmu
+- 📱 Small / Medium widgety
+- 🎨 vlastní motiv, barvy a obrázek pozadí
+- 🌍 vícejazyčné prostředí
+- 🔄 aktualizace přímo ze Scriptable
+- 🧰 diagnostika, cache a záloha nastavení
 
-> Sports Live je zatím ve vývoji. Instalační balíček zveřejníme až ve chvíli, kdy bude připravený pro běžné použití.
+> Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript je dostupný v repozitáři; samostatný `.scriptable` instalační balíček zatím není zveřejněn.
 
 ## Podpora
 
