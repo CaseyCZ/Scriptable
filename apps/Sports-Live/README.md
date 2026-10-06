@@ -28,7 +28,7 @@
 
 ## Původ a poděkování
 
-Sports Live původně vychází ze skriptu [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **thisisevanfox & Nicolas-kings (Nicolasking007)**. Původní NBA widget jsme použili jako předlohu a výchozí bod. Současný Sports Live byl následně zásadně přepracován na vícesportovní aplikaci s vlastními datovými zdroji, výběrem sportu, soutěže a týmu, novým nastavením a vzhledem CaseyCZ Scriptable Apps.
+Sports Live původně vychází ze skriptu [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **Nicolas-kings**, který navazuje na původní [**NBA MyTeam widget**](https://github.com/thisisevanfox/nba-my-team-ios-widget) od [**thisisevanfox**](https://github.com/thisisevanfox). Samotná hlavička ONE-NBA uvádí jako autory **thisisevanfox & Nicolas-kings**. Tento NBA základ jsme použili jako předlohu a výchozí bod; současný Sports Live byl následně zásadně přepracován na vícesportovní aplikaci s vlastními datovými zdroji, výběrem sportu, soutěže a týmu, novým nastavením a vzhledem CaseyCZ Scriptable Apps.
 
 ## Podporované sporty
 
