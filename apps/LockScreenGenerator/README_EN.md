@@ -26,6 +26,10 @@
 
 **LockScreen Generator** lets you build a wallpaper around the information you actually want to see on your Lock Screen. Content, order, appearance and individual modules can all be customized directly in the app.
 
+## Origin and credits
+
+When the project started, we used [**LSWeather**](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) by [**ajatkj (Ankit Jain)**](https://github.com/ajatkj) as a reference and starting point for generating dynamic Lock Screen wallpapers with Scriptable and Shortcuts. The current **LockScreen Generator** was then extensively redesigned and expanded with its own user interface, modules, localization, automatic layout, diagnostics and additional features.
+
 ## Main features
 
 - 📅 calendar and reminders
