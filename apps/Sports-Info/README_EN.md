@@ -26,6 +26,10 @@
 
 **Sports Info** brings sports data into a single widget and lets you choose a sport, competition and favorite team. The layout adapts automatically to the widget size and its individual sections.
 
+## Origin and reference
+
+**Sports Info** is our own multi-sport implementation. During its initial development, we used the architecture and some design principles of our **LockScreen Generator** as a reference for the app structure, settings and responsive interface. The sports data layer, multi-sport and competition support, standings, diagnostics and other features were then developed specifically for Sports Info.
+
 ## Supported sports
 
 - ⚽ football
