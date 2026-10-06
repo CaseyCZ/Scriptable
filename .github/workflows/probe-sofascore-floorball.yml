@@ -9,17 +9,16 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe direct standings feed
+      - name: Probe complete standings request
         shell: bash
         run: |
           set -euo pipefail
           UA='Mozilla/5.0 (iPhone; CPU iPhone OS like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148'
-          T='6gJP1e91'
-          TS='YseEWnAC'
+          T='6gJP1e91'; TS='YseEWnAC'; H='dbQYZfKT'; A='K8tSZzY8'; E='zZLyPmfK'
           urls=(
-            "https://500.flashscore.ninja/500/x/feed/ss_1_${T}_${TS}_table_overall"
-            "https://www.livesport.com/x/feed/ss_1_${T}_${TS}_table_overall"
-            "https://500.flashscore.ninja/500/x/feed/ss_1_${T}_${TS}_table_overall?"
+            "https://500.flashscore.ninja/500/x/feed/ss_1_${T}_${TS}_table_overall?hp1=${H}&hp2=${A}&e=${E}"
+            "https://www.livesport.com/x/feed/ss_1_${T}_${TS}_table_overall?hp1=${H}&hp2=${A}&e=${E}"
+            "https://500.flashscore.ninja/500/x/feed/ss_1_${TS}_${T}_table_overall?hp1=${H}&hp2=${A}&e=${E}"
           )
           n=0
           for url in "${urls[@]}"; do
@@ -34,6 +33,17 @@ jobs:
               -H 'x-fsign: SW9D1eZo' \
               -o "$out" -w '%{http_code}' "$url" || true)
             echo "HTTP $code SIZE $(wc -c < "$out" 2>/dev/null || echo 0)"
-            head -c 6000 "$out" || true
+            head -c 12000 "$out" || true
             echo
           done
+          echo '=== match page variables ==='
+          curl -sS -L -H "User-Agent: $UA" 'https://www.livesport.com/match/zZLyPmfK/' -o /tmp/match.html || true
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('/tmp/match.html').read_text('utf-8','ignore') if Path('/tmp/match.html').exists() else ''
+          print('MATCH SIZE',len(s))
+          for pat in [r'tournamentStageEncodedId.{0,120}',r'tournamentEncodedId.{0,120}',r'participantEncodedIds.{0,200}',r'"tournament".{0,120}',r'6gJP1e91',r'YseEWnAC']:
+              hits=re.findall(pat,s,re.I)
+              print(pat, hits[:5])
+          PY
