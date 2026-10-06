@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  Kolekce vlastních <strong>Scriptable</strong> aplikací a widgetů pro iPhone doplněná veřejným katalogem.
+  Kolekce <strong>Scriptable</strong> aplikací a widgetů pro iPhone — některé vznikly jako vlastní projekty, jiné vycházejí z veřejných Scriptable skriptů, které jsme výrazně upravili a rozšířili.
 </p>
 
 <p align="center">
@@ -26,14 +26,25 @@
     <tr><td><strong>Sports Info</strong></td><td><code>v2.5.41</code></td><td>Univerzální sportovní widget pro více sportů a soutěží.</td><td><a href="./apps/Sports-Info/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Info" /></a></td></tr>
     <tr><td><strong>Sideload Watch</strong></td><td><code>v0.2.25</code></td><td>Sleduje nové verze vybraných sideload aplikací z katalogu iOS-Hub.</td><td><a href="./apps/Sideload-Watch/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sideload Watch" /></a></td></tr>
     <tr><td><strong>Home Dashboard</strong></td><td><code>v0.3.13</code></td><td>Dashboard pro monitoring webů, serverů, JSON API, GitHubu a lokální sítě.</td><td><a href="./apps/Home-Dashboard/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Home Dashboard" /></a></td></tr>
-    <tr><td><strong>Homebridge Status</strong></td><td><code>v0.1.13</code></td><td>Testovací Homebridge monitoring s LAN → VPN fallbackem, vlastním vzhledem, notifikacemi a více velikostmi widgetu.</td><td><a href="./apps/Homebridge-Status/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Homebridge Status" /></a></td></tr>
-    <tr><td><strong>Sports Live</strong></td><td><code>připravujeme</code></td><td>Widget zaměřený na rychlé živé výsledky napříč sporty.</td><td><a href="./apps/Sports-Live/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Live" /></a></td></tr>
+    <tr><td><strong>Homebridge Status</strong></td><td><code>v0.1.13</code></td><td>Homebridge monitoring s LAN → VPN fallbackem, vlastním vzhledem, notifikacemi a více velikostmi widgetu.</td><td><a href="./apps/Homebridge-Status/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Homebridge Status" /></a></td></tr>
+    <tr><td><strong>Sports Live</strong></td><td><code>v0.3.3</code></td><td>Vývojový widget pro rychlý live přehled jednoho vybraného týmu napříč sporty.</td><td><a href="./apps/Sports-Live/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Live" /></a></td></tr>
   </tbody>
 </table>
 
 ## O projektu
 
 Scriptable Apps jsou praktické nástroje pro každodenní použití na iPhonu. Každá aplikace má vlastní README a přehled hlavních funkcí.
+
+## Původ a poděkování
+
+U projektů, které vznikly na základě existujícího veřejného skriptu, uvádíme původní předlohu a autory přímo v jejich README:
+
+- **LockScreen Generator** — předloha [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) od [ajatkj / Ankit Jain](https://github.com/ajatkj).
+- **Homebridge Status** — předloha [homebridgeStatusWidget](https://github.com/lwitzani/homebridgeStatusWidget) od [lwitzani](https://github.com/lwitzani).
+- **Sports Live** — původní předloha [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **thisisevanfox & Nicolas-kings**.
+- **Sports Info** — vlastní multi-sport implementace, při jejímž návrhu byla jako předloha použita architektura našeho LockScreen Generatoru.
+
+Tyto projekty byly od původních předloh dále výrazně přepracovány a rozšířeny; konkrétní informace jsou uvedené v README jednotlivých aplikací.
 
 <p>
   <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable pro iPhone" /></a>
