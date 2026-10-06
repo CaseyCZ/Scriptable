@@ -2,14 +2,14 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: trophy;
 // ============================================================
-// Sports Info v2.5.39
+// Sports Info v2.5.40
 // CaseyCZ Scriptable Apps
 // Own implementation inspired by the LockScreen Generator template.
 // One runtime JS file. Public multi-sport data. No personal API key required.
 // ============================================================
 
 const APP_NAME = "Sports Info";
-const APP_VERSION = "2.5.39";
+const APP_VERSION = "2.5.40";
 const SETTINGS_FILE = "SportsInfo_settings.json";
 const LEGACY_SETTINGS_FILE = "FootballInfo_settings.json";
 const CACHE_FILE = "SportsInfo_cache.json";
@@ -54,7 +54,7 @@ const SPORTS = [
     {id:"ncaa-basketball-women",provider:"espn",espnSport:"basketball",espnLeague:"womens-college-basketball",flag:"🇺🇸",cs:"NCAA ženy",en:"NCAA Women",de:"NCAA Frauen",es:"NCAA Mujeres"}
   ]},
   {id:"floorball",icon:"🥅",cs:"Florbal",en:"Floorball",de:"Floorball",es:"Floorball",leagues:[
-    {id:"floorball.cz",provider:"floorball",lsPath:"/floorball/czech-republic/livesport-superliga/",sofaId:829,sofaSport:"floorball",sportsApiQuery:"Superliga Czechia",flag:"🇨🇿",cs:"Livesport Superliga",en:"Czech Livesport Superliga",de:"Tschechische Livesport Superliga",es:"Livesport Superliga Checa"},
+    {id:"floorball.cz",provider:"livesport",lsPath:"/floorball/czech-republic/livesport-superliga/",flag:"🇨🇿",cs:"Livesport Superliga",en:"Czech Livesport Superliga",de:"Tschechische Livesport Superliga",es:"Livesport Superliga Checa"},
     {id:"floorball.se",provider:"livesport",lsPath:"/floorball/sweden/svenska-superligan/",flag:"🇸🇪",cs:"Svenska Superligan",en:"Swedish SSL",de:"Swedish SSL",es:"Swedish SSL"},
     {id:"floorball.fi",provider:"livesport",lsPath:"/floorball/finland/f-liiga/",flag:"🇫🇮",cs:"F-liiga",en:"F-liiga",de:"F-liiga",es:"F-liiga"},
     {id:"floorball.ch",provider:"livesport",lsPath:"/floorball/switzerland/prime-league/",flag:"🇨🇭",cs:"Swiss Prime League",en:"Swiss Prime League",de:"Swiss Prime League",es:"Swiss Prime League"},
@@ -207,7 +207,31 @@ function lsFields(rec){const o={};for(const part of String(rec||"").split("¬"))
 function lsAllFeeds(html){const out=[],re=/cjs\.initialFeeds\["([^"]+)"\]\s*=\s*\{\s*data:\s*`([\s\S]*?)`/g;let m;while((m=re.exec(String(html||""))))out.push({name:m[1],data:m[2]});return out}
 function lsEvents(feed){const out=[];for(const tail of String(feed||"").split("¬~AA÷").slice(1)){const f=lsFields("AA÷"+tail);if(!f.AA||!f.AD||!f.AE||!f.AF)continue;const code=Number(f.AB||1),completed=code===3,state=code===2?"in":completed?"post":"pre",logo=x=>x?`https://static.flashscore.com/res/image/data/${x}`:"";out.push({id:String(f.AA),date:new Date(Number(f.AD)*1000).toISOString(),state,completed,status:f.ER||"",home:{id:String(f.PX||f.WM||f.AE),name:f.AE||"",short:f.WM||f.AE||"",abbr:f.WM||"",logo:logo(f.OA),score:f.AG==null?"":String(f.AG)},away:{id:String(f.PY||f.WN||f.AF),name:f.AF||"",short:f.WN||f.AF||"",abbr:f.WN||"",logo:logo(f.OB),score:f.AH==null?"":String(f.AH)}})}return out}
 function lsRows(feed){const rows=[],seen=new Set();for(const raw of String(feed||"").split("~")){const f=lsFields(raw);if(!f.TI||!f.TN||seen.has(f.TI))continue;seen.add(f.TI);let gf="",ga="";if(f.TG&&f.TG.includes(":")){const q=f.TG.split(":");gf=q[0];ga=q[1]}rows.push({rank:Number(f.TR||rows.length+1),id:String(f.TI),name:f.TN,short:f.TN,played:String(f.TM??""),wins:String(f.TW??""),won:String(f.TW??""),draws:String(f.TDR??""),drawn:String(f.TDR??""),losses:String(f.TL??""),lost:String(f.TL??""),otWins:String(f.TWO??""),otLosses:String(f.TLO??""),points:String(f.TP??""),pct:String(f.TAP??""),gb:String(f.TGB??f.TB??""),gf:String(gf),ga:String(ga),diff:String(f.TPF??"")})}return rows}
-async function livesportBundle(s){const m=league(s),key=`ls:${m.id}`;if(LIVESPORT_MEM[key])return LIVESPORT_MEM[key];if(!m.lsPath)throw new Error("No Livesport mapping");const base=`https://www.livesport.com${m.lsPath}`,pages=await Promise.allSettled([requestText(base,LIVESPORT_HEADERS),requestText(base+"standings/",LIVESPORT_HEADERS)]),html=pages[0].status==="fulfilled"?pages[0].value:"",standHtml=pages[1].status==="fulfilled"?pages[1].value:"",events=unique([...lsEvents(lsFeed(html,"summary-results")),...lsEvents(lsFeed(html,"summary-fixtures"))]);let table=[];for(const f of lsAllFeeds(standHtml)){const r=lsRows(f.data);if(r.length>table.length)table=r}if(!table.length)try{table=(await sofaBundle(s)).table||[]}catch(_){}if(!events.length&&!table.length)throw new Error("Livesport returned no data");const map=new Map();for(const x of table)if(x.id)map.set(x.id,{id:x.id,name:x.name,short:x.short,logo:""});for(const e of events)for(const t of[e.home,e.away])if(t.id)map.set(t.id,{id:t.id,name:t.name,short:t.short,logo:t.logo});const out={events,teams:[...map.values()].sort((a,b)=>a.name.localeCompare(b.name)),table};LIVESPORT_MEM[key]=out;return out}
+async function livesportDynamicTable(s,html){
+  const feed=lsFeed(html,"summary-results")||lsFeed(html,"summary-fixtures"),head=String(feed||"").split("¬~AA÷")[0],meta=lsFields(head),tournament=meta.ZE||"",stage=meta.ZC||"";
+  if(!tournament||!stage)throw new Error("Livesport table ids missing");
+  const headers=Object.assign({},LIVESPORT_HEADERS,{"Accept":"*/*","Accept-Language":"cs-CZ,cs;q=0.9,en;q=0.8","Referer":"https://www.livesport.cz/","Origin":"https://www.livesport.cz","x-fsign":"SW9D1eZo"});
+  const raw=await requestText(`https://global.flashscore.ninja/1/x/feed/to_${encodeURIComponent(tournament)}_${encodeURIComponent(stage)}_1`,headers),rows=lsRows(raw);
+  if(!rows.length)throw new Error("Livesport standings returned 0 rows");
+  return rows
+}
+async function livesportBundle(s){
+  const m=league(s),key=`ls:${m.id}`;
+  if(LIVESPORT_MEM[key])return LIVESPORT_MEM[key];
+  if(!m.lsPath)throw new Error("No Livesport mapping");
+  const base=`https://www.livesport.com${m.lsPath}`,pages=await Promise.allSettled([requestText(base,LIVESPORT_HEADERS),requestText(base+"standings/",LIVESPORT_HEADERS)]),html=pages[0].status==="fulfilled"?pages[0].value:"",standHtml=pages[1].status==="fulfilled"?pages[1].value:"",events=unique([...lsEvents(lsFeed(html,"summary-results")),...lsEvents(lsFeed(html,"summary-fixtures"))]);
+  let table=[];
+  for(const f of lsAllFeeds(standHtml)){const r=lsRows(f.data);if(r.length>table.length)table=r}
+  if(!table.length)try{table=await livesportDynamicTable(s,html||standHtml)}catch(e){console.log(`Livesport standings: ${String(e?.message||e)}`)}
+  if(!table.length&&m.sofaId)try{table=(await sofaBundle(s)).table||[]}catch(_){}
+  if(!events.length&&!table.length)throw new Error("Livesport returned no data");
+  const map=new Map();
+  for(const x of table)if(x.id)map.set(x.id,{id:x.id,name:x.name,short:x.short,logo:""});
+  for(const e of events)for(const t of[e.home,e.away])if(t.id)map.set(t.id,{id:t.id,name:t.name,short:t.short,logo:t.logo});
+  const out={events,teams:[...map.values()].sort((a,b)=>a.name.localeCompare(b.name)),table};
+  LIVESPORT_MEM[key]=out;
+  return out
+}
 
 const SPORTSAPI_MEM={};
 function sportsApiHeaders(s){if(!s.sportsApiKey)throw new Error("SportsAPI Pro API key missing");return {"x-api-key":s.sportsApiKey,"Accept":"application/json"}}
@@ -286,7 +310,7 @@ async function dataWithBudget(s,ms){
 function timeoutAfter(ms,label="API"){return new Promise((_,reject)=>{Timer.schedule(ms,false,()=>reject(new Error(`${label} timeout ${Math.round(ms/1000)}s`)))})}
 async function limited(fn,ms=9000,label="API"){return await Promise.race([Promise.resolve().then(fn),timeoutAfter(ms,label)])}
 async function probe(label,fn,ms=10000){const started=Date.now();try{const detail=await limited(fn,ms,label);const elapsed=Date.now()-started;return{label,state:"ok",detail:`${String(detail||"")} · ${elapsed} ms`}}catch(e){const elapsed=Date.now()-started;return{label,state:"error",detail:`${String(e?.message||e).slice(0,90)} · ${elapsed} ms`}}}
-async function sourceHealth(s){const m=league(s),today=dateKey(new Date());if(m.provider==="soccer"){const [o,e,f]=await Promise.allSettled([limited(()=>oneFootballHealth(s),7500,"OneFootball"),limited(()=>espnScoreboard(s,today),7500,"ESPN"),limited(()=>fotmobLeague(s),7500,"FotMob")]);const os=o.status==="fulfilled"?`OneFootball OK · ${o.value}`:"OneFootball ERROR",es=e.status==="fulfilled"?"ESPN OK":"ESPN ERROR",fs=f.status==="fulfilled"?"FotMob OK":"FotMob ERROR";if(o.status!=="fulfilled"&&e.status!=="fulfilled"&&f.status!=="fulfilled")throw new Error(`${os} · ${es} · ${fs}`);return `${os} · ${es} · ${fs}`}if(m.provider==="livesport"){const d=await limited(()=>livesportBundle(s),9000,"Livesport");return `Livesport OK · ${d.events.length} events`}if(m.provider==="floorball"){const d=await limited(()=>floorballBundle(s),9000,"Floorball");return `SofaScore OK · ${d.events.length} events · ${d.table.length} rows${s.sportsApiKey?" · SportsAPI fallback ready":""}`}if(m.provider==="sofa"){await limited(()=>sofaResolve(s),7500,"SofaScore");return "SofaScore OK"}await limited(()=>espnScoreboard(s,today),7500,"ESPN");return "ESPN OK"}
+async function sourceHealth(s){const m=league(s),today=dateKey(new Date());if(m.provider==="soccer"){const [o,e,f]=await Promise.allSettled([limited(()=>oneFootballHealth(s),7500,"OneFootball"),limited(()=>espnScoreboard(s,today),7500,"ESPN"),limited(()=>fotmobLeague(s),7500,"FotMob")]);const os=o.status==="fulfilled"?`OneFootball OK · ${o.value}`:"OneFootball ERROR",es=e.status==="fulfilled"?"ESPN OK":"ESPN ERROR",fs=f.status==="fulfilled"?"FotMob OK":"FotMob ERROR";if(o.status!=="fulfilled"&&e.status!=="fulfilled"&&f.status!=="fulfilled")throw new Error(`${os} · ${es} · ${fs}`);return `${os} · ${es} · ${fs}`}if(m.provider==="livesport"){const d=await limited(()=>livesportBundle(s),9000,"Livesport");return `Livesport OK · ${d.events.length} events · ${d.table.length} rows`}if(m.provider==="floorball"){const d=await limited(()=>floorballBundle(s),9000,"Floorball");return `SofaScore OK · ${d.events.length} events · ${d.table.length} rows${s.sportsApiKey?" · SportsAPI fallback ready":""}`}if(m.provider==="sofa"){await limited(()=>sofaResolve(s),7500,"SofaScore");return "SofaScore OK"}await limited(()=>espnScoreboard(s,today),7500,"ESPN");return "ESPN OK"}
 function runStatusRow(s){const r=runStatusRead();if(!r)return{label:`🕓 ${tx(s,"diagLastRun")}`,state:"off",detail:tx(s,"neverRun")};const when=new Date(r.ts).toLocaleString(s.language||"en",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}),source=String(r.source||"").toUpperCase();const detail=`${when} · v${r.version||"?"}${source?` · ${source}`:""}${r.ok?"":` · ${r.error||tx(s,"error")}`}`;return{label:`🕓 ${tx(s,"diagLastRun")}`,state:r.ok?"ok":"error",detail}}
 function diagnosticPlaceholders(s){return[runStatusRow(s),{label:`🌐 ${tx(s,"diagSource")}`,state:"idle",detail:sourceLabel(s)},{label:`👥 ${tx(s,"diagTeams")}`,state:"idle",detail:""},{label:`📊 ${tx(s,"diagTable")}`,state:"idle",detail:""},{label:`💾 ${tx(s,"diagCache")}`,state:fm.fileExists(cachePath)?"ok":"off",detail:fm.fileExists(cachePath)?tx(s,"cache"):""}]}
 async function collectDiagnostics(s,onUpdate=null){let rows=[runStatusRow(s),{label:`🌐 ${tx(s,"diagSource")}`,state:"checking",detail:sourceLabel(s)},{label:`👥 ${tx(s,"diagTeams")}`,state:"checking",detail:""},{label:`📊 ${tx(s,"diagTable")}`,state:"checking",detail:""},{label:`💾 ${tx(s,"diagCache")}`,state:fm.fileExists(cachePath)?"ok":"off",detail:fm.fileExists(cachePath)?tx(s,"cache"):""}];const publish=async()=>{if(onUpdate)try{await onUpdate(rows.map(x=>Object.assign({},x)))}catch(_){}};await publish();const jobs=[probe(`🌐 ${tx(s,"diagSource")}`,()=>sourceHealth(s),9000).then(async r=>{rows[1]=r;await publish()}),probe(`👥 ${tx(s,"diagTeams")}`,async()=>{const a=await teamsFor(s);return `${a.length} teams · endpoint OK`},10000).then(async r=>{rows[2]=r;await publish()}),probe(`📊 ${tx(s,"diagTable")}`,async()=>{const a=await standingsFor(s);if(!a.length)throw new Error("0 rows · standings unavailable");return `${a.length} rows`},10000).then(async r=>{rows[3]=r;await publish()})];await Promise.all(jobs);return rows}
