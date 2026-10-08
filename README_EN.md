@@ -18,6 +18,7 @@
 ## Documentation
 
 - 📘 [Getting started](https://caseycz.github.io/Scriptable/guide.html)
+- 🙏 [Credits & acknowledgements](https://caseycz.github.io/Scriptable/credits.html)
 - 📝 [Changelog](CHANGELOG.md)
 - 🛡️ [Community catalog compliance](COMPLIANCE.md)
 - 🔐 [Security](SECURITY.md)

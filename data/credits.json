@@ -1,0 +1,1215 @@
+{
+  "generatedAt": "2026-10-08T19:07:21.166Z",
+  "total": 233,
+  "authorCount": 138,
+  "authors": {
+    "0xf0xx0": [
+      {
+        "name": "nobg auto",
+        "source": "https://github.com/0xf0xx0/scriptable-no-background/blob/ios-18-and-later/examples/nobg-auto.js"
+      },
+      {
+        "name": "nobg configurable widget template",
+        "source": "https://github.com/0xf0xx0/scriptable-no-background/blob/ios-18-and-later/examples/nobg-configurable-widget-template.js"
+      },
+      {
+        "name": "nobg small top left widget",
+        "source": "https://github.com/0xf0xx0/scriptable-no-background/blob/ios-18-and-later/examples/nobg-small-top-left-widget.js"
+      },
+      {
+        "name": "semi transparent",
+        "source": "https://github.com/0xf0xx0/scriptable-no-background/blob/ios-18-and-later/examples/semi-transparent.js"
+      },
+      {
+        "name": "weather widget 414",
+        "source": "https://github.com/0xf0xx0/scriptable-no-background/blob/ios-18-and-later/examples/weather-widget-414.js"
+      }
+    ],
+    "abbyjeet": [
+      {
+        "name": "IPL",
+        "source": "https://github.com/abbyjeet/scriptable-widgets/blob/main/IPL.js"
+      }
+    ],
+    "AhmedHalat": [
+      {
+        "name": "Notifications",
+        "source": "https://github.com/AhmedHalat/GitHub-Scriptable-Widget/blob/master/Notifications.js"
+      }
+    ],
+    "akaFTS": [
+      {
+        "name": "script",
+        "source": "https://github.com/akaFTS/superglance-scriptable-widget/blob/main/script.js"
+      }
+    ],
+    "alexboden": [
+      {
+        "name": "Toronto Bike Share",
+        "source": "https://github.com/alexboden/toronto-bike-share-status"
+      }
+    ],
+    "alexhfmnn": [
+      {
+        "name": "Spotify Top Tracks",
+        "source": "https://github.com/alexhfmnn/spotify-top-tracks"
+      }
+    ],
+    "andyngo": [
+      {
+        "name": "Conversable",
+        "source": "https://github.com/andyngo/conversable-for-scriptable"
+      }
+    ],
+    "angus-thompson": [
+      {
+        "name": "Obsidian Tasks",
+        "source": "https://github.com/angus-thompson/obsidian-scriptable-tasks-widget"
+      }
+    ],
+    "AngusTse": [
+      {
+        "name": "aus news widget",
+        "source": "https://github.com/AngusTse/ios-scriptable-ausnews-widget/blob/main/aus-news-widget.js"
+      },
+      {
+        "name": "hk news widget",
+        "source": "https://github.com/AngusTse/ios-scriptable-hknews-widget/blob/main/hk-news-widget.js"
+      }
+    ],
+    "aquova": [
+      {
+        "name": "Home Assistant",
+        "source": "https://github.com/aquova/hass-ios-scriptable-widgets/blob/master/Home%20Assistant.js"
+      },
+      {
+        "name": "Home Assistant Lock",
+        "source": "https://github.com/aquova/hass-ios-scriptable-widgets/blob/master/Home%20Assistant%20Lock.js"
+      }
+    ],
+    "archive-sh": [
+      {
+        "name": "F1 Scriptable Widget",
+        "source": "https://github.com/archive-sh/F1-Scriptable-Widget"
+      }
+    ],
+    "Arxhtects": [
+      {
+        "name": "simpletimeandweather",
+        "source": "https://github.com/Arxhtects/Scriptable-Basic-Widget/blob/main/simpletimeandweather.js"
+      }
+    ],
+    "awaescher": [
+      {
+        "name": "widget",
+        "source": "https://github.com/awaescher/home-battery-widget/blob/main/widget.js"
+      }
+    ],
+    "Baumchen": [
+      {
+        "name": "Austria Incidence",
+        "source": "https://gist.github.com/Baumchen/b8b9aaf5ba0aebef173a4f956a3b4290"
+      }
+    ],
+    "benjaminmckinley": [
+      {
+        "name": "trello widget",
+        "source": "https://github.com/benjaminmckinley/Scriptable-Widgets/blob/main/trello_widget.js"
+      }
+    ],
+    "BergenSoft": [
+      {
+        "name": "scriptable_premiumsim",
+        "source": "https://github.com/BergenSoft/scriptable_premiumsim"
+      }
+    ],
+    "BerkeleyPB": [
+      {
+        "name": "i Term Widget",
+        "source": "https://github.com/BerkeleyPB/Scriptable/blob/main/iTerm%20Widget.js"
+      }
+    ],
+    "Besenwiesler": [
+      {
+        "name": "corona",
+        "source": "https://github.com/Besenwiesler/corona-widget/blob/main/corona.js"
+      }
+    ],
+    "bestmacfly": [
+      {
+        "name": "Lichess Widget",
+        "source": "https://github.com/bestmacfly/Scriptable-lichess-Widget"
+      }
+    ],
+    "bigfoott": [
+      {
+        "name": "PoGO Events",
+        "source": "https://github.com/bigfoott/PoGOEvents"
+      }
+    ],
+    "bitKrakenCode": [
+      {
+        "name": "Word Clock",
+        "source": "https://github.com/bitKrakenCode/ScriptableWordClockWidget"
+      }
+    ],
+    "bluewalk": [
+      {
+        "name": "scriptable 50plusmobiel",
+        "source": "https://github.com/bluewalk/scriptable-widgets/blob/master/scriptable-50plusmobiel.js"
+      },
+      {
+        "name": "scriptable mijnsimpel",
+        "source": "https://github.com/bluewalk/scriptable-widgets/blob/master/scriptable-mijnsimpel.js"
+      }
+    ],
+    "Boatkungg": [
+      {
+        "name": "YRCcanteen",
+        "source": "https://github.com/Boatkungg/YRC-Canteen-Widget/blob/main/YRCcanteen.js"
+      }
+    ],
+    "bradrblack": [
+      {
+        "name": "adafruit io scriptable widget",
+        "source": "https://github.com/bradrblack/adafruit-io-scriptable-widget/blob/main/adafruit-io-scriptable-widget.js"
+      },
+      {
+        "name": "adafruit io scriptable widget guage",
+        "source": "https://github.com/bradrblack/adafruit-io-scriptable-widget/blob/main/adafruit-io-scriptable-widget-guage.js"
+      }
+    ],
+    "brenoprata10": [
+      {
+        "name": "Steam Wishlist",
+        "source": "https://gist.github.com/brenoprata10/10d6bd1c8445a1181b899dd47c715577"
+      }
+    ],
+    "brianseidman": [
+      {
+        "name": "Pocket Widget",
+        "source": "https://github.com/brianseidman/scriptable-pocket-widget"
+      }
+    ],
+    "brianwalborn": [
+      {
+        "name": "ncaaf script",
+        "source": "https://github.com/brianwalborn/football-team-schedule-widget/blob/main/ncaaf-script.js"
+      },
+      {
+        "name": "nfl script",
+        "source": "https://github.com/brianwalborn/football-team-schedule-widget/blob/main/nfl-script.js"
+      },
+      {
+        "name": "nfl-team-schedule-widget",
+        "source": "https://github.com/brianwalborn/nfl-team-schedule-widget"
+      }
+    ],
+    "cbpowell": [
+      {
+        "name": "Sense Widget",
+        "source": "https://github.com/cbpowell/Sense-Scriptable/blob/main/Sense%20Widget.js"
+      }
+    ],
+    "Chrischi-": [
+      {
+        "name": "Tradegate Stock Widget",
+        "source": "https://github.com/Chrischi-/tradegate-stock-widget-for-scriptable"
+      }
+    ],
+    "ChristophObermeier": [
+      {
+        "name": "Air Quali fix",
+        "source": "https://github.com/ChristophObermeier/iOS-Widgets/blob/main/Air%20Polution%20Widget/AirQuali_fix.js"
+      },
+      {
+        "name": "Air Quali locbased",
+        "source": "https://github.com/ChristophObermeier/iOS-Widgets/blob/main/Air%20Polution%20Widget/AirQuali_locbased.js"
+      },
+      {
+        "name": "mvg widget fix",
+        "source": "https://github.com/ChristophObermeier/iOS-Widgets/blob/main/MVG-Widget/mvg_widget_fix.js"
+      }
+    ],
+    "codegangsta": [
+      {
+        "name": "obsidian tasks widget",
+        "source": "https://github.com/codegangsta/scriptable_widgets/blob/main/obsidian-tasks-widget.js"
+      }
+    ],
+    "colin273": [
+      {
+        "name": "TestFlight Watcher",
+        "source": "https://github.com/colin273/scriptable-testflight-watcher"
+      }
+    ],
+    "coughski": [
+      {
+        "name": "Citi Bike Availability",
+        "source": "https://gist.github.com/coughski/43c7a4da3829a3ffe394d6eeb6a8c90a"
+      }
+    ],
+    "cristiancode-hermes": [
+      {
+        "name": "automation bridge",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/automation-bridge.js"
+      },
+      {
+        "name": "camera roll atlas",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/camera-roll-atlas.js"
+      },
+      {
+        "name": "cue dispatcher",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/cue-dispatcher.js"
+      },
+      {
+        "name": "daily hub widget",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/daily-hub-widget.js"
+      },
+      {
+        "name": "day arc widget",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/day-arc-widget.js"
+      },
+      {
+        "name": "geo pin board",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/geo-pin-board.js"
+      },
+      {
+        "name": "on my way relay",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/on-my-way-relay.js"
+      },
+      {
+        "name": "routine runner",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/routine-runner.js"
+      },
+      {
+        "name": "threshold sentry",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/threshold-sentry.js"
+      },
+      {
+        "name": "wip kanban board",
+        "source": "https://github.com/cristiancode-hermes/scriptable-widgets/blob/main/wip-kanban-board.js"
+      }
+    ],
+    "Ctrl-plus-R": [
+      {
+        "name": "mooncat scriptable widget",
+        "source": "https://github.com/Ctrl-plus-R/MoonCat-Scriptable-Widget/blob/main/mooncat-scriptable-widget.js"
+      }
+    ],
+    "DanielGallo": [
+      {
+        "name": "givenergy widget",
+        "source": "https://github.com/DanielGallo/GivEnergy-Scriptable-Widget/blob/master/givenergy_widget.js"
+      }
+    ],
+    "DanielStefanK": [
+      {
+        "name": "FitX Capacity",
+        "source": "https://gist.github.com/DanielStefanK/487175b6f65ede401e37ee4848970176"
+      }
+    ],
+    "doersino": [
+      {
+        "name": "Aerialbot Lite",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/aerialbot-lite"
+      },
+      {
+        "name": "Binary Date",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/binary-date"
+      },
+      {
+        "name": "Location Location Location",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/location-location-location"
+      },
+      {
+        "name": "Read Statistics",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/read-statistics"
+      },
+      {
+        "name": "Small Seasons",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/small-seasons"
+      },
+      {
+        "name": "Uberspace Quota",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/uberspace-quota"
+      },
+      {
+        "name": "Weekly Cycling Distance",
+        "source": "https://github.com/doersino/scriptable-widgets/tree/main/weekly-cycling-distance"
+      }
+    ],
+    "dominik-lueke": [
+      {
+        "name": "Pokemon Of The Day",
+        "source": "https://github.com/dominik-lueke/PokemonOfTheDay/blob/main/PokemonOfTheDay.js"
+      }
+    ],
+    "DrieStone": [
+      {
+        "name": "TeslaData Widget",
+        "source": "https://github.com/DrieStone/TeslaData-Widget"
+      }
+    ],
+    "dschablowsky": [
+      {
+        "name": "FordPass Widget",
+        "source": "https://github.com/dschablowsky/FordPassWidget"
+      }
+    ],
+    "edisonX-sudo": [
+      {
+        "name": "Meta Trader Account Viewer",
+        "source": "https://github.com/edisonX-sudo/MetaTraderAccountViewer/blob/master/MetaTraderAccountViewer.js"
+      }
+    ],
+    "efficlab": [
+      {
+        "name": "main",
+        "source": "https://github.com/efficlab/social-media-follower-widget/blob/main/main.js"
+      }
+    ],
+    "esonwong": [
+      {
+        "name": "twitter followers count",
+        "source": "https://github.com/esonwong/scriptable-widget/blob/main/twitter-followers-count.js"
+      }
+    ],
+    "extendedzero": [
+      {
+        "name": "CountUp",
+        "source": "https://github.com/extendedzero/Scriptable-IOS-Widget"
+      }
+    ],
+    "f1tz": [
+      {
+        "name": "bwh-monitor-widget-for-scriptable",
+        "source": "https://github.com/f1tz/bwh-monitor-widget-for-scriptable"
+      }
+    ],
+    "fabianpimminger": [
+      {
+        "name": "Netatmo",
+        "source": "https://github.com/fabianpimminger/scriptable-netatmo-widget/blob/master/Netatmo.js"
+      }
+    ],
+    "fcelsa": [
+      {
+        "name": "Moon Phase",
+        "source": "https://github.com/fcelsa/ScriptableMoonPhase/blob/main/MoonPhase.js"
+      }
+    ],
+    "ferraridavide": [
+      {
+        "name": "GitHub Contributions",
+        "source": "https://github.com/ferraridavide/scriptable"
+      }
+    ],
+    "FifiTheBulldog": [
+      {
+        "name": "scriptable-testflight-watcher",
+        "source": "https://github.com/FifiTheBulldog/scriptable-testflight-watcher"
+      }
+    ],
+    "flasozzi": [
+      {
+        "name": "Simple Countdown",
+        "source": "https://gist.github.com/flasozzi/ab6222ea15de5113555c32c855e9e326"
+      }
+    ],
+    "flopp999": [
+      {
+        "name": "Ei B",
+        "source": "https://github.com/flopp999/Scriptable-EiB/blob/main/EiB.js"
+      },
+      {
+        "name": "Nordpool",
+        "source": "https://github.com/flopp999/Scriptable-NordPool/blob/main/Nordpool.js"
+      }
+    ],
+    "gnrmarcel": [
+      {
+        "name": "xbox achievements",
+        "source": "https://github.com/gnrmarcel/scriptable-xbox/blob/main/xbox-achievements.js"
+      },
+      {
+        "name": "xbox gamercard",
+        "source": "https://github.com/gnrmarcel/scriptable-xbox/blob/main/xbox-gamercard.js"
+      }
+    ],
+    "hendrilee": [
+      {
+        "name": "claude usage widget",
+        "source": "https://github.com/hendrilee/claude-usage-widget/blob/main/claude-usage-widget.js"
+      }
+    ],
+    "henningtillmann": [
+      {
+        "name": "sonntagsfrage",
+        "source": "https://github.com/henningtillmann/sonntagsfrage"
+      }
+    ],
+    "heyprashant": [
+      {
+        "name": "Book Read heatmap",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Book%20Read%20heatmap.js"
+      },
+      {
+        "name": "DSA tracker",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/DSA%20tracker.js"
+      },
+      {
+        "name": "Get Quotes",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Get%20Quotes%20.js"
+      },
+      {
+        "name": "Habit log 1",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Habit%20log%201.js"
+      },
+      {
+        "name": "habits Log",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/habitsLog.js"
+      },
+      {
+        "name": "Leetcode heatmap",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Leetcode%20heatmap.js"
+      },
+      {
+        "name": "living Healthy Log",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/livingHealthyLog.js"
+      },
+      {
+        "name": "Study heatmap",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Study%20heatmap.js"
+      },
+      {
+        "name": "Wakeup heatmap",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Wakeup%20heatmap.js"
+      },
+      {
+        "name": "Workout heatmap",
+        "source": "https://github.com/heyprashant/Scriptables-widget-ios/blob/main/Workout%20heatmap.js"
+      }
+    ],
+    "Honye": [
+      {
+        "name": ".eslintrc by Honye",
+        "source": "https://github.com/Honye/scriptable-scripts"
+      }
+    ],
+    "iamrbn": [
+      {
+        "name": "Inline Weather",
+        "source": "https://github.com/iamrbn/Inline-Weather"
+      },
+      {
+        "name": "Reddit Widget by iamrbn",
+        "source": "https://github.com/iamrbn/Reddit-Widget"
+      },
+      {
+        "name": "Slack Status",
+        "source": "https://github.com/iamrbn/slack-status"
+      },
+      {
+        "name": "Tagesschau Widget",
+        "source": "https://github.com/iamrbn/tagesschau-widget"
+      }
+    ],
+    "jasonsnell": [
+      {
+        "name": "PurpleAir-AQI-Scriptable-Widget",
+        "source": "https://github.com/jasonsnell/PurpleAir-AQI-Scriptable-Widget"
+      }
+    ],
+    "jaydainn": [
+      {
+        "name": "CFBWidget",
+        "source": "https://github.com/jaydainn/CFBWidget"
+      }
+    ],
+    "Juniorchen2012": [
+      {
+        "name": "exchangeRate.js",
+        "source": "https://github.com/Juniorchen2012/scriptable"
+      }
+    ],
+    "junsang3": [
+      {
+        "name": "resin counter",
+        "source": "https://github.com/junsang3/genshin-resin-counter-widget/blob/master/resin-counter.js"
+      }
+    ],
+    "kevinkub": [
+      {
+        "name": "Germany Incidence",
+        "source": "https://gist.github.com/kevinkub/46caebfebc7e26be63403a7f0587f664"
+      }
+    ],
+    "Korysam15": [
+      {
+        "name": "bamboo-scriptable-widget",
+        "source": "https://github.com/Korysam15/bamboo-scriptable-widget"
+      }
+    ],
+    "kylereddoch": [
+      {
+        "name": "WakaStats",
+        "source": "https://github.com/kylereddoch/scriptable"
+      }
+    ],
+    "leon47331": [
+      {
+        "name": "Lockscreen RSS",
+        "source": "https://github.com/leon47331/scriptable-lockscreen-rss-widget"
+      }
+    ],
+    "lukrencijus": [
+      {
+        "name": "clock",
+        "source": "https://github.com/lukrencijus/scriptable-widgets/blob/master/clock.js"
+      },
+      {
+        "name": "git",
+        "source": "https://github.com/lukrencijus/scriptable-widgets/blob/master/git.js"
+      },
+      {
+        "name": "Time Progress",
+        "source": "https://github.com/lukrencijus/scriptable-widgets/blob/master/Time%20Progress.js"
+      }
+    ],
+    "lwitzani": [
+      {
+        "name": "Days Until Birthday",
+        "source": "https://github.com/lwitzani/daysUntilBirthday"
+      },
+      {
+        "name": "Homebridge Status Widget Original",
+        "source": "https://github.com/lwitzani/homebridgeStatusWidget"
+      }
+    ],
+    "macdis": [
+      {
+        "name": "Pollen Widget",
+        "source": "https://github.com/macdis/pollen-widget/blob/main/Pollen%20Widget.js"
+      }
+    ],
+    "MacSchierer": [
+      {
+        "name": "Impf Quoten",
+        "source": "https://github.com/MacSchierer/ImpfQuoten/blob/main/ImpfQuoten.js"
+      },
+      {
+        "name": "Warn Wetter",
+        "source": "https://github.com/MacSchierer/WarnWetter/blob/main/WarnWetter.js"
+      }
+    ],
+    "marcjulianschwarz": [
+      {
+        "name": "Boca Chica SpaceX",
+        "source": "https://github.com/marcjulianschwarz/scriptable-widgets/tree/main/boca-chica-spacex"
+      },
+      {
+        "name": "Germany Rain Radar",
+        "source": "https://github.com/marcjulianschwarz/scriptable-widgets/tree/main/germany-rain-radar"
+      },
+      {
+        "name": "NASA Pictures",
+        "source": "https://github.com/marcjulianschwarz/scriptable-widgets/tree/main/nasa-pictures"
+      },
+      {
+        "name": "Newsroom",
+        "source": "https://github.com/marcjulianschwarz/scriptable-widgets/tree/main/newsroom"
+      },
+      {
+        "name": "Telekom Data Usage",
+        "source": "https://github.com/marcjulianschwarz/scriptable-widgets/tree/main/telekom-data-usage"
+      }
+    ],
+    "marco79cgn": [
+      {
+        "name": "cowboy widget",
+        "source": "https://github.com/marco79cgn/cowboy-ios-widget/blob/main/cowboy-widget.js"
+      },
+      {
+        "name": "dm Toilet Paper",
+        "source": "https://gist.github.com/marco79cgn/23ce08fd8711ee893a3be12d4543f2d2"
+      },
+      {
+        "name": "Sonos Now Playing",
+        "source": "https://gist.github.com/marco79cgn/98616fcbb2dfdbd752b33a452208bcc8"
+      },
+      {
+        "name": "Spotify Now Playing",
+        "source": "https://gist.github.com/marco79cgn/79a6a265d978dc22cc2a12058b24e02b"
+      },
+      {
+        "name": "Vaccination Stats Germany",
+        "source": "https://gist.github.com/marco79cgn/b5f291d6242a2c530e56c748f1ae7f2c"
+      }
+    ],
+    "markhunte": [
+      {
+        "name": "Discourse Forum 2",
+        "source": "https://github.com/markhunte/Discourse-Forum----Latest-Post-iOS-Widget/blob/main/Discourse%20Forum%202.js"
+      },
+      {
+        "name": "Scriptable Forum 2",
+        "source": "https://github.com/markhunte/Discourse-Forum----Latest-Post-iOS-Widget/blob/main/Scriptable%20%20Forum%202.js"
+      },
+      {
+        "name": "Tumult Forum 2",
+        "source": "https://github.com/markhunte/Discourse-Forum----Latest-Post-iOS-Widget/blob/main/Tumult%20Forum%202.js"
+      }
+    ],
+    "Martlgap": [
+      {
+        "name": "CryptoDepotWidget",
+        "source": "https://github.com/Martlgap/CryptoDepotWidget"
+      },
+      {
+        "name": "SmarterTankenWidget.js",
+        "source": "https://github.com/Martlgap/SmarterTankenWidget"
+      }
+    ],
+    "marvnsch": [
+      {
+        "name": "Strava activity widget",
+        "source": "https://github.com/marvnsch/Scriptable-widget-for-Strava/blob/main/Strava_activity_widget.js"
+      }
+    ],
+    "masselmello": [
+      {
+        "name": "McFit Capacity",
+        "source": "https://gist.github.com/masselmello/6d4f4c533b98b2550ee23a7a5e6c6cff"
+      }
+    ],
+    "maxarndt": [
+      {
+        "name": "home screen",
+        "source": "https://github.com/maxarndt/apsystems-ez1-scriptable-widget/blob/main/home-screen.js"
+      },
+      {
+        "name": "lock screen",
+        "source": "https://github.com/maxarndt/apsystems-ez1-scriptable-widget/blob/main/lock-screen.js"
+      }
+    ],
+    "McSliverMoon": [
+      {
+        "name": "index · McSliverMoon",
+        "source": "https://github.com/McSliverMoon/Scriptable-Widgets-IOS/blob/main/index.js"
+      }
+    ],
+    "mountbatt": [
+      {
+        "name": "Renault ZOE Widget",
+        "source": "https://gist.github.com/mountbatt/772e4512089802a2aa2622058dd1ded7"
+      }
+    ],
+    "mtoutkast": [
+      {
+        "name": "calendar",
+        "source": "https://github.com/mtoutkast/scriptable-calendar-widget/blob/main/calendar.js"
+      }
+    ],
+    "mvan231": [
+      {
+        "name": "Alexa To Reminders",
+        "source": "https://github.com/mvan231/Scriptable"
+      },
+      {
+        "name": "NASA Photo of the Day",
+        "source": "https://github.com/mvan231/Scriptable/blob/main/NASA%20Photo%20Of%20The%20Day.js"
+      },
+      {
+        "name": "Strava API",
+        "source": "https://github.com/mvan231/Scriptable/tree/main/Strava"
+      },
+      {
+        "name": "Upcoming Calendar Events",
+        "source": "https://github.com/mvan231/Scriptable/blob/main/Upcoming%20Calendar%20Widget.js"
+      },
+      {
+        "name": "VSCO Recents",
+        "source": "https://github.com/mvan231/Scriptable/tree/main/VSCO%20Recents"
+      },
+      {
+        "name": "Weather Overview",
+        "source": "https://github.com/mvan231/Scriptable/tree/main/Weather%20Overview"
+      }
+    ],
+    "mzeryck": [
+      {
+        "name": "Weather-Cal",
+        "source": "https://github.com/mzeryck/Weather-Cal"
+      },
+      {
+        "name": "Widget Blur",
+        "source": "https://github.com/mzeryck/Widget-Blur"
+      }
+    ],
+    "Necriso": [
+      {
+        "name": "tankstellenpreise.js",
+        "source": "https://github.com/Necriso/ScriptableWidgets"
+      }
+    ],
+    "neidigsi": [
+      {
+        "name": "froniview day",
+        "source": "https://github.com/neidigsi/froniview_scriptable/blob/main/froniview_day.js"
+      }
+    ],
+    "Nicolas-kings": [
+      {
+        "name": "ONE-Tool",
+        "source": "https://github.com/Nicolasking007/Scriptable"
+      }
+    ],
+    "Nicolasking007": [
+      {
+        "name": "ONE-NBA",
+        "source": "https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA"
+      }
+    ],
+    "niklasvieth": [
+      {
+        "name": "Polestar Medium Widget",
+        "source": "https://github.com/niklasvieth/polestar-ios-medium-widget"
+      }
+    ],
+    "noiseorigin": [
+      {
+        "name": "Cat Widget",
+        "source": "https://github.com/noiseorigin/scriptable-ios-widget/blob/main/CatWidget.js"
+      },
+      {
+        "name": "Dog Widget",
+        "source": "https://github.com/noiseorigin/scriptable-ios-widget/blob/main/DogWidget.js"
+      }
+    ],
+    "Normal-Tangerine8609": [
+      {
+        "name": "Can I Use Widget",
+        "source": "https://github.com/Normal-Tangerine8609/Scriptable-Widgets"
+      }
+    ],
+    "npadgen": [
+      {
+        "name": "uk covid vaccinations widget",
+        "source": "https://github.com/npadgen/scriptable-uk-covid-dashboard/blob/main/uk-covid-vaccinations-widget.js"
+      },
+      {
+        "name": "uk covid widget",
+        "source": "https://github.com/npadgen/scriptable-uk-covid-dashboard/blob/main/uk-covid-widget.js"
+      }
+    ],
+    "okuRaku": [
+      {
+        "name": "Random Jisho Words",
+        "source": "https://github.com/okuRaku/random-jisho-word-widget/blob/main/RandomJishoWords.js"
+      }
+    ],
+    "olahellgren": [
+      {
+        "name": "Home Assistant Sensor Widget",
+        "source": "https://github.com/olahellgren/home-assistant-sensor-widget-scriptable"
+      }
+    ],
+    "olikdesign": [
+      {
+        "name": "WooCommerce Sales",
+        "source": "https://gist.github.com/olikdesign/4c9c5549686c81e728b065286eb0e750"
+      }
+    ],
+    "opp100": [
+      {
+        "name": "BMW Linker",
+        "source": "https://github.com/opp100/bmw-scriptable-widgets"
+      }
+    ],
+    "p0fi": [
+      {
+        "name": "gitlab-stats-for-scribtable",
+        "source": "https://github.com/p0fi/gitlab-stats-for-scribtable"
+      },
+      {
+        "name": "Skiable",
+        "source": "https://github.com/p0fi/skiable-for-scriptable"
+      }
+    ],
+    "phatsanphonna": [
+      {
+        "name": "index",
+        "source": "https://github.com/phatsanphonna/COVID-19-Scriptable/blob/master/index.js"
+      }
+    ],
+    "PINPAL": [
+      {
+        "name": "Today Widget",
+        "source": "https://github.com/PINPAL/ScriptableWidgets/blob/main/Today%20Widget.js"
+      }
+    ],
+    "planecore": [
+      {
+        "name": "Coronavirus Country Stats",
+        "source": "https://gist.github.com/planecore/e7b4c1e5db2dd28b1a023860e831355e"
+      }
+    ],
+    "rfresh": [
+      {
+        "name": "Pollen Level",
+        "source": "https://github.com/rfresh/Scriptable/blob/main/PollenLevel/PollenLevel.js"
+      },
+      {
+        "name": "Tesco Mobile Data",
+        "source": "https://github.com/rfresh/Scriptable/blob/main/TescoMobileData/TescoMobileData.js"
+      }
+    ],
+    "RiccStella": [
+      {
+        "name": "Random-Canvas",
+        "source": "https://github.com/RiccStella/Random-Canvas"
+      }
+    ],
+    "richicarli": [
+      {
+        "name": "HomeWidget Scribble",
+        "source": "https://github.com/richicarli/HomeWidget-Scribble-"
+      }
+    ],
+    "rik-rosseel": [
+      {
+        "name": "Launch Schedule",
+        "source": "https://github.com/rik-rosseel/launch-schedule"
+      }
+    ],
+    "Robby3St": [
+      {
+        "name": "Scriptables-WindowWidget",
+        "source": "https://github.com/Robby3St/Scriptables-WindowWidget"
+      }
+    ],
+    "Roninjc": [
+      {
+        "name": "Countries a year",
+        "source": "https://github.com/Roninjc/scriptable/blob/main/widgets/Countries%20a%20year.js"
+      },
+      {
+        "name": "Servers healthz",
+        "source": "https://github.com/Roninjc/scriptable/blob/main/widgets/Servers%20healthz.js"
+      },
+      {
+        "name": "Shopping list",
+        "source": "https://github.com/Roninjc/scriptable/blob/main/widgets/Shopping%20list.js"
+      }
+    ],
+    "rushhiii": [
+      {
+        "name": "Countdown Widget",
+        "source": "https://github.com/rushhiii/Scriptable-iOSWidgets/tree/main/Widgets/Countdown%20Widget"
+      },
+      {
+        "name": "Dynamic Weather",
+        "source": "https://github.com/rushhiii/Scriptable-iOSWidgets/tree/main/Widgets/Weather%20Widget"
+      },
+      {
+        "name": "MyUniSchedule",
+        "source": "https://github.com/rushhiii/Scriptable-iOSWidgets/tree/main/Widgets/Schedule%20Widget"
+      },
+      {
+        "name": "OpenWeather AQI",
+        "source": "https://github.com/rushhiii/Scriptable-iOSWidgets"
+      },
+      {
+        "name": "Quote Widget",
+        "source": "https://github.com/rushhiii/Scriptable-iOSWidgets/tree/main/Widgets/Quote%20Widget"
+      }
+    ],
+    "SapneshNaik": [
+      {
+        "name": "kuvera ios widget",
+        "source": "https://github.com/SapneshNaik/kuvera-ios-widget-scriptable/blob/main/kuvera_ios_widget.js"
+      }
+    ],
+    "Saudumm": [
+      {
+        "name": "News Widget",
+        "source": "https://github.com/Saudumm/scriptable-News-Widget"
+      }
+    ],
+    "sayantangr": [
+      {
+        "name": "Airtel",
+        "source": "https://github.com/sayantangr/Airtel_Scriptable_Widget/blob/main/Airtel.js"
+      }
+    ],
+    "shfrmn": [
+      {
+        "name": "scriptable-recipe",
+        "source": "https://github.com/shfrmn/scriptable-recipe"
+      }
+    ],
+    "Sillium": [
+      {
+        "name": "Telekom Data Consumption",
+        "source": "https://gist.github.com/Sillium/f904fb89444bc8dde12cfc07b8fa8728"
+      },
+      {
+        "name": "Telekom Lock Screen",
+        "source": "https://github.com/Sillium/telekom-lock-screen-widget/blob/main/TelekomLockScreen.js"
+      }
+    ],
+    "SmonSE": [
+      {
+        "name": "notiz Blog load json",
+        "source": "https://github.com/SmonSE/Notizblog/blob/main/notizBlog_load_json.js"
+      }
+    ],
+    "SolsticeLeaf": [
+      {
+        "name": "Steam Profile Widget",
+        "source": "https://github.com/SolsticeLeaf/Scriptable-Steam-Widget"
+      }
+    ],
+    "spencerwooo": [
+      {
+        "name": "TermiWidget",
+        "source": "https://gist.github.com/spencerwooo/7955aefc4ffa5bc8ae7c83d85d05e7a4"
+      }
+    ],
+    "sryo": [
+      {
+        "name": "ZenDigest",
+        "source": "https://github.com/sryo/scriptables"
+      }
+    ],
+    "St3v3ncher": [
+      {
+        "name": "rewards widget",
+        "source": "https://github.com/St3v3ncher/scriptable-widgets/blob/main/strongblock/rewards_widget.js"
+      },
+      {
+        "name": "rewards widget SN",
+        "source": "https://github.com/St3v3ncher/scriptable-widgets/blob/main/strongblock/rewards_widget_SN.js"
+      }
+    ],
+    "Suma-xy": [
+      {
+        "name": "Birthday Countdown",
+        "source": "https://github.com/Suma-xy/iOS-MacOS-Widgets/blob/main/Birthday-Countdown/Birthday-Countdown.js"
+      }
+    ],
+    "supermamon": [
+      {
+        "name": "Instagram Latest Post",
+        "source": "https://github.com/supermamon/scriptable-instagram-widgets"
+      }
+    ],
+    "tai78nan": [
+      {
+        "name": "Env",
+        "source": "https://github.com/tai78nan/ios-scriptable-widget/blob/main/Env.js"
+      },
+      {
+        "name": "main · tai78nan",
+        "source": "https://github.com/tai78nan/ios-scriptable-widget/blob/main/main.js"
+      }
+    ],
+    "thejosejorge": [
+      {
+        "name": "FutCal",
+        "source": "https://github.com/thejosejorge/futcal-for-scriptable"
+      }
+    ],
+    "ThisIsBenny": [
+      {
+        "name": "VodafoneDE",
+        "source": "https://github.com/ThisIsBenny/iOS-Widgets"
+      }
+    ],
+    "thisisevanfox": [
+      {
+        "name": "NBA My Team",
+        "source": "https://github.com/thisisevanfox/nba-my-team-ios-widget"
+      },
+      {
+        "name": "NHL My Team",
+        "source": "https://github.com/thisisevanfox/nhl-my-team-ios-widget"
+      }
+    ],
+    "tiuub": [
+      {
+        "name": "Traewelling Widget",
+        "source": "https://github.com/tiuub/traewelling-widget/blob/main/src/TraewellingWidget.js"
+      }
+    ],
+    "tonesto7": [
+      {
+        "name": "FordPass by tonesto7",
+        "source": "https://github.com/tonesto7/fordpass-scriptable"
+      }
+    ],
+    "tony-aptx4869": [
+      {
+        "name": "cache",
+        "source": "https://github.com/tony-aptx4869/scriptable/blob/main/js_scripts/cache.js"
+      },
+      {
+        "name": "terminal",
+        "source": "https://github.com/tony-aptx4869/scriptable/blob/main/js_scripts/terminal.js"
+      }
+    ],
+    "toto": [
+      {
+        "name": "homeassistant widget",
+        "source": "https://github.com/toto/homeassistant-solar-widget-scriptable/blob/main/homeassistant-widget.js"
+      }
+    ],
+    "transilluminate": [
+      {
+        "name": "Download Station",
+        "source": "https://github.com/transilluminate/download-station-widget/blob/main/Download%20Station.js"
+      }
+    ],
+    "ttsantos": [
+      {
+        "name": "FPL Private League Score",
+        "source": "https://github.com/ttsantos/Scriptable-examples"
+      }
+    ],
+    "unvsDev": [
+      {
+        "name": "Blend Installer",
+        "source": "https://github.com/unvsDev/blend"
+      },
+      {
+        "name": "Pixel Widget",
+        "source": "https://github.com/unvsDev/pixel-widget"
+      }
+    ],
+    "UsernameYann": [
+      {
+        "name": "Flower USD",
+        "source": "https://github.com/UsernameYann/Sunflower-Land-Widget-for-iOS/blob/main/Flower-USD.js"
+      },
+      {
+        "name": "SFL auctions",
+        "source": "https://github.com/UsernameYann/Sunflower-Land-Widget-for-iOS/blob/main/SFL-auctions.js"
+      },
+      {
+        "name": "SFL widget Notif",
+        "source": "https://github.com/UsernameYann/Sunflower-Land-Widget-for-iOS/blob/main/SFL-widget%2BNotif.js"
+      },
+      {
+        "name": "SFL world prices v3",
+        "source": "https://github.com/UsernameYann/Sunflower-Land-Widget-for-iOS/blob/main/SFL.world-prices-v3.js"
+      },
+      {
+        "name": "widget faction weekly",
+        "source": "https://github.com/UsernameYann/Sunflower-Land-Widget-for-iOS/blob/main/widget-faction-weekly.js"
+      },
+      {
+        "name": "widget inventory Flowers",
+        "source": "https://github.com/UsernameYann/Sunflower-Land-Widget-for-iOS/blob/main/widget-inventory-Flowers.js"
+      }
+    ],
+    "v1lling": [
+      {
+        "name": "ClubConnector Gym Capacity Widget",
+        "source": "https://github.com/v1lling/scriptable-clubconnector"
+      }
+    ],
+    "Vxider": [
+      {
+        "name": "Niu Data Widget",
+        "source": "https://github.com/Vxider/NiuDataWidget"
+      }
+    ],
+    "waaeel": [
+      {
+        "name": "wiener linien monitor",
+        "source": "https://github.com/waaeel/ios-scriptable-wiener-linien-widgets/blob/main/wiener-linien-monitor.js"
+      }
+    ],
+    "wickenico": [
+      {
+        "name": "btc-usd-course.js",
+        "source": "https://github.com/wickenico/btc-usd-course.js"
+      },
+      {
+        "name": "exchange rates",
+        "source": "https://github.com/wickenico/exchange-rates.js/blob/main/exchange-rates.js"
+      },
+      {
+        "name": "Stock Widget",
+        "source": "https://github.com/wickenico/stock-widget.js"
+      }
+    ],
+    "wizard-ron17": [
+      {
+        "name": "abx Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Alephium%20Tokens/abxPrice.js"
+      },
+      {
+        "name": "apad Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Alephium%20Tokens/apadPrice.js"
+      },
+      {
+        "name": "bro Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Kadena%20Tokens/broPrice.js"
+      },
+      {
+        "name": "exy Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Alephium%20Tokens/exyPrice.js"
+      },
+      {
+        "name": "heron Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Kadena%20Tokens/heronPrice.js"
+      },
+      {
+        "name": "kds Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Kadena%20Tokens/kdsPrice.js"
+      },
+      {
+        "name": "mok Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Kadena%20Tokens/mokPrice.js"
+      },
+      {
+        "name": "ngu Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Alephium%20Tokens/nguPrice.js"
+      },
+      {
+        "name": "rfkj Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Solana%20Tokens/rfkjPrice.js"
+      },
+      {
+        "name": "wgw Price",
+        "source": "https://github.com/wizard-ron17/Scriptable-iOS-Widgets/blob/main/Solana%20Tokens/wgwPrice.js"
+      }
+    ],
+    "xditya": [
+      {
+        "name": "Month Pulse Widget",
+        "source": "https://github.com/xditya/ios-scriptable-widgets/blob/main/MonthPulse/MonthPulse_Widget.js"
+      }
+    ],
+    "yaylinda": [
+      {
+        "name": "Calendar Events Widget",
+        "source": "https://github.com/yaylinda/scriptable"
+      }
+    ],
+    "yuristru": [
+      {
+        "name": "One Day Calendar Widget XS",
+        "source": "https://github.com/yuristru/scriptable_OneDayCalendarWidgetXS/blob/main/OneDayCalendarWidgetXS.js"
+      }
+    ],
+    "zSaaiq": [
+      {
+        "name": "Signing script",
+        "source": "https://github.com/zSaaiq/iOS-Signing-Status-Widget/blob/main/Signing-script.js"
+      }
+    ]
+  }
+}
