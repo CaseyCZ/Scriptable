@@ -13,6 +13,7 @@ body{background:radial-gradient(circle at 50% -10%,var(--hero),var(--bg) 38%,var
 .nav{display:flex;align-items:center;gap:4px;margin-left:auto}
 .nav a{padding:9px 10px;border-radius:9px;color:var(--muted);font-size:12px;font-weight:800}
 .nav a:hover{background:var(--panel2);color:var(--text)}
+.nav a.active{background:var(--accent-soft);color:var(--accent)}
 .nav-actions{display:flex;align-items:center;gap:7px}
 .icon-btn,.compact-btn{height:38px;border:1px solid var(--border);background:color-mix(in srgb,var(--panel) 90%,transparent);border-radius:10px;color:var(--text)}
 .icon-btn{width:38px;display:grid;place-items:center;cursor:pointer;padding:0}
