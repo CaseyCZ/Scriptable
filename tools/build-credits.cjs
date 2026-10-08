@@ -18,7 +18,7 @@ const seen=new Set();
 const items=[];
 for(const app of [...builtIn,...extended]){
   const name=clean(app.name),author=clean(app.author),source=clean(app.source),file=clean(app.file);
-  const key=(source||file||author+'|'+name).toLowerCase();
+  const key=(file||((source||author)+'|'+name)).toLowerCase();
   if(!name||!author||seen.has(key)) continue;
   seen.add(key);
   items.push({name,author,source,file,category:clean(app.category)});
