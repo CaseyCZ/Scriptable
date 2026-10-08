@@ -23,18 +23,33 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def decode_js_string(raw: str) -> str:
+    return raw.replace("\\/", "/").replace("\\'", "'").replace('\\"', '"').replace("\\\\", "\\")
+
+
 def js_strings(text: str) -> list[str]:
     out: list[str] = []
     pattern = re.compile(r"'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\"")
     for match in pattern.finditer(text):
         raw = match.group(1) if match.group(1) is not None else match.group(2)
-        raw = raw.replace("\\/", "/").replace("\\'", "'").replace('\\"', '"').replace("\\\\", "\\")
-        out.append(raw)
+        out.append(decode_js_string(raw))
     return out
 
 
-def collect_items() -> list[dict[str, str]]:
-    items: list[dict[str, str]] = []
+def variant_files(chunk: str) -> list[str]:
+    if "variants" not in chunk:
+        return []
+    tail = chunk.split("variants", 1)[1]
+    pattern = re.compile(r"\bfile\s*:\s*(?:'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\")")
+    out: list[str] = []
+    for match in pattern.finditer(tail):
+        raw = match.group(1) if match.group(1) is not None else match.group(2)
+        out.append(decode_js_string(raw))
+    return out
+
+
+def collect_projects() -> list[dict[str, object]]:
+    projects: list[dict[str, object]] = []
 
     index_text = INDEX.read_text(encoding="utf-8")
     try:
@@ -44,7 +59,7 @@ def collect_items() -> list[dict[str, str]]:
 
     object_pattern = re.compile(r"\{name:(['\"])(.*?)\1.*?file:(['\"])(.*?)\3.*?\}", re.S)
     for match in object_pattern.finditer(community_block):
-        items.append({"name": match.group(2), "file": match.group(4)})
+        projects.append({"name": match.group(2), "files": [match.group(4)]})
 
     extra_text = EXTRA.read_text(encoding="utf-8")
     for line in extra_text.splitlines():
@@ -52,15 +67,22 @@ def collect_items() -> list[dict[str, str]]:
             continue
         chunk = line.split("communityItem(", 1)[1]
         values = js_strings(chunk)
-        if len(values) >= 5:
-            items.append({"name": values[0], "file": values[4]})
-
-    dedup: dict[str, dict[str, str]] = {}
-    for item in items:
-        url = item["file"].strip()
-        if not url.startswith(("https://", "http://")):
+        if len(values) < 5:
             continue
-        dedup.setdefault(url, item)
+        files = [values[4], *variant_files(chunk)]
+        files = list(dict.fromkeys(url.strip() for url in files if url.strip()))
+        projects.append({"name": values[0], "files": files})
+
+    dedup: dict[tuple[str, ...], dict[str, object]] = {}
+    for project in projects:
+        files = tuple(
+            url for url in project["files"]
+            if isinstance(url, str) and url.startswith(("https://", "http://"))
+        )
+        if not files:
+            continue
+        project["files"] = list(files)
+        dedup.setdefault(files, project)
 
     return list(dedup.values())
 
@@ -114,30 +136,48 @@ def probe(item: dict[str, str]) -> tuple[str, dict[str, object]]:
 
 
 def main() -> None:
-    items = collect_items()
-    if not items:
+    projects = collect_projects()
+    if not projects:
         raise SystemExit("No community download URLs found")
+
+    endpoints: dict[str, dict[str, str]] = {}
+    for project in projects:
+        for url in project["files"]:
+            endpoints.setdefault(url, {"name": str(project["name"]), "file": url})
 
     results: dict[str, dict[str, object]] = {}
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        futures = [pool.submit(probe, item) for item in items]
+        futures = [pool.submit(probe, item) for item in endpoints.values()]
         for future in as_completed(futures):
             url, status = future.result()
             results[url] = status
 
-    online = sum(1 for item in results.values() if item.get("online") is True)
-    offline = len(results) - online
+    project_online = 0
+    for project in projects:
+        statuses = [results.get(url, {}) for url in project["files"]]
+        if any(status.get("online") is True for status in statuses):
+            project_online += 1
+    project_offline = len(projects) - project_online
+
+    endpoint_online = sum(1 for item in results.values() if item.get("online") is True)
+    endpoint_offline = len(results) - endpoint_online
     payload = {
         "generatedAt": now_iso(),
-        "total": len(results),
-        "online": online,
-        "offline": offline,
+        "total": len(projects),
+        "online": project_online,
+        "offline": project_offline,
+        "endpointsTotal": len(results),
+        "endpointsOnline": endpoint_online,
+        "endpointsOffline": endpoint_offline,
         "items": dict(sorted(results.items())),
     }
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Checked {len(results)} community projects: {online} online, {offline} offline")
+    print(
+        f"Checked {len(projects)} community projects / {len(results)} download endpoints: "
+        f"{project_online} projects online, {project_offline} offline"
+    )
 
 
 if __name__ == "__main__":
