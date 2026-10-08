@@ -1,1189 +1,2764 @@
 {
-  "generatedAt": "2026-10-08T17:08:41Z",
-  "total": 169,
-  "online": 165,
+  "generatedAt": "2026-10-08T17:17:54Z",
+  "total": 394,
+  "online": 390,
   "offline": 4,
   "items": {
+    "https://gist.githubusercontent.com/Baumchen/b8b9aaf5ba0aebef173a4f956a3b4290/raw/": {
+      "name": "Austria Incidence",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/DanielStefanK/487175b6f65ede401e37ee4848970176/raw/": {
+      "name": "FitX Capacity",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/Sillium/f904fb89444bc8dde12cfc07b8fa8728/raw/": {
+      "name": "Telekom Data Consumption",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/brenoprata10/10d6bd1c8445a1181b899dd47c715577/raw/": {
+      "name": "Steam Wishlist",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/coughski/43c7a4da3829a3ffe394d6eeb6a8c90a/raw/": {
+      "name": "Citi Bike Availability",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/flasozzi/ab6222ea15de5113555c32c855e9e326/raw/": {
+      "name": "Simple Countdown",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/kevinkub/46caebfebc7e26be63403a7f0587f664/raw/": {
+      "name": "Germany Incidence",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/marco79cgn/23ce08fd8711ee893a3be12d4543f2d2/raw/": {
+      "name": "dm Toilet Paper",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/marco79cgn/79a6a265d978dc22cc2a12058b24e02b/raw/": {
+      "name": "Spotify Now Playing",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/marco79cgn/98616fcbb2dfdbd752b33a452208bcc8/raw/": {
+      "name": "Sonos Now Playing",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/marco79cgn/b5f291d6242a2c530e56c748f1ae7f2c/raw/": {
+      "name": "Vaccination Stats Germany",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/masselmello/6d4f4c533b98b2550ee23a7a5e6c6cff/raw/": {
+      "name": "McFit Capacity",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/mountbatt/772e4512089802a2aa2622058dd1ded7/raw/": {
+      "name": "Renault ZOE Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/olikdesign/4c9c5549686c81e728b065286eb0e750/raw/": {
+      "name": "WooCommerce Sales",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/planecore/e7b4c1e5db2dd28b1a023860e831355e/raw/": {
+      "name": "Coronavirus Country Stats",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://gist.githubusercontent.com/spencerwooo/7955aefc4ffa5bc8ae7c83d85d05e7a4/raw/": {
+      "name": "TermiWidget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/0xf0xx0/scriptable-no-background/ios-18-and-later/examples/nobg-auto.js": {
+      "name": "nobg auto",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/0xf0xx0/scriptable-no-background/ios-18-and-later/examples/nobg-configurable-widget-template.js": {
+      "name": "nobg configurable widget template",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/0xf0xx0/scriptable-no-background/ios-18-and-later/examples/nobg-small-top-left-widget.js": {
+      "name": "nobg small top left widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/0xf0xx0/scriptable-no-background/ios-18-and-later/examples/semi-transparent.js": {
+      "name": "semi transparent",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/0xf0xx0/scriptable-no-background/ios-18-and-later/examples/weather-widget-414.js": {
+      "name": "weather widget 414",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/AhmedHalat/GitHub-Scriptable-Widget/master/Notifications.js": {
+      "name": "Notifications",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/AngusTse/ios-scriptable-ausnews-widget/main/aus-news-widget.js": {
+      "name": "aus news widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/AngusTse/ios-scriptable-hknews-widget/main/hk-news-widget.js": {
+      "name": "hk news widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Arxhtects/Scriptable-Basic-Widget/main/simpletimeandweather.js": {
+      "name": "simpletimeandweather",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/BergenSoft/scriptable_premiumsim/main/src/PremiumSim.js": {
+      "name": "scriptable_premiumsim",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/BerkeleyPB/Scriptable/main/iTerm%20Widget.js": {
+      "name": "i Term Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Besenwiesler/corona-widget/main/corona.js": {
+      "name": "corona",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Boatkungg/YRC-Canteen-Widget/main/YRCcanteen.js": {
+      "name": "YRCcanteen",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
     "https://raw.githubusercontent.com/Chrischi-/tradegate-stock-widget-for-scriptable/main/tradegate-stock-widget.js": {
       "name": "Tradegate Stock Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ChristophObermeier/iOS-Widgets/main/Air%20Polution%20Widget/AirQuali_fix.js": {
+      "name": "Air Quali fix",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ChristophObermeier/iOS-Widgets/main/Air%20Polution%20Widget/AirQuali_locbased.js": {
+      "name": "Air Quali locbased",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ChristophObermeier/iOS-Widgets/main/MVG-Widget/mvg_widget_fix.js": {
+      "name": "mvg widget fix",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Ctrl-plus-R/MoonCat-Scriptable-Widget/main/mooncat-scriptable-widget.js": {
+      "name": "mooncat scriptable widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/DanielGallo/GivEnergy-Scriptable-Widget/master/givenergy_widget.js": {
+      "name": "givenergy widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/DrieStone/TeslaData-Widget/main/TeslaData%20Widget.js": {
       "name": "TeslaData Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/FifiTheBulldog/scriptable-testflight-watcher/master/TestFlight%20Watcher.js": {
+      "name": "scriptable-testflight-watcher",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/.eslintrc.js": {
+      "name": ".eslintrc by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/%E6%98%9F%E5%BA%A7%E5%B1%8B.js": {
+      "name": "星座屋 by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/%E6%B9%96%E5%8C%97%E8%81%94%E9%80%9A.js": {
+      "name": "湖北联通 by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/10010.js": {
+      "name": "10010 by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/App%20%E9%99%90%E5%85%8D%E4%BC%98%E6%83%A0.js": {
+      "name": "App 限免优惠 by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Astrology.js": {
+      "name": "Astrology by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/CLS%20Telegraph.js": {
+      "name": "CLS Telegraph by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Calendar.js": {
+      "name": "Calendar by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/ChatGPT.js": {
+      "name": "ChatGPT by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/CoinGecko.js": {
+      "name": "CoinGecko by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Countdown.js": {
+      "name": "Countdown by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Days%20Dots.js": {
+      "name": "Days Dots by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Douban.js": {
+      "name": "Douban by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/GitHub%20Contributions.js": {
+      "name": "GitHub Contributions by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Juejin.js": {
+      "name": "Juejin by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Matrix.js": {
+      "name": "Matrix by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/NAT.js": {
+      "name": "NAT by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Olympics.js": {
+      "name": "Olympics by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/OpenAI.js": {
+      "name": "OpenAI by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Pet%20Birthday.js": {
+      "name": "Pet Birthday by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Photo.js": {
+      "name": "Photo by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/SGCC.js": {
+      "name": "SGCC by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Send%20Photo.js": {
+      "name": "Send Photo by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Sinopec.js": {
+      "name": "Sinopec by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Unicom.ui.js": {
+      "name": "Unicom.ui by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Wallhaven.js": {
+      "name": "Wallhaven by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Weibo.js": {
+      "name": "Weibo by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/dist/Xiaohongshu.js": {
+      "name": "Xiaohongshu by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/src/GitHub%20Profile.js": {
+      "name": "GitHub Profile by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/src/Photos.js": {
+      "name": "Photos by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/src/Shortcuts.js": {
+      "name": "Shortcuts by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Honye/scriptable-scripts/master/src/utils/utils.js": {
+      "name": "utils by Honye",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Juniorchen2012/scriptable/master/exchangeRate.js": {
+      "name": "exchangeRate.js",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Korysam15/bamboo-scriptable-widget/main/src/bamboo-widget.js": {
+      "name": "bamboo-scriptable-widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/MacSchierer/ImpfQuoten/main/ImpfQuoten.js": {
+      "name": "Impf Quoten",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/MacSchierer/WarnWetter/main/WarnWetter.js": {
+      "name": "Warn Wetter",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Martlgap/CryptoDepotWidget/main/cryptowidget.js": {
       "name": "CryptoDepotWidget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Martlgap/SmarterTankenWidget/main/SmarterTankenWidget.js": {
+      "name": "SmarterTankenWidget.js",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/McSliverMoon/Scriptable-Widgets-IOS/main/index.js": {
+      "name": "index · McSliverMoon",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/guenstigsteTankstelle.js": {
+      "name": "guenstigsteTankstelle by Necriso",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/guenstigsteTankstelleAT.js": {
+      "name": "guenstigsteTankstelleAT by Necriso",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/openWebIf.js": {
+      "name": "openWebIf by Necriso",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/tankstellenpreise.js": {
+      "name": "tankstellenpreise.js",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/tankstellenpreisev2_beta.js": {
+      "name": "tankstellenpreisev2_beta by Necriso",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/%E6%8D%B7%E5%BE%84%E7%9B%92%E6%95%B0%E6%8D%AE%E7%9C%8B%E6%9D%BF/%E6%8D%B7%E5%BE%84%E7%9B%92%E6%95%B0%E6%8D%AE.js": {
       "name": "Shortcut Box Dashboard",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/%E6%8D%B7%E5%BE%84%E7%A4%BE%E5%8C%BA%E6%95%B0%E6%8D%AE%E7%9C%8B%E6%9D%BF/%E6%8D%B7%E5%BE%84%E7%A4%BE%E5%8C%BA%E6%95%B0%E6%8D%AE.js": {
       "name": "Shortcut Community Dashboard",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-DayMatter/ONE-DayMatter.Enc.js": {
       "name": "ONE-DayMatter",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-FOOTMATCH/ONE-FOOTMATCH.Enc.js": {
       "name": "ONE-FOOTMATCH",
       "online": false,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 404,
       "error": "HTTPError: 404 Not Found"
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-Forwardtime/ONE-Forwardtime.Enc.js": {
       "name": "ONE-Forwardtime",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-Friday/ONE-Friday.Enc.js": {
       "name": "ONE-Friday",
       "online": false,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 404,
       "error": "HTTPError: 404 Not Found"
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-LOLMATCH/ONE-LOLMATCH.Enc.js": {
       "name": "ONE-LOLMATCH",
       "online": false,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 404,
       "error": "HTTPError: 404 Not Found"
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-NBA/ONE-NBA.Enc.js": {
       "name": "ONE-NBA",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-NBAMATCH/ONE-NBAMATCH.Enc.js": {
       "name": "ONE-NBAMATCH",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-Olympic/ONE-Olympic.Enc.js": {
       "name": "ONE-Olympic",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-Progress/ONE-Progress.Enc.js": {
       "name": "ONE-Progress",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-Today/ONE-Today.Enc.js": {
       "name": "ONE-Today",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-cuntdown/ONE-cuntdown.Enc.js": {
       "name": "ONE-Countdown",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-hotcomments/ONE-hotcomments.Enc.js": {
       "name": "ONE-Hot Comments",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-memorandum/ONE-memorandum.Enc.js": {
       "name": "ONE-Memorandum",
       "online": false,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 404,
       "error": "HTTPError: 404 Not Found"
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-oilprice/ONE-oilprice.Enc.js": {
       "name": "ONE-Oil Price",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Nicolasking007/Scriptable/main/ONE-tool/ONE-Tool.Enc.js": {
       "name": "ONE-Tool",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/can-i-use.js": {
       "name": "Can I Use Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/commander-articles.js": {
       "name": "Commander Articles",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/daily-quote-widget.js": {
       "name": "Daily Quote Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/lobsters-widget.js": {
       "name": "Lobsters Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/mdn-web-api.js": {
       "name": "MDN Web API Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/on-this-day-in-history.js": {
       "name": "On This Day in History",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/pokemon-themes.js": {
       "name": "Pokemon Themes",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/random-colour-generator.js": {
       "name": "Random Colour Generator",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/reddit-text-subreddit-widget.js": {
       "name": "Reddit Text Subreddit Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/routinehub-medium.js": {
       "name": "RoutineHub Stats Medium",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/routinehub-small.js": {
       "name": "RoutineHub Stats Small",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/special-days-widget.js": {
       "name": "Special Days Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/tildes-widget.js": {
       "name": "Tildes Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/urban-dictionary-word-of-the-day.js": {
       "name": "Urban Dictionary Word of the Day",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/weather-circles.js": {
       "name": "Weather Circles",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Normal-Tangerine8609/Scriptable-Widgets/main/widgets/word-of-the-day.js": {
       "name": "Word of the Day",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/PINPAL/ScriptableWidgets/main/Today%20Widget.js": {
+      "name": "Today Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/RiccStella/Random-Canvas/main/Scriptable-script.js": {
+      "name": "Random-Canvas",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Robby3St/Scriptables-WindowWidget/main/Window%20Open%20EN.js": {
+      "name": "Scriptables-WindowWidget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Roninjc/scriptable/main/widgets/Countries%20a%20year.js": {
+      "name": "Countries a year",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Roninjc/scriptable/main/widgets/Servers%20healthz.js": {
+      "name": "Servers healthz",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Roninjc/scriptable/main/widgets/Shopping%20list.js": {
+      "name": "Shopping list",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/SapneshNaik/kuvera-ios-widget-scriptable/main/kuvera_ios_widget.js": {
+      "name": "kuvera ios widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Saudumm/scriptable-News-Widget/main/News%20Widget%20Clear%20Cache.js": {
+      "name": "scriptable-news-Widget.js",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/Saudumm/scriptable-News-Widget/main/News%20Widget.js": {
       "name": "News Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Sillium/telekom-lock-screen-widget/main/TelekomLockScreen.js": {
+      "name": "Telekom Lock Screen",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/SmonSE/Notizblog/main/notizBlog_load_json.js": {
+      "name": "notiz Blog load json",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/SolsticeLeaf/Scriptable-Steam-Widget/master/widget.js": {
       "name": "Steam Profile Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/St3v3ncher/scriptable-widgets/main/strongblock/rewards_widget.js": {
+      "name": "rewards widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/St3v3ncher/scriptable-widgets/main/strongblock/rewards_widget_SN.js": {
+      "name": "rewards widget SN",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Suma-xy/iOS-MacOS-Widgets/main/Birthday-Countdown/Birthday-Countdown.js": {
+      "name": "Birthday Countdown",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/Countdown/Countdown.js": {
+      "name": "Countdown by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/Covid-19/Covid-19.js": {
+      "name": "Covid-19 by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/DevTo/DevTo.js": {
+      "name": "DevTo by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/Ecosia/Ecosia.js": {
+      "name": "Ecosia by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/Meeting-dial-in/Meeting-dial-in.js": {
+      "name": "Meeting-dial-in by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/PAYBACK-Points/PAYBACK-Points.js": {
+      "name": "PAYBACK-Points by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/PeriodOfPregnancy/PeriodOfPregnancy.js": {
+      "name": "PeriodOfPregnancy by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/VRR-Monitor/VRR-Monitor.js": {
+      "name": "VRR-Monitor by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/VodafoneDE/VodafoneDE.js": {
+      "name": "VodafoneDE",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/Webservices-Health-Check/Webservices-Health-Check.js": {
+      "name": "Webservices-Health-Check by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/car-location/car-location.js": {
+      "name": "car-location by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ThisIsBenny/iOS-Widgets/main/number-of-covild-19-vaccinations/number-of-covild-19-vaccinations.js": {
+      "name": "number-of-covild-19-vaccinations by ThisIsBenny",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/UsernameYann/Sunflower-Land-Widget-for-iOS/main/Flower-USD.js": {
+      "name": "Flower USD",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/UsernameYann/Sunflower-Land-Widget-for-iOS/main/SFL-auctions.js": {
+      "name": "SFL auctions",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/UsernameYann/Sunflower-Land-Widget-for-iOS/main/SFL-widget%2BNotif.js": {
+      "name": "SFL widget Notif",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/UsernameYann/Sunflower-Land-Widget-for-iOS/main/SFL.world-prices-v3.js": {
+      "name": "SFL world prices v3",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/UsernameYann/Sunflower-Land-Widget-for-iOS/main/widget-faction-weekly.js": {
+      "name": "widget faction weekly",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/UsernameYann/Sunflower-Land-Widget-for-iOS/main/widget-inventory-Flowers.js": {
+      "name": "widget inventory Flowers",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/Vxider/NiuDataWidget/master/NiuDataWidget.js": {
+      "name": "Niu Data Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/abbyjeet/scriptable-widgets/main/IPL.js": {
+      "name": "IPL",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/akaFTS/superglance-scriptable-widget/main/script.js": {
+      "name": "script",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/alexboden/toronto-bike-share-status/main/compact-widget.js": {
+      "name": "Toronto Bike Share",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/andyngo/conversable-for-scriptable/main/Conversable.js": {
       "name": "Conversable",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/angus-thompson/obsidian-scriptable-tasks-widget/main/Obsidian%20Tasks.js": {
+      "name": "Obsidian Tasks",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/aquova/hass-ios-scriptable-widgets/master/Home%20Assistant%20Lock.js": {
+      "name": "Home Assistant Lock",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/aquova/hass-ios-scriptable-widgets/master/Home%20Assistant.js": {
+      "name": "Home Assistant",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/archive-sh/F1-Scriptable-Widget/main/F1%20Widget%20OfficialF1.js": {
+      "name": "F1 Widget Official F1",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/archive-sh/F1-Scriptable-Widget/main/F1%20Widget%20OpenF1.js": {
+      "name": "F1 Widget Open F1",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/awaescher/home-battery-widget/main/widget.js": {
+      "name": "widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/benjaminmckinley/Scriptable-Widgets/main/trello_widget.js": {
+      "name": "trello widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/bestmacfly/Scriptable-lichess-Widget/main/Lichess.js": {
       "name": "Lichess Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/bigfoott/PoGOEvents/master/PoGOEvents.js": {
+      "name": "PoGO Events",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/bitKrakenCode/ScriptableWordClockWidget/main/Word%20Clock%20Widget.js": {
       "name": "Word Clock",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/bluewalk/scriptable-widgets/master/scriptable-50plusmobiel.js": {
+      "name": "scriptable 50plusmobiel",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/bluewalk/scriptable-widgets/master/scriptable-mijnsimpel.js": {
+      "name": "scriptable mijnsimpel",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/bradrblack/adafruit-io-scriptable-widget/main/adafruit-io-scriptable-widget-guage.js": {
+      "name": "adafruit io scriptable widget guage",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/bradrblack/adafruit-io-scriptable-widget/main/adafruit-io-scriptable-widget.js": {
+      "name": "adafruit io scriptable widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/brianseidman/scriptable-pocket-widget/main/pocket_widget.js": {
       "name": "Pocket Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/brianwalborn/football-team-schedule-widget/main/ncaaf-script.js": {
+      "name": "ncaaf script",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/brianwalborn/football-team-schedule-widget/main/nfl-script.js": {
+      "name": "nfl script",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/brianwalborn/nfl-team-schedule-widget/main/ncaaf-script.js": {
+      "name": "nfl-team-schedule-widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cbpowell/Sense-Scriptable/main/Sense%20Widget.js": {
+      "name": "Sense Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/codegangsta/scriptable_widgets/main/obsidian-tasks-widget.js": {
+      "name": "obsidian tasks widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/colin273/scriptable-testflight-watcher/master/TestFlight%20Watcher.js": {
+      "name": "TestFlight Watcher",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/automation-bridge.js": {
+      "name": "automation bridge",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/camera-roll-atlas.js": {
+      "name": "camera roll atlas",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/cue-dispatcher.js": {
+      "name": "cue dispatcher",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/daily-hub-widget.js": {
+      "name": "daily hub widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/day-arc-widget.js": {
+      "name": "day arc widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/geo-pin-board.js": {
+      "name": "geo pin board",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/on-my-way-relay.js": {
+      "name": "on my way relay",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/routine-runner.js": {
+      "name": "routine runner",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/threshold-sentry.js": {
+      "name": "threshold sentry",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/cristiancode-hermes/scriptable-widgets/main/wip-kanban-board.js": {
+      "name": "wip kanban board",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/aerialbot-lite/aerialbot-lite.js": {
       "name": "Aerialbot Lite",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/binary-date/binary-date.js": {
       "name": "Binary Date",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/location-location-location/location-location-location.js": {
       "name": "Location Location Location",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/read-statistics/read-statistics.js": {
       "name": "Read Statistics",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/small-seasons/small-seasons.js": {
       "name": "Small Seasons",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/uberspace-quota/uberspace-quota.js": {
       "name": "Uberspace Quota",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/doersino/scriptable-widgets/main/weekly-cycling-distance/weekly-cycling-distance.js": {
       "name": "Weekly Cycling Distance",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/dominik-lueke/PokemonOfTheDay/main/PokemonOfTheDay.js": {
+      "name": "Pokemon Of The Day",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/BiliBili.js": {
       "name": "BiliBili",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/BiliBiliUp.js": {
       "name": "BiliBili Up",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/BiliBiliWatch.js": {
       "name": "BiliBili Watch",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Calendar.js": {
       "name": "Dompling Calendar",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/CarWidget.js": {
       "name": "Car Widget by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/ChinaMobile.js": {
       "name": "China Mobile",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/ChinaTelecom.js": {
       "name": "China Telecom",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/ChinaUnicom.js": {
       "name": "China Unicom",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Contact.js": {
       "name": "Contact Widget by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/DmYY.js": {
       "name": "DmYY",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Ftms.js": {
       "name": "Ftms",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Health.js": {
       "name": "Health by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/HistoryToday.js": {
       "name": "History Today by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/JD-all-one-v2.js": {
       "name": "JD All in One",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/JDDou.js": {
       "name": "JDDou",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/JDDouK.js": {
       "name": "JDDouK",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/JDWuLiu.js": {
       "name": "JD Logistics",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Oild.js": {
       "name": "Oil Price by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/PoisonCalendar.js": {
       "name": "Poison Calendar",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/PoisonCalendarText.js": {
       "name": "Poison Calendar Text",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/PriceWidgets.js": {
       "name": "Price Widgets",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Spotify.js": {
       "name": "Spotify by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/Telegram.js": {
       "name": "Telegram by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/VPNBoardPress.js": {
       "name": "VPN Board Press",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/VPNSubscription.js": {
       "name": "VPN Subscription",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/VpnBoard.js": {
       "name": "VPN Board",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/YouTube.js": {
       "name": "YouTube by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/ZXTrains.js": {
       "name": "ZX Trains",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/birthday.js": {
       "name": "Birthday by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/webo.js": {
       "name": "Webo",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/wsgw.js": {
       "name": "WSGW",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dompling/Scriptable/master/birthdayCountDown/index.js": {
       "name": "Birthday Countdown by dompling",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/dschablowsky/FordPassWidget/master/Ford.js": {
       "name": "FordPass Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/edisonX-sudo/MetaTraderAccountViewer/master/MetaTraderAccountViewer.js": {
+      "name": "Meta Trader Account Viewer",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/efficlab/social-media-follower-widget/main/main.js": {
+      "name": "main",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/esonwong/scriptable-widget/main/twitter-followers-count.js": {
+      "name": "twitter followers count",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/CountUp/CountUp.js": {
       "name": "CountUp",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/Covid-19%20Ukraine%20Stats/COVID-19.js": {
       "name": "COVID-19 Ukraine Stats",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/Covid-19-Multilang-Stats/Covid-19%20Multilang.js": {
       "name": "COVID-19 Multilang Stats",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/Losses_of_russia/Losses_of_russia.js": {
       "name": "Losses of Russia",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/SpaceLaunch/SpaceLaunch.js": {
       "name": "SpaceLaunch",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/Svitlo/%D0%A1%D0%B2%D1%96%D1%82%D0%BB%D0%BE.js": {
       "name": "Svitlo",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/extendedzero/Scriptable-IOS-Widget/main/WhereIsWebb/WhereIsWebb.js": {
       "name": "Where Is Webb",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/f1tz/bwh-monitor-widget-for-scriptable/main/bwh_monitor.js": {
+      "name": "bwh-monitor-widget-for-scriptable",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/fabianpimminger/scriptable-netatmo-widget/master/Netatmo.js": {
+      "name": "Netatmo",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/fcelsa/ScriptableMoonPhase/main/MoonPhase.js": {
+      "name": "Moon Phase",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/ferraridavide/scriptable/main/days-left.js": {
+      "name": "days-left by ferraridavide",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/ferraridavide/scriptable/main/github-contributions.js": {
       "name": "GitHub Contributions",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/flopp999/Scriptable-EiB/main/EiB.js": {
+      "name": "Ei B",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/flopp999/Scriptable-NordPool/main/Nordpool.js": {
+      "name": "Nordpool",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/gnrmarcel/scriptable-xbox/main/xbox-achievements.js": {
+      "name": "xbox achievements",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/gnrmarcel/scriptable-xbox/main/xbox-gamercard.js": {
+      "name": "xbox gamercard",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/hendrilee/claude-usage-widget/main/claude-usage-widget.js": {
+      "name": "claude usage widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/henningtillmann/sonntagsfrage/main/Sonntagsfrage.js": {
+      "name": "sonntagsfrage",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Book%20Read%20heatmap.js": {
+      "name": "Book Read heatmap",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/DSA%20tracker.js": {
+      "name": "DSA tracker",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Get%20Quotes%20.js": {
+      "name": "Get Quotes",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Habit%20log%201.js": {
+      "name": "Habit log 1",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Leetcode%20heatmap.js": {
+      "name": "Leetcode heatmap",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Study%20heatmap.js": {
+      "name": "Study heatmap",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Wakeup%20heatmap.js": {
+      "name": "Wakeup heatmap",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/Workout%20heatmap.js": {
+      "name": "Workout heatmap",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/habitsLog.js": {
+      "name": "habits Log",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/heyprashant/Scriptables-widget-ios/main/livingHealthyLog.js": {
+      "name": "living Healthy Log",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/iamrbn/Inline-Weather/main/Inline-Weather.js": {
       "name": "Inline Weather",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/iamrbn/Reddit-Widget/main/Reddit-Widget.js": {
       "name": "Reddit Widget by iamrbn",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/iamrbn/slack-status/main/slack-status-widget.js": {
       "name": "Slack Status",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/jasonsnell/PurpleAir-AQI-Scriptable-Widget/main/purpleair-aqi.js": {
+      "name": "PurpleAir-AQI-Scriptable-Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/jaydainn/CFBWidget/main/script.js": {
       "name": "CFBWidget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/junsang3/genshin-resin-counter-widget/master/resin-counter.js": {
+      "name": "resin counter",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/kylereddoch/scriptable/main/src/WakaStats.js": {
       "name": "WakaStats",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/leon47331/scriptable-lockscreen-rss-widget/main/lockscreen-rss-widget_rotation.js": {
       "name": "Lockscreen RSS",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/lukrencijus/scriptable-widgets/master/Time%20Progress.js": {
+      "name": "Time Progress",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/lukrencijus/scriptable-widgets/master/clock.js": {
+      "name": "clock",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/lukrencijus/scriptable-widgets/master/git.js": {
+      "name": "git",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/lwitzani/daysUntilBirthday/main/daysUntilBirthdayWidget.js": {
       "name": "Days Until Birthday",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/lwitzani/homebridgeStatusWidget/main/homebridgeStatusWidget.js": {
+      "name": "Homebridge Status Widget Original",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/macdis/pollen-widget/main/Pollen%20Widget.js": {
+      "name": "Pollen Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/marcjulianschwarz/scriptable-widgets/main/boca-chica-spacex/boca-chica-spacex.js": {
       "name": "Boca Chica SpaceX",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/marcjulianschwarz/scriptable-widgets/main/germany-rain-radar/germany-rain-radar.js": {
       "name": "Germany Rain Radar",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/marcjulianschwarz/scriptable-widgets/main/nasa-pictures/nasa-pictures.js": {
       "name": "NASA Pictures",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/marcjulianschwarz/scriptable-widgets/main/newsroom/newsroom.js": {
       "name": "Newsroom",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/marcjulianschwarz/scriptable-widgets/main/telekom-data-usage/telekom-data-usage.js": {
       "name": "Telekom Data Usage",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/marco79cgn/cowboy-ios-widget/main/cowboy-widget.js": {
+      "name": "cowboy widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/markhunte/Discourse-Forum----Latest-Post-iOS-Widget/main/Discourse%20Forum%202.js": {
+      "name": "Discourse Forum 2",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/markhunte/Discourse-Forum----Latest-Post-iOS-Widget/main/Scriptable%20%20Forum%202.js": {
+      "name": "Scriptable Forum 2",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/markhunte/Discourse-Forum----Latest-Post-iOS-Widget/main/Tumult%20Forum%202.js": {
+      "name": "Tumult Forum 2",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/marvnsch/Scriptable-widget-for-Strava/main/Strava_activity_widget.js": {
+      "name": "Strava activity widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/maxarndt/apsystems-ez1-scriptable-widget/main/home-screen.js": {
+      "name": "home screen",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/maxarndt/apsystems-ez1-scriptable-widget/main/lock-screen.js": {
+      "name": "lock screen",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/mtoutkast/scriptable-calendar-widget/main/calendar.js": {
+      "name": "calendar",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Alexa%20To%20Reminders%20Access.js": {
       "name": "Alexa To Reminders",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Automators.fm%20Feed/Automators.fm%20Feed%20Widget.js": {
       "name": "Automators.fm Feed",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/COD%20Warzone%20Stats.js": {
       "name": "COD Warzone Stats",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Circles%20with%20image.js": {
       "name": "Circles with Image",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Combine%20photos%20w%20grid": {
       "name": "Combine Photos Grid",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Dashed%20Line.js": {
       "name": "Dashed Line",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/England%20Bridge%20Status.js": {
       "name": "England Bridge Status",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Equal%20Stacks%20no%20hardcode.js": {
       "name": "Equal Stacks",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/MEE6%20LeaderBoard%20Info.js": {
       "name": "MEE6 LeaderBoard",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Mastodon%20Latest.js": {
       "name": "Mastodon Latest",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/NASA%20Photo%20Of%20The%20Day.js": {
       "name": "NASA Photo of the Day",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/OpenWeatherMap%20API%20Example.js": {
       "name": "OpenWeatherMap API Example",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Pollen.com%20API%20-%20Today.js": {
       "name": "Pollen Today",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/RH-Downloads.js": {
       "name": "RH Downloads",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Reminders%20Widget.js": {
       "name": "Reminders Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Remove%20Scheduled%20Notifications.js": {
       "name": "Remove Scheduled Notifications",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/ScriptBackup.js": {
       "name": "ScriptBackup",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Simple%20Image%20Widget.js": {
       "name": "Simple Image Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Strava/StravaAPI.js": {
       "name": "Strava API",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Transparent%20StockChange.js": {
       "name": "Transparent Stock Change",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Twitter%20Widget.js": {
       "name": "Twitter Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Upcoming%20Calendar%20Agenda.js": {
       "name": "Upcoming Calendar Agenda",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Upcoming%20Calendar%20Indicator.js": {
       "name": "Upcoming Calendar Indicator",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Upcoming%20Calendar%20Widget.js": {
       "name": "Upcoming Calendar Events",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/VSCO%20Recents/VSCO%20Recents%20Widget.js": {
       "name": "VSCO Recents",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Weather%20Overview/Weather%20Overview.js": {
       "name": "Weather Overview",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/Weather%20Snarky.js": {
       "name": "Weather Snarky",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mvan231/Scriptable/main/exchangeRate.js": {
       "name": "Exchange Rate",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mzeryck/Weather-Cal/main/weather-cal.js": {
       "name": "Weather-Cal",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/mzeryck/Widget-Blur/main/widget-blur.js": {
       "name": "Widget Blur",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/neidigsi/froniview_scriptable/main/froniview_day.js": {
+      "name": "froniview day",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/niklasvieth/polestar-ios-medium-widget/main/polestar-medium-widget.js": {
       "name": "Polestar Medium Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/noiseorigin/scriptable-ios-widget/main/CatWidget.js": {
+      "name": "Cat Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/noiseorigin/scriptable-ios-widget/main/DogWidget.js": {
+      "name": "Dog Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/npadgen/scriptable-uk-covid-dashboard/main/uk-covid-vaccinations-widget.js": {
+      "name": "uk covid vaccinations widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/npadgen/scriptable-uk-covid-dashboard/main/uk-covid-widget.js": {
+      "name": "uk covid widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/okuRaku/random-jisho-word-widget/main/RandomJishoWords.js": {
+      "name": "Random Jisho Words",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/olahellgren/home-assistant-sensor-widget-scriptable/main/home-assistant-widget.js": {
+      "name": "Home Assistant Sensor Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/opp100/bmw-scriptable-widgets/main/Publish/bmw-linker.js": {
+      "name": "BMW Linker",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/p0fi/gitlab-stats-for-scribtable/main/gitlab-stats.js": {
+      "name": "gitlab-stats-for-scribtable",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/p0fi/skiable-for-scriptable/main/skiable.js": {
       "name": "Skiable",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/phatsanphonna/COVID-19-Scriptable/master/index.js": {
+      "name": "index",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/rfresh/Scriptable/main/PollenLevel/PollenLevel.js": {
+      "name": "Pollen Level",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/rfresh/Scriptable/main/TescoMobileData/TescoMobileData.js": {
+      "name": "Tesco Mobile Data",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rik-rosseel/launch-schedule/main/LaunchSchedule.js": {
       "name": "Launch Schedule",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/rushhiii/Scriptable-IOSWidgets/main/.assets/backups/anviqs-habit-tracker.js": {
+      "name": "Class Schedule Viewer",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/rushhiii/Scriptable-IOSWidgets/main/.assets/backups/jvscholz-countdown.js": {
+      "name": "Countdown Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/rushhiii/Scriptable-IOSWidgets/main/Widgets/Quote%20Widget/MyQuotes.js": {
+      "name": "MyQuotes",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/rushhiii/Scriptable-IOSWidgets/main/Widgets/TimeProgress%20Widget/ModularTimeProgress.js": {
+      "name": "Time-Progress",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/AQI%20Widget/OpenWeatherAQI.js": {
       "name": "OpenWeather AQI",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Birthday%20Widget/HowOldmi.js": {
       "name": "Life Progress",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Countdown%20Widget/MyCountdowns.js": {
       "name": "MyCountdowns",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Countdown%20Widget/v2/MyCountdowns-v2.js": {
       "name": "MyCountdowns v2",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Countdown%20Widget/v2/NotionCountdowns.js": {
       "name": "Notion Countdowns",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/GitHubStats%20Widget/MyGitHubStats.js": {
       "name": "My GitHub Stats",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/HinduClrWear%20Widget/WearClrAccHindu.js": {
       "name": "Hindu Color Wear",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Quote%20Widget/MyQuotes.js": {
       "name": "MyQuotes",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Quote%20Widget/NotionQuotes.js": {
       "name": "Notion Quotes",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Quote%20Widget/light%20version/quote.js": {
       "name": "Quote Light",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Schedule%20Widget/MyUniSchedule.js": {
       "name": "MyUniSchedule",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/TimeProgress%20Widget/ModularTimeProgress.js": {
       "name": "Modular Time Progress",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Toyota%20Widget/MyToyota.js": {
       "name": "My Toyota",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/rushhiii/Scriptable-iOSWidgets/main/Widgets/Weather%20Widget/MinimalWeather.js": {
       "name": "Dynamic Weather",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:39Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/sayantangr/Airtel_Scriptable_Widget/main/Airtel.js": {
+      "name": "Airtel",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/shfrmn/scriptable-recipe/main/food-recipe-widget.js": {
+      "name": "scriptable-recipe",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/sryo/scriptables/main/ZenDigest.js": {
       "name": "ZenDigest",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/sryo/scriptables/main/ZenLendar.js": {
       "name": "ZenLendar",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/sryo/scriptables/main/ZenTrate.js": {
       "name": "ZenTrate",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/sryo/scriptables/main/ZenTweak.js": {
       "name": "ZenTweak",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/supermamon/scriptable-instagram-widgets/master/ig-latest-post.js": {
       "name": "Instagram Latest Post",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/tai78nan/ios-scriptable-widget/main/Env.js": {
+      "name": "Env",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/tai78nan/ios-scriptable-widget/main/main.js": {
+      "name": "main · tai78nan",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/thejosejorge/futcal-for-scriptable/main/Futcal.js": {
       "name": "FutCal",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/thisisevanfox/nba-my-team-ios-widget/main/NBA-MyTeam-Widget.js": {
       "name": "NBA My Team",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/thisisevanfox/nhl-my-team-ios-widget/main/NHL-MyTeam-Widget.js": {
       "name": "NHL My Team",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/tiuub/traewelling-widget/main/src/TraewellingWidget.js": {
+      "name": "Traewelling Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/tonesto7/fordpass-scriptable/main/Fordpass%20Widget.js": {
+      "name": "FordPass by tonesto7",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/tony-aptx4869/scriptable/main/js_scripts/cache.js": {
+      "name": "cache",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/tony-aptx4869/scriptable/main/js_scripts/terminal.js": {
+      "name": "terminal",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/toto/homeassistant-solar-widget-scriptable/main/homeassistant-widget.js": {
+      "name": "homeassistant widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/transilluminate/download-station-widget/main/Download%20Station.js": {
+      "name": "Download Station",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/ttsantos/Scriptable-examples/main/FPL%20Private%20League%20Score.js": {
       "name": "FPL Private League Score",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/ttsantos/Scriptable-examples/main/FPL%20Real%20Time.js": {
       "name": "FPL Real Time",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/ttsantos/Scriptable-examples/main/OGS%20Notifier.js": {
       "name": "OGS Notifier",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/ttsantos/Scriptable-examples/main/Portugal%20Polls.js": {
       "name": "Portugal Polls",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/unvsDev/blend/main/blend-widget.js": {
+      "name": "blend widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/unvsDev/blend/main/blend.js": {
+      "name": "blend",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/unvsDev/pixel-widget/main/Pixel%20Widget.js": {
       "name": "Pixel Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:41Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/v1lling/scriptable-clubconnector/main/clubconnector-widget.js": {
+      "name": "ClubConnector Gym Capacity Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/waaeel/ios-scriptable-wiener-linien-widgets/main/wiener-linien-monitor.js": {
+      "name": "wiener linien monitor",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wickenico/btc-usd-course.js/main/btc-usd-course.js": {
+      "name": "btc-usd-course.js",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:53Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wickenico/exchange-rates.js/main/exchange-rates.js": {
+      "name": "exchange rates",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Alephium%20Tokens/abxPrice.js": {
+      "name": "abx Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Alephium%20Tokens/apadPrice.js": {
+      "name": "apad Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Alephium%20Tokens/exyPrice.js": {
+      "name": "exy Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Alephium%20Tokens/nguPrice.js": {
+      "name": "ngu Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Kadena%20Tokens/broPrice.js": {
+      "name": "bro Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Kadena%20Tokens/heronPrice.js": {
+      "name": "heron Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Kadena%20Tokens/kdsPrice.js": {
+      "name": "kds Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Kadena%20Tokens/mokPrice.js": {
+      "name": "mok Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Solana%20Tokens/rfkjPrice.js": {
+      "name": "rfkj Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/wizard-ron17/Scriptable-iOS-Widgets/main/Solana%20Tokens/wgwPrice.js": {
+      "name": "wgw Price",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/xditya/ios-scriptable-widgets/main/MonthPulse/MonthPulse_Widget.js": {
+      "name": "Month Pulse Widget",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/CalendarEventsWidget.js": {
       "name": "Calendar Events Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/DailyLogAggregator.js": {
       "name": "Daily Log Aggregator",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/DailyLogWidget.js": {
       "name": "Daily Log Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/DiscordWidget.js": {
       "name": "Discord Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/MultiDayCalendarWidget.js": {
       "name": "Multi-Day Calendar",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/TerminalWidget.js": {
       "name": "Terminal Widget",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
       "httpStatus": 206,
       "error": null
     },
     "https://raw.githubusercontent.com/yaylinda/scriptable/main/WordClockWidget.js": {
       "name": "Word Clock by yaylinda",
       "online": true,
-      "checkedAt": "2026-10-08T17:08:40Z",
+      "checkedAt": "2026-10-08T17:17:52Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/yuristru/scriptable_OneDayCalendarWidgetXS/main/OneDayCalendarWidgetXS.js": {
+      "name": "One Day Calendar Widget XS",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
+      "httpStatus": 206,
+      "error": null
+    },
+    "https://raw.githubusercontent.com/zSaaiq/iOS-Signing-Status-Widget/main/Signing-script.js": {
+      "name": "Signing script",
+      "online": true,
+      "checkedAt": "2026-10-08T17:17:54Z",
       "httpStatus": 206,
       "error": null
     }
