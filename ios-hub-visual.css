@@ -119,3 +119,9 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
 /* Scriptable status summary aligned with iOS Hub */
 .communityHealth{justify-content:center;margin:10px 0 14px}
 .communityHealth .communityAvailability{margin:0}
+
+
+/* Community card author + availability on one line */
+.authorStatusRow{display:flex;align-items:center;gap:6px;min-width:0;margin-top:4px;white-space:nowrap}
+.authorStatusRow .author{margin-top:0;min-width:0;max-width:100%;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.authorStatusRow .communityAvailability{margin-top:0;flex:0 0 auto}
