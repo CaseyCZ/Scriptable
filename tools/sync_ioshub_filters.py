@@ -1,0 +1,139 @@
+from pathlib import Path
+
+index = Path('index.html')
+text = index.read_text(encoding='utf-8')
+
+old_markup = '<div class="catalogBar"><div class="catalogFilters"><div class="filterWrap"><span class="filterLabel" data-cs="Kategorie" data-en="Category">Kategorie</span><select id="categoryFilter" class="categorySelect" onchange="setCategory(this.value)"></select></div><div class="searchWrap"><span class="filterLabel" data-cs="Hledat" data-en="Search">Hledat</span><input id="communitySearch" class="searchInput" type="search" autocomplete="off" placeholder="Hledat projekt…" data-placeholder-cs="Hledat projekt…" data-placeholder-en="Search projects…" oninput="setCommunitySearch(this.value)"></div></div><div class="catalogRight"><div id="pagination" class="pagination"></div><div id="pageInfo" class="pageInfo"></div></div></div>'
+new_markup = '''<details class="content-disclosure filter-disclosure">
+          <summary>
+            <span class="disclosure-title" data-cs="⚙ Filtry · 🔎 Hledání" data-en="⚙ Filters · 🔎 Search">⚙ Filtry · 🔎 Hledání</span>
+            <span id="communityFilterSummaryActions" class="filter-summary-actions" hidden>
+              <span id="communityFilterSummaryCount" class="filter-summary-count"></span>
+              <button class="filter-summary-clear" type="button" onclick="clearCommunityFilters(event)"></button>
+            </span>
+          </summary>
+          <div class="disclosure-body">
+            <div class="catalog-filters filter-disclosure-grid">
+              <div class="filter-group">
+                <div class="filter-label">● <span data-cs="Stav" data-en="Status">Stav</span></div>
+                <div id="availabilityFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">🏷 <span data-cs="Kategorie" data-en="Category">Kategorie</span></div>
+                <div id="categoryFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">↕ <span data-cs="Řazení" data-en="Sort">Řazení</span></div>
+                <div id="sortFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">🔎 <span data-cs="Hledat" data-en="Search">Hledat</span></div>
+                <input id="sourceSearch" class="search" type="search" autocomplete="off" placeholder="Hledat projekty…" oninput="setCommunitySearch(this.value)">
+              </div>
+            </div>
+          </div>
+        </details>
+        <div class="catalogRight catalogPager"><div id="pagination" class="pagination"></div><div id="pageInfo" class="pageInfo"></div></div>'''
+if old_markup not in text:
+    raise SystemExit('old catalog filter markup not found')
+text = text.replace(old_markup, new_markup, 1)
+
+old_state = "    let communityPage=0;\n    let communityCategory='all';\n    let communitySearch='';"
+new_state = "    let communityPage=0;\n    let communityCategory=localStorage.getItem('scriptable-community-category')||'all';\n    let communityAvailability=localStorage.getItem('scriptable-community-availability')||'all';\n    let communitySort=localStorage.getItem('scriptable-community-sort')||'name';\n    let communitySearch=localStorage.getItem('scriptable-community-query')||'';\n    const COMMUNITY_AVAILABILITY=new Set(['all','online','offline']);\n    const COMMUNITY_SORTS=new Set(['name','author']);"
+if old_state not in text:
+    raise SystemExit('community state block not found')
+text = text.replace(old_state, new_state, 1)
+
+old_functions = """    function categoryLabel(category){const x=CATEGORY_LABELS[category]||{cs:category,en:category};return uiText(x.cs||category,x.en||x.cs||category)}
+    function normalizeSearch(value){return String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim()}
+    function filteredCommunityApps(){let rows=communityCategory==='all'?communityApps:communityApps.filter(app=>app.category===communityCategory);const q=normalizeSearch(communitySearch);if(!q)return rows;return rows.filter(app=>{const haystack=[app.name,app.author,app.category,...(app.tags||[]),app.description?.cs,app.description?.en,...(app.features?.cs||[]),...(app.features?.en||[])].filter(Boolean).join(' ');return normalizeSearch(haystack).includes(q)})}
+    function renderCategoryFilter(){const select=document.getElementById('categoryFilter');const present=new Set(communityApps.map(app=>app.category));const options=CATEGORY_ORDER.filter(x=>x==='all'||present.has(x));select.innerHTML=options.map(x=>`<option value=\"${x}\">${categoryLabel(x)}</option>`).join('');select.value=communityCategory}
+    function updateCommunityCount(){const filtered=filteredCommunityApps().length;const active=communityCategory!=='all'||normalizeSearch(communitySearch);document.getElementById('communityCount').textContent=(active?`${filtered} / ${communityApps.length}`:communityApps.length)+' '+tr('projektů','projects')}
+    function setCategory(category){communityCategory=CATEGORY_ORDER.includes(category)?category:'all';communityPage=0;renderCommunity();updateCommunityCount()}
+    function setCommunitySearch(value){communitySearch=value||'';communityPage=0;renderCommunity();updateCommunityCount()}"""
+new_functions = """    function categoryLabel(category){const x=CATEGORY_LABELS[category]||{cs:category,en:category};return uiText(x.cs||category,x.en||x.cs||category)}
+    function normalizeSearch(value){return String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim()}
+    function toggleCommunityFilter(currentValue,requestedValue,allowedValues){const next=allowedValues.has(requestedValue)?requestedValue:'all';return next!=='all'&&next===currentValue?'all':next}
+    function communityAvailabilityValue(app){const item=communityStatusFor(app);if(item?.online===true)return 'online';if(item?.checkedAt)return 'offline';return 'checking'}
+    function compareCommunityApps(left,right){const byName=()=>String(left.name||'').localeCompare(String(right.name||''),lang,{sensitivity:'base'});if(communitySort==='author'){const diff=String(left.author||'').localeCompare(String(right.author||''),lang,{sensitivity:'base'});return diff||byName()}return byName()}
+    function filteredCommunityApps(){let rows=communityCategory==='all'?[...communityApps]:communityApps.filter(app=>app.category===communityCategory);if(communityAvailability!=='all')rows=rows.filter(app=>communityAvailabilityValue(app)===communityAvailability);const q=normalizeSearch(communitySearch);if(q)rows=rows.filter(app=>{const haystack=[app.name,app.author,app.category,...(app.tags||[]),app.description?.cs,app.description?.en,...(app.features?.cs||[]),...(app.features?.en||[])].filter(Boolean).join(' ');return normalizeSearch(haystack).includes(q)});return rows.sort(compareCommunityApps)}
+    function communityFilterButton(label,value,active,handler){return `<button class=\"filter ${active?'active':''}\" type=\"button\" aria-pressed=\"${active}\" onclick=\"${handler}('${value}')\">${label}</button>`}
+    function renderCommunityFilters(){if(!CATEGORY_ORDER.includes(communityCategory))communityCategory='all';if(!COMMUNITY_AVAILABILITY.has(communityAvailability))communityAvailability='all';if(!COMMUNITY_SORTS.has(communitySort))communitySort='name';const availabilityHost=document.getElementById('availabilityFilters');if(availabilityHost)availabilityHost.innerHTML=[['all',tr('Vše','All')],['online','Online'],['offline','Offline']].map(([value,label])=>communityFilterButton(label,value,communityAvailability===value,'setAvailabilityFilter')).join('');const categoryHost=document.getElementById('categoryFilters');if(categoryHost){const present=new Set(communityApps.map(app=>app.category));const options=CATEGORY_ORDER.filter(x=>x==='all'||present.has(x));categoryHost.innerHTML=options.map(value=>communityFilterButton(categoryLabel(value),value,communityCategory===value,'setCategory')).join('')}const sortHost=document.getElementById('sortFilters');if(sortHost)sortHost.innerHTML=[['name',tr('Název A–Z','Name A–Z')],['author',tr('Autor A–Z','Author A–Z')]].map(([value,label])=>communityFilterButton(label,value,communitySort===value,'setCommunitySort')).join('');const search=document.getElementById('sourceSearch');if(search){if(search.value!==communitySearch)search.value=communitySearch;search.placeholder=tr('Hledat projekty…','Search projects…')}setupCommunityFilterDisclosure();syncCommunityFilterSummary()}
+    function scrollActiveCommunityFilter(id){requestAnimationFrame(()=>document.getElementById(id)?.querySelector('.filter.active')?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'}))}
+    function updateCommunityCount(){const filtered=filteredCommunityApps().length;const active=communityCategory!=='all'||communityAvailability!=='all'||communitySort!=='name'||normalizeSearch(communitySearch);document.getElementById('communityCount').textContent=(active?`${filtered} / ${communityApps.length}`:communityApps.length)+' '+tr('projektů','projects');syncCommunityFilterSummary()}
+    function setCategory(category){const requested=CATEGORY_ORDER.includes(category)?category:'all';communityCategory=toggleCommunityFilter(communityCategory,requested,new Set(CATEGORY_ORDER));localStorage.setItem('scriptable-community-category',communityCategory);communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount();scrollActiveCommunityFilter('categoryFilters')}
+    function setAvailabilityFilter(value){communityAvailability=toggleCommunityFilter(communityAvailability,value,COMMUNITY_AVAILABILITY);localStorage.setItem('scriptable-community-availability',communityAvailability);communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount();scrollActiveCommunityFilter('availabilityFilters')}
+    function setCommunitySort(value){communitySort=COMMUNITY_SORTS.has(value)?value:'name';localStorage.setItem('scriptable-community-sort',communitySort);communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount();scrollActiveCommunityFilter('sortFilters')}
+    function setCommunitySearch(value){communitySearch=value||'';localStorage.setItem('scriptable-community-query',communitySearch);communityPage=0;renderCommunity();updateCommunityCount()}
+    function clearCommunityFilters(event){event?.preventDefault();event?.stopPropagation();communityCategory='all';communityAvailability='all';communitySort='name';communitySearch='';localStorage.setItem('scriptable-community-category','all');localStorage.setItem('scriptable-community-availability','all');localStorage.setItem('scriptable-community-sort','name');localStorage.setItem('scriptable-community-query','');communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount()}
+    function setupCommunityFilterDisclosure(){const details=document.querySelector('details.filter-disclosure');if(!details||details.dataset.filterReady)return;details.dataset.filterReady='1';details.addEventListener('toggle',syncCommunityFilterSummary)}
+    function syncCommunityFilterSummary(){const details=document.querySelector('details.filter-disclosure');const actions=document.getElementById('communityFilterSummaryActions');const countNode=document.getElementById('communityFilterSummaryCount');const clear=document.querySelector('.filter-summary-clear');if(!details||!actions)return;let count=0;if(communityAvailability!=='all')count++;if(communityCategory!=='all')count++;if(communitySort!=='name')count++;if(normalizeSearch(communitySearch))count++;if(countNode)countNode.textContent=`${count} ${tr('aktivní','active')}`;if(clear){clear.textContent=`${tr('Smazat filtry','Clear filters')} ×`;clear.setAttribute('aria-label',tr('Smazat filtry','Clear filters'))}actions.hidden=details.open||count===0}"""
+if old_functions not in text:
+    raise SystemExit('community filter functions block not found')
+text = text.replace(old_functions, new_functions, 1)
+
+old_render = "    function renderAll(){document.getElementById('ourCount').textContent=ourApps.length+' '+tr(ourApps.length===1?'aplikace':'aplikací',ourApps.length===1?'app':'apps');document.getElementById('ourGrid').innerHTML=ourApps.map((app,i)=>cardHtml(app,i,false)).join('');renderCategoryFilter();const search=document.getElementById('communitySearch');if(search)search.value=communitySearch;updateCommunityCount();renderCommunity();renderCommunityHealth()}"
+new_render = "    function renderAll(){document.getElementById('ourCount').textContent=ourApps.length+' '+tr(ourApps.length===1?'aplikace':'aplikací',ourApps.length===1?'app':'apps');document.getElementById('ourGrid').innerHTML=ourApps.map((app,i)=>cardHtml(app,i,false)).join('');renderCommunityFilters();updateCommunityCount();renderCommunity();renderCommunityHealth()}"
+if old_render not in text:
+    raise SystemExit('renderAll block not found')
+text = text.replace(old_render, new_render, 1)
+
+scroll_script = '''
+  <script>
+  (()=>{
+    const selector='.filter-tabs';
+    const getScroller=target=>target instanceof Element?target.closest(selector):null;
+    const canScroll=scroller=>Boolean(scroller&&scroller.scrollWidth>scroller.clientWidth+1);
+    document.addEventListener('wheel',event=>{const scroller=getScroller(event.target);if(!canScroll(scroller))return;const delta=Math.abs(event.deltaX)>Math.abs(event.deltaY)?event.deltaX:event.deltaY;if(!delta)return;const max=Math.max(0,scroller.scrollWidth-scroller.clientWidth);const atStart=scroller.scrollLeft<=0;const atEnd=scroller.scrollLeft>=max-1;if((delta<0&&atStart)||(delta>0&&atEnd))return;scroller.scrollLeft+=delta;event.preventDefault()},{passive:false});
+    document.addEventListener('keydown',event=>{if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;const scroller=getScroller(event.target);if(!canScroll(scroller))return;if(event.target instanceof HTMLInputElement||event.target instanceof HTMLTextAreaElement)return;scroller.scrollBy({left:event.key==='ArrowLeft'?-120:120,behavior:'smooth'})});
+    document.addEventListener('click',event=>{const scroller=getScroller(event.target);if(!scroller)return;const item=event.target.closest('button,a,[role="option"],[role="tab"]');if(item&&scroller.contains(item))requestAnimationFrame(()=>item.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'}))});
+    let drag=null;
+    document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;const scroller=getScroller(event.target);if(!canScroll(scroller))return;const touch=event.touches[0];drag={scroller,startX:touch.clientX,startY:touch.clientY,startScrollLeft:scroller.scrollLeft,horizontal:false}},{passive:true});
+    document.addEventListener('touchmove',event=>{if(!drag||event.touches.length!==1)return;const touch=event.touches[0],dx=touch.clientX-drag.startX,dy=touch.clientY-drag.startY;if(!drag.horizontal){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;if(Math.abs(dy)>Math.abs(dx)){drag=null;return}drag.horizontal=true}drag.scroller.scrollLeft=drag.startScrollLeft-dx;event.preventDefault()},{passive:false});
+    const clear=()=>{drag=null};document.addEventListener('touchend',clear,{passive:true});document.addEventListener('touchcancel',clear,{passive:true});
+  })();
+  </script>
+'''
+if "const selector='.filter-tabs'" not in text:
+    text = text.replace('</body>', scroll_script + '</body>', 1)
+
+index.write_text(text, encoding='utf-8')
+
+css_path = Path('ios-hub-visual.css')
+css = css_path.read_text(encoding='utf-8')
+marker = '/* iOS Hub filter system 1:1 */'
+if marker not in css:
+    css += '''
+
+/* iOS Hub filter system 1:1 */
+.content-disclosure{margin-top:12px;border:1px solid var(--border);border-radius:12px;background:color-mix(in srgb,var(--panel) 82%,transparent);overflow:hidden}
+.content-disclosure>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;font-size:11px;font-weight:900;color:var(--text);user-select:none;text-align:center}
+.content-disclosure>summary::-webkit-details-marker{display:none}.content-disclosure>summary::after{content:'▾';color:var(--accent);font-size:13px;transition:transform .18s ease}.content-disclosure[open]>summary::after{transform:rotate(180deg)}
+.disclosure-title{min-width:0;flex:1}.disclosure-body{border-top:1px solid var(--border);padding:12px}.filter-disclosure{margin:0 0 14px}
+.catalog-filters{padding:0;margin:0;display:grid;gap:12px;text-align:center}.filter-group{display:grid;grid-template-columns:100px minmax(0,1fr);gap:10px;align-items:start;justify-items:center}.filter-label{padding-top:9px;color:var(--muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;text-align:center}
+.filter-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;align-items:center;width:100%;min-width:0;max-width:100%;justify-self:stretch;justify-content:start;overflow-x:auto!important;overflow-y:hidden!important;padding-inline:8px;padding-bottom:3px;scroll-padding-inline:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-y;scroll-behavior:auto;user-select:none;gap:5px}.filter-tabs::-webkit-scrollbar{display:none}.filter-tabs>.filter{flex:0 0 auto}
+.filter{height:34px;padding:0 10px;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--muted);font-size:10px;font-weight:900;cursor:pointer}.filter.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.catalog-filters .search{width:100%;min-width:0;margin-top:2px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--input);color:var(--text);padding:0 11px;outline:none;text-align:center}.catalog-filters .search:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.filter-summary-actions{margin-left:auto;margin-right:20px;display:inline-flex;align-items:center;justify-content:flex-end;gap:9px;white-space:nowrap}.filter-summary-actions[hidden]{display:none!important}.filter-summary-count{color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.02em}.filter-summary-clear{appearance:none;border:0;background:transparent;padding:4px 2px;color:#f87171;font-size:10px;font-weight:950;cursor:pointer;line-height:1}.filter-summary-clear:hover,.filter-summary-clear:focus-visible{text-decoration:underline;text-underline-offset:3px;outline:none}
+.catalogPager{margin:0 0 12px;justify-content:space-between}.catalogPager .pagination{justify-content:flex-start}
+@media(max-width:900px){.filter-group{grid-template-columns:1fr}.filter-label{padding-top:0}.catalogPager{width:100%}}
+@media(max-width:640px){.content-disclosure>summary{padding:10px}.filter-summary-actions{margin-right:14px;gap:6px}.filter-summary-count{display:none}.filter-summary-clear{font-size:9px}.catalogPager{align-items:stretch;flex-direction:column}.catalogPager .pagination{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}}
+'''
+    css_path.write_text(css, encoding='utf-8')
+
+required = [
+    'details class="content-disclosure filter-disclosure"',
+    'id="availabilityFilters"',
+    'id="categoryFilters"',
+    'id="sortFilters"',
+    'id="sourceSearch"',
+    'function setAvailabilityFilter',
+    'function clearCommunityFilters',
+    "const selector='.filter-tabs'",
+]
+missing = [item for item in required if item not in text]
+if missing:
+    raise SystemExit(f'missing filter parts: {missing}')
+if 'id="categoryFilter"' in text or 'id="communitySearch"' in text:
+    raise SystemExit('old filter controls still present')
+print('iOS Hub filter sync audit OK')
