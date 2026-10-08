@@ -15,6 +15,14 @@
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Website-App%20Catalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable catalog" /></a>
 </p>
 
+## Documentation
+
+- 📘 [Getting started](https://caseycz.github.io/Scriptable/guide.html)
+- 📝 [Changelog](CHANGELOG.md)
+- 🛡️ [Community catalog compliance](COMPLIANCE.md)
+- 🔐 [Security](SECURITY.md)
+- 🤝 [Contributing](CONTRIBUTING.md)
+
 ## Apps
 
 <!-- App versions are synchronized automatically from APP_VERSION in each production script. -->
