@@ -1,0 +1,41 @@
+name: Final Scriptable 1.0 catalog check
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - ".github/workflows/release-status-refresh.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+      - name: Audit catalog
+        run: node tools/audit-community-catalog.cjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh availability
+        run: python tools/update_community_status.py
+      - name: Commit status
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add data/community-status.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh Scriptable 1.0 community status"
+            git push origin HEAD:Master
+          fi
+      - name: Deploy latest Master
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref Master
