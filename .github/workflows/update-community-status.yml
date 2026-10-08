@@ -2,6 +2,7 @@ name: Update Scriptable community status
 
 # Mirrors the iOS-Hub approach: probe third-party download endpoints in Actions,
 # publish one small status JSON, and let the website render cached availability.
+# Release-readiness refresh: 2026-10-08.
 on:
   workflow_dispatch:
   schedule:
