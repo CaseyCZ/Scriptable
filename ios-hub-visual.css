@@ -146,3 +146,16 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
 @media(max-width:900px){.mobile-menu-button{display:grid}.topbar{overflow:visible}}
 @media(max-width:640px){.topbar-inner{gap:7px}.nav-actions{gap:5px}.mobile-nav-panel{right:10px;left:auto;top:calc(100% + 8px);width:220px}}
 
+
+
+/* Landscape/mobile navigation enforcement — same 900px behavior as iOS Hub */
+@media (min-width:901px){
+  .topbar .nav{display:flex!important}
+  .topbar .mobile-menu-button{display:none!important}
+  .topbar .mobile-nav-panel{display:none!important}
+}
+@media (max-width:900px){
+  .topbar .nav{display:none!important}
+  .topbar .mobile-menu-button{display:grid!important}
+  .topbar.mobile-menu-open .mobile-nav-panel{display:block!important}
+}
