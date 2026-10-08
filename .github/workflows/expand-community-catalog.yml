@@ -1,0 +1,200 @@
+name: Expand community catalog
+
+on:
+  push:
+    paths:
+      - '.github/workflows/expand-community-catalog.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Verify and append community projects
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          import json, re
+
+          path = Path('community-extra.js')
+          text = path.read_text(encoding='utf-8')
+          candidates = []
+
+          def add(name, category, author, repo, branch, script_path, icon, tags, cs, en):
+              encoded = quote(script_path, safe='/')
+              candidates.append({
+                  'name': name, 'category': category, 'author': author, 'icon': icon,
+                  'file': f'https://raw.githubusercontent.com/{repo}/{branch}/{encoded}',
+                  'filename': script_path.rsplit('/', 1)[-1],
+                  'source': f'https://github.com/{repo}',
+                  'preview': f'https://opengraph.githubassets.com/caseycz-catalog/{repo}',
+                  'tags': tags, 'cs': cs, 'en': en,
+              })
+
+          # Normal-Tangerine8609 — standalone widgets
+          add('Can I Use Widget','tools','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/can-i-use.js','🌐',['Web','Compatibility'],'Přehled podpory webových funkcí z Can I Use.','Can I Use web-feature compatibility overview.')
+          add('Commander Articles','news','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/commander-articles.js','📰',['Articles','News'],'Přehled článků Commander v Scriptable widgetu.','Commander articles in a Scriptable widget.')
+          add('Daily Quote Widget','reading','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/daily-quote-widget.js','💬',['Quote','Daily'],'Denní citát v jednoduchém widgetu.','A simple daily quote widget.')
+          add('Lobsters Widget','news','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/lobsters-widget.js','🦞',['Lobsters','Tech'],'Nové příspěvky z technologické komunity Lobsters.','Latest posts from the Lobsters tech community.')
+          add('MDN Web API Widget','tools','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/mdn-web-api.js','🧩',['MDN','Developer'],'Informace z MDN Web API ve widgetu.','MDN Web API information in a widget.')
+          add('On This Day in History','reading','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/on-this-day-in-history.js','📜',['History','Daily'],'Historické události vztahující se k dnešnímu dni.','Historical events for the current date.')
+          add('Pokemon Themes','gaming','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/pokemon-themes.js','⚡',['Pokemon','Themes'],'Pokémon témata a informace ve widgetu.','Pokemon themed widget and information.')
+          add('Random Colour Generator','art','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/random-colour-generator.js','🎨',['Colour','Design'],'Generátor náhodné barvy pro plochu.','Random colour generator for the Home Screen.')
+          add('Reddit Text Subreddit Widget','social','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/reddit-text-subreddit-widget.js','👽',['Reddit','Social'],'Textový přehled příspěvků z vybraného subredditu.','Text overview of posts from a selected subreddit.')
+          add('RoutineHub Stats Medium','tools','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/routinehub-medium.js','📊',['RoutineHub','Shortcuts'],'Statistiky RoutineHub v Medium widgetu.','RoutineHub statistics in a medium widget.')
+          add('RoutineHub Stats Small','tools','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/routinehub-small.js','📊',['RoutineHub','Shortcuts'],'Statistiky RoutineHub v Small widgetu.','RoutineHub statistics in a small widget.')
+          add('Special Days Widget','calendar','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/special-days-widget.js','🎉',['Calendar','Events'],'Zajímavé a speciální dny v kalendáři.','Interesting and special calendar days.')
+          add('Tildes Widget','social','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/tildes-widget.js','🗨️',['Tildes','Community'],'Příspěvky z komunity Tildes.','Posts from the Tildes community.')
+          add('Urban Dictionary Word of the Day','reading','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/urban-dictionary-word-of-the-day.js','📖',['Dictionary','Daily'],'Slovo dne z Urban Dictionary.','Urban Dictionary word of the day.')
+          add('Weather Circles','weather','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/weather-circles.js','🌤️',['Weather','Forecast'],'Grafický přehled počasí v kruhovém designu.','Visual weather overview with circular design.')
+          add('Word of the Day','reading','Normal-Tangerine8609','Normal-Tangerine8609/Scriptable-Widgets','main','widgets/word-of-the-day.js','🔤',['Words','Daily'],'Každodenní nové slovo a jeho význam.','A new word and definition every day.')
+
+          # extendedzero collection
+          add('CountUp','tools','extendedzero','extendedzero/Scriptable-IOS-Widget','main','CountUp/CountUp.js','⏱️',['CountUp','Time'],'Počítání času od zvoleného data.','Counts elapsed time from a selected date.')
+          add('COVID-19 Ukraine Stats','health','extendedzero','extendedzero/Scriptable-IOS-Widget','main','Covid-19 Ukraine Stats/COVID-19.js','🦠',['COVID-19','Ukraine'],'Statistiky COVID-19 pro Ukrajinu.','COVID-19 statistics for Ukraine.')
+          add('COVID-19 Multilang Stats','health','extendedzero','extendedzero/Scriptable-IOS-Widget','main','Covid-19-Multilang-Stats/Covid-19 Multilang.js','🦠',['COVID-19','Multilang'],'Vícejazyčný widget statistik COVID-19.','Multilingual COVID-19 statistics widget.')
+          add('Losses of Russia','news','extendedzero','extendedzero/Scriptable-IOS-Widget','main','Losses_of_russia/Losses_of_russia.js','📊',['Ukraine','Statistics'],'Statistický informační widget z veřejného projektu autora.','Statistics information widget from the original public project.')
+          add('SpaceLaunch','news','extendedzero','extendedzero/Scriptable-IOS-Widget','main','SpaceLaunch/SpaceLaunch.js','🚀',['Space','Launch'],'Informace o nadcházejících startech do vesmíru.','Information about upcoming space launches.')
+          add('Svitlo','tools','extendedzero','extendedzero/Scriptable-IOS-Widget','main','Svitlo/Світло.js','💡',['Energy','Ukraine'],'Informační widget Svítlo pro energetické údaje.','Svitlo information widget for energy data.')
+          add('Where Is Webb','news','extendedzero','extendedzero/Scriptable-IOS-Widget','main','WhereIsWebb/WhereIsWebb.js','🔭',['JWST','Space'],'Poloha a informace o teleskopu James Webb.','Location and information for the James Webb telescope.')
+
+          # ttsantos examples
+          add('FPL Private League Score','sport','ttsantos','ttsantos/Scriptable-examples','main','FPL Private League Score.js','⚽',['FPL','Football'],'Skóre soukromé ligy Fantasy Premier League.','Fantasy Premier League private-league score.')
+          add('FPL Real Time','sport','ttsantos','ttsantos/Scriptable-examples','main','FPL Real Time.js','⚽',['FPL','Live'],'Průběžné statistiky Fantasy Premier League.','Real-time Fantasy Premier League statistics.')
+          add('OGS Notifier','gaming','ttsantos','ttsantos/Scriptable-examples','main','OGS Notifier.js','⚫',['Go','OGS'],'Notifikace a stav her z Online Go Serveru.','Notifications and game status from Online Go Server.')
+          add('Portugal Polls','news','ttsantos','ttsantos/Scriptable-examples','main','Portugal Polls.js','📊',['Portugal','Polls'],'Přehled portugalských volebních průzkumů.','Overview of Portuguese election polls.')
+
+          # sryo Zen widgets
+          add('ZenDigest','news','sryo','sryo/scriptables','main','ZenDigest.js','📰',['Digest','Minimal'],'Minimalistický informační digest.','Minimal information digest widget.')
+          add('ZenLendar','calendar','sryo','sryo/scriptables','main','ZenLendar.js','🗓️',['Calendar','Minimal'],'Minimalistický kalendářní widget.','Minimal calendar widget.')
+          add('ZenTrate','tools','sryo','sryo/scriptables','main','ZenTrate.js','🎯',['Focus','Productivity'],'Zen widget zaměřený na soustředění a produktivitu.','Zen widget focused on concentration and productivity.')
+          add('ZenTweak','tools','sryo','sryo/scriptables','main','ZenTweak.js','🛠️',['Tools','Customization'],'Nástroj pro úpravy a konfiguraci Zen widgetů.','Tool for tweaking and configuring Zen widgets.')
+
+          # iamrbn projects
+          add('Reddit Widget by iamrbn','social','iamrbn','iamrbn/Reddit-Widget','main','Reddit-Widget.js','👽',['Reddit','Account'],'Pokročilý Reddit widget s více režimy.','Advanced Reddit widget with multiple modes.')
+          add('Inline Weather','weather','iamrbn','iamrbn/Inline-Weather','main','Inline-Weather.js','🌦️',['Weather','LockScreen'],'Počasí pro Home Screen i Lock Screen.','Weather for Home Screen and Lock Screen.')
+          add('Slack Status','tools','iamrbn','iamrbn/slack-status','main','slack-status-widget.js','💬',['Slack','Status'],'Stav služeb Slack a případné incidenty.','Slack service status and incident information.')
+
+          # kylereddoch
+          add('WakaStats','tools','kylereddoch','kylereddoch/scriptable','main','src/WakaStats.js','⌨️',['WakaTime','Developer'],'Statistiky programování z WakaTime.','Programming statistics from WakaTime.')
+
+          # dompling collection
+          add('BiliBili','social','dompling','dompling/Scriptable','master','Scripts/BiliBili.js','📺',['BiliBili','Video'],'BiliBili přehled ve widgetu.','BiliBili overview widget.')
+          add('BiliBili Up','social','dompling','dompling/Scriptable','master','Scripts/BiliBiliUp.js','📺',['BiliBili','Creator'],'Informace o BiliBili tvůrci.','BiliBili creator information.')
+          add('BiliBili Watch','social','dompling','dompling/Scriptable','master','Scripts/BiliBiliWatch.js','📺',['BiliBili','Watch'],'BiliBili watch widget.','BiliBili watch widget.')
+          add('Dompling Calendar','calendar','dompling','dompling/Scriptable','master','Scripts/Calendar.js','🗓️',['Calendar','Date'],'Kalendářní widget z kolekce dompling.','Calendar widget from the dompling collection.')
+          add('Car Widget by dompling','cars','dompling','dompling/Scriptable','master','Scripts/CarWidget.js','🚗',['Car','Status'],'Automobilový informační widget.','Vehicle information widget.')
+          add('China Mobile','tools','dompling','dompling/Scriptable','master','Scripts/ChinaMobile.js','📱',['Mobile','China'],'Přehled služeb China Mobile.','China Mobile service overview.')
+          add('China Telecom','tools','dompling','dompling/Scriptable','master','Scripts/ChinaTelecom.js','📱',['Mobile','China'],'Přehled služeb China Telecom.','China Telecom service overview.')
+          add('China Unicom','tools','dompling','dompling/Scriptable','master','Scripts/ChinaUnicom.js','📱',['Mobile','China'],'Přehled služeb China Unicom.','China Unicom service overview.')
+          add('Contact Widget by dompling','social','dompling','dompling/Scriptable','master','Scripts/Contact.js','👤',['Contacts','Quick Action'],'Kontakty a rychlé akce ve widgetu.','Contacts and quick actions in a widget.')
+          add('DmYY','tools','dompling','dompling/Scriptable','master','Scripts/DmYY.js','🧰',['Utility','Widget'],'Víceúčelový Scriptable nástroj z kolekce autora.','Multipurpose Scriptable utility from the author collection.')
+          add('Ftms','tools','dompling','dompling/Scriptable','master','Scripts/Ftms.js','📊',['Info','Widget'],'Kompaktní informační widget Ftms.','Compact Ftms information widget.')
+          add('Health by dompling','health','dompling','dompling/Scriptable','master','Scripts/Health.js','❤️',['Health','Stats'],'Zdravotní a fitness přehled ve widgetu.','Health and fitness overview widget.')
+          add('History Today by dompling','reading','dompling','dompling/Scriptable','master','Scripts/HistoryToday.js','📜',['History','Daily'],'Události z historie pro dnešní datum.','Historical events for today.')
+          add('JD All in One','shopping','dompling','dompling/Scriptable','master','Scripts/JD-all-one-v2.js','🛍️',['JD','Shopping'],'Kombinovaný přehled služeb JD.','Combined JD services overview.')
+          add('JDDou','shopping','dompling','dompling/Scriptable','master','Scripts/JDDou.js','🫘',['JD','Shopping'],'JD Bean informační widget.','JD Bean information widget.')
+          add('JDDouK','shopping','dompling','dompling/Scriptable','master','Scripts/JDDouK.js','🫘',['JD','Shopping'],'Alternativní JD Bean widget.','Alternative JD Bean widget.')
+          add('JD Logistics','shopping','dompling','dompling/Scriptable','master','Scripts/JDWuLiu.js','📦',['JD','Delivery'],'Informace o zásilkách JD Logistics.','JD Logistics delivery information.')
+          add('Oil Price by dompling','finance','dompling','dompling/Scriptable','master','Scripts/Oild.js','⛽',['Fuel','Price'],'Přehled cen paliv.','Fuel price overview.')
+          add('Poison Calendar','calendar','dompling','dompling/Scriptable','master','Scripts/PoisonCalendar.js','☠️',['Calendar','Design'],'Stylizovaný kalendářní widget.','Stylized calendar widget.')
+          add('Poison Calendar Text','calendar','dompling','dompling/Scriptable','master','Scripts/PoisonCalendarText.js','☠️',['Calendar','Text'],'Textová varianta Poison Calendar.','Text variant of Poison Calendar.')
+          add('Price Widgets','finance','dompling','dompling/Scriptable','master','Scripts/PriceWidgets.js','💹',['Price','Finance'],'Cenové údaje v kompaktním widgetu.','Price data in a compact widget.')
+          add('Spotify by dompling','music','dompling','dompling/Scriptable','master','Scripts/Spotify.js','🎵',['Spotify','Music'],'Spotify informační widget.','Spotify information widget.')
+          add('Telegram by dompling','social','dompling','dompling/Scriptable','master','Scripts/Telegram.js','✈️',['Telegram','Social'],'Telegram informační widget.','Telegram information widget.')
+          add('VPN Board Press','tools','dompling','dompling/Scriptable','master','Scripts/VPNBoardPress.js','🛡️',['VPN','Network'],'Přehled VPN / síťových údajů.','VPN and network information overview.')
+          add('VPN Subscription','tools','dompling','dompling/Scriptable','master','Scripts/VPNSubscription.js','🛡️',['VPN','Subscription'],'Přehled VPN předplatného a provozu.','VPN subscription and traffic overview.')
+          add('VPN Board','tools','dompling','dompling/Scriptable','master','Scripts/VpnBoard.js','🛡️',['VPN','Dashboard'],'VPN dashboard ve widgetu.','VPN dashboard widget.')
+          add('YouTube by dompling','social','dompling','dompling/Scriptable','master','Scripts/YouTube.js','▶️',['YouTube','Video'],'YouTube informační widget.','YouTube information widget.')
+          add('ZX Trains','travel','dompling','dompling/Scriptable','master','Scripts/ZXTrains.js','🚆',['Train','Travel'],'Vlakové informace ve widgetu.','Train information in a widget.')
+          add('Birthday by dompling','calendar','dompling','dompling/Scriptable','master','Scripts/birthday.js','🎂',['Birthday','Calendar'],'Narozeninový přehled a odpočet.','Birthday overview and countdown.')
+          add('Webo','social','dompling','dompling/Scriptable','master','Scripts/webo.js','💬',['Weibo','Social'],'Sociální informační widget Weibo.','Weibo social information widget.')
+          add('WSGW','tools','dompling','dompling/Scriptable','master','Scripts/wsgw.js','📊',['Utility','Data'],'Datový informační widget z kolekce dompling.','Data information widget from the dompling collection.')
+          add('Birthday Countdown by dompling','calendar','dompling','dompling/Scriptable','master','birthdayCountDown/index.js','🎉',['Birthday','Countdown'],'Odpočet k narozeninám s vlastním layoutem.','Birthday countdown with a custom layout.')
+
+          # Standalone projects confirmed by GitHub code search
+          add('Futcal','sport','thejosejorge','thejosejorge/futcal-for-scriptable','main','Futcal.js','⚽',['Football','Calendar'],'Fotbalový kalendář a zápasy ve widgetu.','Football calendar and matches widget.')
+          add('Scriptable News Widget','news','Saudumm','Saudumm/scriptable-News-Widget','main','News Widget.js','📰',['News','RSS'],'Nejnovější články z feedu nebo WordPress webu.','Latest posts from a feed or WordPress site.')
+          add('TeslaData Widget','cars','DrieStone','DrieStone/TeslaData-Widget','main','TeslaData Widget.js','🚘',['Tesla','Car'],'Stav a informace o vozidle Tesla.','Tesla vehicle status and information.')
+          add('Word Clock by bitKrakenCode','tools','bitKrakenCode','bitKrakenCode/ScriptableWordClockWidget','main','Word Clock Widget.js','🕒',['Clock','Typography'],'Aktuální čas zapsaný slovy.','Current time displayed in words.')
+
+          existing_names = set(re.findall(r'^\s*communityItem\([\'\"]([^\'\"]+)', text, re.M))
+          existing_files = set(re.findall(r'https://raw\.githubusercontent\.com/[^\'\"\s]+', text))
+
+          fresh = [c for c in candidates if c['name'] not in existing_names and c['file'] not in existing_files]
+
+          def verify(c):
+              try:
+                  req = Request(c['file'], headers={'User-Agent':'CaseyCZ-Scriptable-Catalog/1.0'})
+                  with urlopen(req, timeout=12) as r:
+                      head = r.read(512).decode('utf-8', 'ignore')
+                      if r.status != 200:
+                          return c, False, f'HTTP {r.status}'
+                      if not head.strip():
+                          return c, False, 'empty response'
+                      return c, True, 'OK'
+              except Exception as e:
+                  return c, False, str(e)
+
+          verified = []
+          rejected = []
+          with ThreadPoolExecutor(max_workers=12) as pool:
+              futures = [pool.submit(verify, c) for c in fresh]
+              for f in as_completed(futures):
+                  c, ok, reason = f.result()
+                  (verified if ok else rejected).append(c if ok else (c, reason))
+
+          verified.sort(key=lambda c: candidates.index(c))
+          print(f'Candidates: {len(candidates)}; new: {len(fresh)}; verified: {len(verified)}; rejected: {len(rejected)}')
+          for c, reason in rejected:
+              print(f'REJECTED: {c["name"]}: {reason}')
+
+          def j(v):
+              return json.dumps(v, ensure_ascii=False, separators=(',', ':'))
+
+          lines = []
+          for c in verified:
+              lines.append('communityItem(' + ','.join([
+                  j(c['name']), j(c['category']), j(c['author']), j(c['icon']), j(c['file']),
+                  j(c['filename']), j(c['source']), j(c['preview']), j(c['tags']), j(c['cs']), j(c['en'])
+              ]) + '),')
+
+          if not lines:
+              raise SystemExit('No new verified community projects found')
+
+          marker = text.rfind('];')
+          if marker < 0:
+              raise SystemExit('communityExtraApps closing marker not found')
+
+          block = '\n// Expanded community catalog — links verified by GitHub Actions\n' + '\n'.join(lines) + '\n'
+          text = text[:marker] + block + text[marker:]
+          path.write_text(text, encoding='utf-8')
+
+          total = len(re.findall(r'^\s*communityItem\(', text, re.M))
+          print(f'Community catalog total: {total}')
+          if total < 140:
+              raise SystemExit(f'Catalog unexpectedly small: {total}')
+          PY
+
+          node --check community-extra.js
+
+      - name: Commit catalog expansion and remove temporary workflow
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git rm .github/workflows/expand-community-catalog.yml
+          git add community-extra.js
+          git commit -m 'Expand community Scriptable catalog'
+          git push origin Master
