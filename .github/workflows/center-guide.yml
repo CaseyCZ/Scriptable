@@ -1,0 +1,41 @@
+name: Center Guide content
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/center-guide.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+      - name: Center Guide content
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('guide.html')
+          s=p.read_text()
+          marker='@media(max-width:700px)'
+          rules='.guide-content{text-align:center}.guide-card{text-align:center}.guide-card .step{margin:0 auto 12px}.guide-card ul{padding-left:0;list-style-position:inside;text-align:center}.guide-notice{text-align:center}'
+          if rules not in s:
+              if marker not in s:
+                  raise SystemExit('Guide CSS marker missing')
+              s=s.replace(marker,rules+'\n'+marker,1)
+          p.write_text(s)
+          PY
+      - name: Commit and remove temporary workflow
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git rm .github/workflows/center-guide.yml
+          git add guide.html
+          git commit -m "Center Guide content like catalog"
+          git push origin HEAD:Master
