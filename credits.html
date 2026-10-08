@@ -120,5 +120,6 @@ function renderCommunityCredits(){if(!creditsData)return;const authors=creditsDa
 async function loadCredits(){try{const r=await fetch('./data/credits.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);creditsData=await r.json();renderCommunityCredits()}catch(_){document.getElementById('creditsSummary').innerHTML=`<span class="pill">${esc(t('Credits se nepodařilo načíst','Credits could not be loaded','Credits konnten nicht geladen werden','No se pudieron cargar los créditos','Impossible de charger les crédits'))}</span>`}}
 document.getElementById('year').textContent=new Date().getFullYear();applyTheme(theme);setLanguage(lang);loadCredits();
 </script>
+<script src="mobile-menu.js"></script>
 </body>
 </html>

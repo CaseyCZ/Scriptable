@@ -126,3 +126,23 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
 .authorStatusRow{display:flex;align-items:center;gap:6px;min-width:0;margin-top:4px;white-space:nowrap}
 .authorStatusRow .author{margin-top:0;min-width:0;max-width:100%;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .authorStatusRow .communityAvailability{margin-top:0;flex:0 0 auto}
+
+/* Mobile navigation — synced 1:1 with iOS Hub */
+.mobile-menu-button{display:none}
+.mobile-menu-icon{position:relative;width:18px;height:2px;border-radius:999px;background:currentColor;display:block}
+.mobile-menu-icon::before,.mobile-menu-icon::after{content:"";position:absolute;left:0;width:18px;height:2px;border-radius:999px;background:currentColor;transition:transform .18s ease,top .18s ease,opacity .18s ease}
+.mobile-menu-icon::before{top:-6px}
+.mobile-menu-icon::after{top:6px}
+.mobile-menu-open .mobile-menu-icon{background:transparent}
+.mobile-menu-open .mobile-menu-icon::before{top:0;transform:rotate(45deg)}
+.mobile-menu-open .mobile-menu-icon::after{top:0;transform:rotate(-45deg)}
+.mobile-nav-panel{display:none;position:absolute;right:16px;top:calc(100% + 8px);z-index:150;width:220px;padding:8px;border:1px solid var(--border);border-radius:14px;background:color-mix(in srgb,var(--panel) 98%,transparent);box-shadow:var(--shadow)}
+.mobile-menu-open .mobile-nav-panel{display:block}
+.mobile-nav-inner{width:100%;padding:0;margin:0}
+.mobile-nav-links{display:grid;grid-template-columns:1fr;gap:4px}
+.mobile-nav-links a{width:100%;min-height:40px;padding:0 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text);display:flex;align-items:center;justify-content:flex-start;text-align:left;font-size:11px;font-weight:800}
+.mobile-nav-links a:hover{background:var(--panel2);border-color:var(--border)}
+.mobile-nav-links a.active{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,var(--border));color:var(--accent)}
+@media(max-width:900px){.mobile-menu-button{display:grid}.topbar{overflow:visible}}
+@media(max-width:640px){.topbar-inner{gap:7px}.nav-actions{gap:5px}.mobile-nav-panel{right:10px;left:auto;top:calc(100% + 8px);width:220px}}
+
