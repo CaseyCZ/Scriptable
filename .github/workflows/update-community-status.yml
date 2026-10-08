@@ -1,0 +1,69 @@
+name: Update Scriptable community status
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */6 * * *"
+  push:
+    branches: [Master]
+    paths:
+      - "community-extra.js"
+      - "index.html"
+      - "tools/update_community_status.py"
+      - ".github/workflows/update-community-status.yml"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: update-scriptable-community-status
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check community download URLs
+        run: python tools/update_community_status.py
+
+      - name: Commit generated status
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin Master
+            git reset --hard origin/Master
+            python tools/update_community_status.py
+            git add data/community-status.json
+
+            if git diff --cached --quiet; then
+              echo "No community status changes."
+              break
+            fi
+
+            git commit -m "Update Scriptable community status"
+            if git push origin HEAD:Master; then
+              break
+            fi
+
+            echo "Push raced with another commit; retrying ($attempt/5)..."
+            sleep 2
+          done
+
+      - name: Deploy refreshed status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref Master
