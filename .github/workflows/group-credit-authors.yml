@@ -1,0 +1,31 @@
+name: Group Credits authors once
+
+on:
+  push:
+    branches: [Master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Group projects under each author
+        run: python3 tools/group-credit-authors.py
+      - name: Validate and commit
+        run: |
+          node tools/audit-community-catalog.cjs
+          grep -q 'const groups=Object.entries(authors)' credits.html
+          grep -q 'catalog-credit-projects' credits.html
+          git rm .github/workflows/group-credit-authors.yml tools/group-credit-authors.py
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add credits.html
+          git commit -m "Group Credits by author like iOS Hub"
+          git push origin Master
