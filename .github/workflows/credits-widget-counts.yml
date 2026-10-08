@@ -1,0 +1,52 @@
+name: Credits author widget counts
+
+on:
+  push:
+    branches: [Master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+      - name: Replace project names with widget counts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('credits.html')
+          s = p.read_text()
+
+          start = s.index('function renderCommunityCredits(){')
+          end = s.index('async function loadCredits(){', start)
+
+          new = '''function widgetCountLabel(count){if(lang==='cs')return count===1?'widget':(count>=2&&count<=4?'widgety':'widgetů');if(lang==='de')return count===1?'Widget':'Widgets';if(lang==='es')return count===1?'widget':'widgets';if(lang==='fr')return count===1?'widget':'widgets';return count===1?'widget':'widgets'}
+function renderCommunityCredits(){if(!creditsData)return;const authors=creditsData.authors||{};document.getElementById('creditsSummary').innerHTML=`<span class="pill">${creditsData.total} ${esc(t('projektů','projects','Projekte','proyectos','projets'))}</span><span class="pill">${creditsData.authorCount} ${esc(t('autorů','authors','Autoren','autores','auteurs'))}</span>`;const groups=Object.entries(authors).sort(([a],[b])=>a.localeCompare(b,undefined,{sensitivity:'base'}));document.getElementById('communityCredits').innerHTML=groups.map(([author,projects])=>{const count=projects.length;const label=widgetCountLabel(count);return `<span class="catalog-credit-pill" title="${esc(author+' · '+count+' '+label)}"><span class="catalog-credit-author">${esc(author)}</span><span class="catalog-credit-dot">·</span><span class="catalog-credit-count">${count} ${esc(label)}</span></span>`}).join('')}
+'''
+
+          s = s[:start] + new + s[end:]
+
+          if '.catalog-credit-count{' not in s:
+              marker = '.catalog-credit-dot{color:var(--muted)}'
+              s = s.replace(marker, marker + '\n.catalog-credit-count{color:var(--accent);font-weight:900}', 1)
+
+          p.write_text(s)
+          PY
+      - name: Validate and commit
+        run: |
+          node tools/audit-community-catalog.cjs
+          grep -q 'widgetCountLabel' credits.html
+          grep -q 'catalog-credit-count' credits.html
+          git rm .github/workflows/credits-widget-counts.yml
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add credits.html
+          git commit -m "Show widget counts per author in Credits"
+          git push origin Master
