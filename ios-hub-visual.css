@@ -114,3 +114,8 @@ footer{margin-top:38px;padding:24px 0 36px;font-size:10px}
 .catalogPager{margin:0 0 12px;justify-content:space-between}.catalogPager .pagination{justify-content:flex-start}
 @media(max-width:900px){.filter-group{grid-template-columns:1fr}.filter-label{padding-top:0}.catalogPager{width:100%}}
 @media(max-width:640px){.content-disclosure>summary{padding:10px}.filter-summary-actions{margin-right:14px;gap:6px}.filter-summary-count{display:none}.filter-summary-clear{font-size:9px}.catalogPager{align-items:stretch;flex-direction:column}.catalogPager .pagination{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}}
+
+
+/* Scriptable status summary aligned with iOS Hub */
+.communityHealth{justify-content:center;margin:10px 0 14px}
+.communityHealth .communityAvailability{margin:0}
