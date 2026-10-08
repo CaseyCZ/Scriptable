@@ -1,0 +1,38 @@
+name: Merge community catalog variants
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - "tools/merge_catalog_variants.py"
+      - ".github/workflows/merge-catalog-variants.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+      - name: Merge project variants
+        run: python tools/merge_catalog_variants.py
+      - name: Validate catalog
+        run: |
+          node --check community-extra.js
+          node tools/audit-community-catalog.cjs
+      - name: Commit catalog changes
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add index.html community-extra.js
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "Merge related community widget variants"
+          git push origin HEAD:Master
