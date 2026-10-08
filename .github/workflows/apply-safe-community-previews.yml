@@ -1,0 +1,114 @@
+name: Apply verified community widget previews
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/apply-safe-community-previews.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  previews:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Restore catalog and apply verified previews
+        run: |
+          git checkout 4722311e2dfdd5ae94b3aee4e5a0b862eafd7ca5 -- community-extra.js
+          python3 <<'PY'
+          from pathlib import Path
+
+          safe = {
+            'Weather-Cal': 'https://raw.githubusercontent.com/mzeryck/Weather-Cal/main/images/header.jpg',
+            'Steam Profile Widget': 'https://raw.githubusercontent.com/SolsticeLeaf/Scriptable-Steam-Widget/refs/heads/master/.github/images/in_game.jpg?raw=true',
+            'NHL My Team': 'https://i.ibb.co/Ctjf1gc/Screenshotv3small.png',
+            'NBA My Team': 'https://i.ibb.co/XJzLx5x/Screenshotv1small.png',
+            'Polestar Medium Widget': 'https://raw.githubusercontent.com/niklasvieth/polestar-ios-medium-widget/main/images/polestar_medium_widget_relative.png',
+            'Lockscreen RSS': 'https://i.imgur.com/DBX2kLD.png',
+            'Pixel Widget': 'https://user-images.githubusercontent.com/63099769/103135730-b1e24b80-46fd-11eb-9624-55926815f4b6.png',
+            'TeslaData Widget': 'https://raw.githubusercontent.com/DrieStone/TeslaData-Widget/main/documentation/screen_001.png',
+            'Inline Weather': 'https://raw.githubusercontent.com/iamrbn/Inline-Weather/main/Images/lockscreenMockup.png',
+            'Slack Status': 'https://raw.githubusercontent.com/iamrbn/slack-status/main/Images/small_light_ok.PNG',
+            'WakaStats': 'https://raw.githubusercontent.com/kylereddoch/scriptable/main/images/wakastats.jpeg',
+            'Futcal': 'https://user-images.githubusercontent.com/76433052/104852433-ed35fb80-58f2-11eb-8a49-256395f18bae.png',
+            'Scriptable News Widget': 'https://raw.githubusercontent.com/Saudumm/scriptable-News-Widget/main/images/widgets.jpg',
+            'Word Clock by bitKrakenCode': 'https://user-images.githubusercontent.com/59827320/133928177-b32f866d-0ae5-46c8-89c9-aa2cb21971e4.png',
+            'BMW Linker': 'https://raw.githubusercontent.com/opp100/bmw-scriptable-widgets/main/screenshots/sc_1.png',
+            'SmarterTankenWidget.js': 'https://user-images.githubusercontent.com/20643017/189459347-e66e7ec1-c66a-4467-b6c9-5517bd38ac28.png',
+            'tankstellenpreise.js': 'https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/images/tankstellenpreise.png',
+            'CryptoDepotWidget': 'https://raw.githubusercontent.com/Martlgap/CryptoDepotWidget/main/preview_small.png',
+            'btc-usd-course.js': 'https://raw.githubusercontent.com/wickenico/btc-usd-course.js/main/img/bitcoin-usd-course-widget-small.png',
+            'Tradegate Stock Widget': 'https://user-images.githubusercontent.com/6323217/166156462-3824d7d9-dbc3-4016-87b3-2ecbc842c758.png',
+            'scriptable_premiumsim': 'https://github.com/BergenSoft/scriptable_premiumsim/raw/main/Preview.jpg',
+            'Launch Schedule': 'https://raw.githubusercontent.com/rik-rosseel/launch-schedule/main/assets/Small%20Light.png',
+            'CFBWidget': 'https://raw.githubusercontent.com/jaydainn/CFBWidget/main/docs/IMG_2384.JPG',
+            'ClubConnector Gym Capacity Widget': 'https://raw.githubusercontent.com/v1lling/scriptable-clubconnector/main/images/preview.png',
+            'nfl-team-schedule-widget': 'https://raw.githubusercontent.com/brianwalborn/nfl-team-schedule-widget/main/img/scriptable01.png',
+            'Scriptable-lichess-Widget': 'https://raw.githubusercontent.com/bestmacfly/Scriptable-lichess-Widget/main/Screenshot.png',
+            'skiable': 'https://raw.githubusercontent.com/p0fi/skiable-for-scriptable/main/cover.png',
+            'bwh-monitor-widget-for-scriptable': 'https://raw.githubusercontent.com/f1tz/bwh-monitor-widget-for-scriptable/main/imgs/widget_preview.jpg',
+            'bamboo-scriptable-widget': 'https://raw.githubusercontent.com/Korysam15/bamboo-scriptable-widget/main/docs/img/widget.png',
+            'github-contributions': 'https://raw.githubusercontent.com/ferraridavide/scriptable/main/img/days.jpg',
+            'gitlab-stats-for-scribtable': 'https://raw.githubusercontent.com/p0fi/gitlab-stats-for-scribtable/main/cover.png',
+            'scriptable-testflight-watcher': 'https://raw.githubusercontent.com/FifiTheBulldog/scriptable-testflight-watcher/master/screenshots/open.png',
+            'Scriptables-WindowWidget': 'https://raw.githubusercontent.com/Robby3St/Scriptables-WindowWidget/main/preview.jpg?raw=true',
+            'Toronto Bike Share': 'https://raw.githubusercontent.com/alexboden/toronto-bike-share-status/main/widget.jpg',
+            'Homebridge Status Widget Original': 'https://raw.githubusercontent.com/lwitzani/homebridgeStatusWidget/main/images/widget_display.jpg',
+            'Home Assistant Sensor Widget': 'https://raw.githubusercontent.com/olahellgren/home-assistant-sensor-widget-scriptable/main/example_widget.jpeg',
+            'TestFlight Watcher': 'https://raw.githubusercontent.com/colin273/scriptable-testflight-watcher/master/screenshots/open.png',
+            'Obsidian Tasks': 'https://user-images.githubusercontent.com/98095245/225629458-ec7bdbeb-2734-460a-ba18-7e3316a5894f.jpeg',
+            'PoGO Events': 'https://raw.githubusercontent.com/bigfoott/PoGOEvents/master/docs/preview.png?raw=true',
+            'Niu Data Widget': 'https://raw.githubusercontent.com/Vxider/NiuDataWidget/master/screenshots/screen_001.png',
+            'FordPass by tonesto7': 'https://github.com/tonesto7/fordpass-scriptable/raw/main/images/dark_widgets_example_v2_1.png',
+            'guenstigsteTankstelle by Necriso': 'https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/images/tankstellenpreise.png',
+            'guenstigsteTankstelleAT by Necriso': 'https://raw.githubusercontent.com/Necriso/ScriptableWidgets/main/images/tankstellenpreise.png',
+            'days-left by ferraridavide': 'https://raw.githubusercontent.com/ferraridavide/scriptable/main/img/days.jpg',
+            'hk news widget': 'https://raw.githubusercontent.com/AngusTse/ios-scriptable-hknews-widget/main/setup-widget.gif',
+            'terminal': 'https://raw.githubusercontent.com/tony-aptx4869/scriptable/0406d0deec14fcbb0a62f93b15a50cf72076c540/images/terminal.jpg',
+            'Telekom Lock Screen': 'https://user-images.githubusercontent.com/8177259/190860999-bdbbad02-6356-43a1-833e-72ad313b2138.jpg',
+            'exchange rates': 'https://raw.githubusercontent.com/wickenico/exchange-rates.js/main/img/exchangeRatesWidget.png',
+            'Traewelling Widget': 'https://raw.githubusercontent.com/tiuub/traewelling-widget/main/examples/2_cut.png',
+            'xbox gamercard': 'https://raw.githubusercontent.com/gnrmarcel/scriptable-xbox-gamercard/main/xbox-gamercard-beispiel.jpeg'
+          }
+
+          path = Path('community-extra.js')
+          lines = path.read_text(encoding='utf-8').splitlines()
+          changed=[]
+          for i,line in enumerate(lines):
+              if 'communityItem(' not in line:
+                  continue
+              for name,url in safe.items():
+                  if name in line and 'opengraph.githubassets.com' in line:
+                      # preview is the 8th argument; replace only the opengraph URL token on this line
+                      import re
+                      new_line,n = re.subn(r'https://opengraph\.githubassets\.com/[^"\']+', url, line, count=1)
+                      if n:
+                          lines[i]=new_line
+                          changed.append(name)
+                      break
+          path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          print(f'Applied verified previews: {len(changed)}')
+          print(changed)
+          PY
+          node --check community-extra.js
+
+      - name: Commit and deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git rm .github/workflows/apply-safe-community-previews.yml
+          git add community-extra.js
+          git commit -m 'Use verified screenshots for community previews'
+          git push origin Master
+          gh workflow run pages.yml --ref Master
