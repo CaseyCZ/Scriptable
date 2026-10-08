@@ -68,6 +68,11 @@ function previewKey(value){
   if(!url||url.includes('opengraph.githubassets.com'))return '';
   return url;
 }
+function allowedVariantWarning(repo,items){
+  if(repo!=='nicolasking007/scriptable')return false;
+  const names=new Set(items.map(x=>x.name));
+  return names.size===2&&names.has('Shortcut Community Dashboard')&&names.has('Shortcut Box Dashboard');
+}
 
 const rows=[...builtins.map(app=>({app,where:'index.html'})),...extras.map(app=>({app,where:'community-extra.js'}))];
 const seenUrls=new Map();
@@ -113,13 +118,14 @@ for(const {app,where} of rows){
 for(const [key,items] of repoCoreGroups){
   if(items.length<2)continue;
   const [repo,core]=key.split('|');
+  if(allowedVariantWarning(repo,items))continue;
   warnings.push(`possible variants: same GitHub project + normalized name\n  repo: ${repo}\n  core: ${core}\n  ${items.map(x=>x.label).join('\n  ')}`);
 }
 for(const [key,items] of previewGroups){
   if(items.length<2)continue;
   const [repo]=key.split('|');
   const names=new Set(items.map(x=>normalizedText(x.name)));
-  if(names.size<2)continue;
+  if(names.size<2||allowedVariantWarning(repo,items))continue;
   warnings.push(`possible duplicate/variant: same project + same preview image\n  repo: ${repo}\n  ${items.map(x=>x.label).join('\n  ')}`);
 }
 
