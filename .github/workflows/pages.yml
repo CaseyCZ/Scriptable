@@ -41,6 +41,11 @@ jobs:
         with:
           path: .
 
+      # GitHub's artifact API can briefly lag immediately after upload finalization.
+      # A short delay avoids deploy-pages seeing zero artifacts in a fresh run.
+      - name: Wait for Pages artifact registration
+        run: sleep 8
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
