@@ -48,14 +48,13 @@ jobs:
           marker='communityApps.push(...(window.communityExtraApps||[]));'
           if 'function communityStatusBadge(app)' not in text:
               if marker not in text: raise SystemExit('communityApps marker missing')
-              block=r'''
-
-    let communityStatus={generatedAt:null,total:0,online:0,offline:0,items:{}};
-    function communityStatusFor(app){return communityStatus?.items?.[app.file]||null}
-    function communityStatusBadge(app){const item=communityStatusFor(app);if(item?.online===true)return `<span class="communityAvailability online">● Online</span>`;if(item?.checkedAt)return `<span class="communityAvailability offline">● Offline</span>`;return `<span class="communityAvailability checking">● ${tr('Čeká na kontrolu','Checking')}</span>`}
-    function renderCommunityHealth(){const host=document.getElementById('communityHealth');if(!host)return;const online=Number.isFinite(communityStatus.online)?communityStatus.online:0;const offline=Number.isFinite(communityStatus.offline)?communityStatus.offline:0;const checked=online+offline;let stamp='';if(communityStatus.generatedAt){const date=new Date(communityStatus.generatedAt);if(!Number.isNaN(date.getTime())){const locale={cs:'cs-CZ',en:'en-GB',de:'de-DE',es:'es-ES',fr:'fr-FR'}[lang]||'en-GB';stamp=new Intl.DateTimeFormat(locale,{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(date)}}host.innerHTML=checked?`<span class="communityAvailability online">● Online ${online}</span><span class="communityAvailability offline">● Offline ${offline}</span>${stamp?`<span class="communityChecked">${tr('Poslední kontrola','Last checked')}: ${stamp}</span>`:''}`:`<span class="communityAvailability checking">● ${tr('Čeká na kontrolu','Checking')}</span>`}
-    async function loadCommunityStatus(){try{const response=await fetch('./data/community-status.json',{cache:'no-store'});if(response.ok){const data=await response.json();if(data&&typeof data==='object')communityStatus=data}}catch(_){}renderAll()}
-'''
+              block=(
+                  "\n\n    let communityStatus={generatedAt:null,total:0,online:0,offline:0,items:{}};\n"
+                  "    function communityStatusFor(app){return communityStatus?.items?.[app.file]||null}\n"
+                  "    function communityStatusBadge(app){const item=communityStatusFor(app);if(item?.online===true)return `<span class=\"communityAvailability online\">● Online</span>`;if(item?.checkedAt)return `<span class=\"communityAvailability offline\">● Offline</span>`;return `<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`}\n"
+                  "    function renderCommunityHealth(){const host=document.getElementById('communityHealth');if(!host)return;const online=Number.isFinite(communityStatus.online)?communityStatus.online:0;const offline=Number.isFinite(communityStatus.offline)?communityStatus.offline:0;const checked=online+offline;let stamp='';if(communityStatus.generatedAt){const date=new Date(communityStatus.generatedAt);if(!Number.isNaN(date.getTime())){const locale={cs:'cs-CZ',en:'en-GB',de:'de-DE',es:'es-ES',fr:'fr-FR'}[lang]||'en-GB';stamp=new Intl.DateTimeFormat(locale,{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(date)}}host.innerHTML=checked?`<span class=\"communityAvailability online\">● Online ${online}</span><span class=\"communityAvailability offline\">● Offline ${offline}</span>${stamp?`<span class=\"communityChecked\">${tr('Poslední kontrola','Last checked')}: ${stamp}</span>`:''}`:`<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`}\n"
+                  "    async function loadCommunityStatus(){try{const response=await fetch('./data/community-status.json',{cache:'no-store'});if(response.ok){const data=await response.json();if(data&&typeof data==='object')communityStatus=data}}catch(_){}renderAll()}\n"
+              )
               text=text.replace(marker,marker+block,1)
 
           if "const availability=external?communityStatusBadge(app):'';" not in text:
@@ -73,7 +72,7 @@ jobs:
               if needle not in text: raise SystemExit('renderAll marker missing')
               text=text.replace(needle,'updateCommunityCount();renderCommunity();renderCommunityHealth()}',1)
 
-          if 'loadCommunityStatus();' not in text:
+          if '\n    loadCommunityStatus();\n' not in text:
               pos=text.rfind('</script>')
               if pos < 0: raise SystemExit('closing script missing')
               text=text[:pos]+'    loadCommunityStatus();\n  '+text[pos:]
