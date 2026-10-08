@@ -1,0 +1,46 @@
+name: Apply iOS Hub filter system
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/apply-ioshub-filters.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Patch filters
+        run: python tools/sync_ioshub_filters.py
+
+      - name: Validate
+        run: |
+          node --check community-extra.js
+          grep -q 'id="availabilityFilters"' index.html
+          grep -q 'id="categoryFilters"' index.html
+          grep -q 'id="sortFilters"' index.html
+          grep -q 'id="sourceSearch"' index.html
+          grep -q 'iOS Hub filter system 1:1' ios-hub-visual.css
+
+      - name: Commit and deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git rm .github/workflows/apply-ioshub-filters.yml tools/sync_ioshub_filters.py
+          git add index.html ios-hub-visual.css
+          git commit -m 'Match community filters to iOS Hub'
+          git push origin Master
+          gh workflow run pages.yml --ref Master
