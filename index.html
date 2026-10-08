@@ -91,7 +91,36 @@
         <div class="divider"></div>
         <div class="sectionHead"><div><h2 data-cs="Ostatní vývojáři" data-en="Other developers">Ostatní vývojáři</h2><p data-cs="Vybrané komunitní projekty. Instalace načte originální kód přímo z repozitáře autora a připraví ho pro Scriptable." data-en="Selected community projects. Installation fetches the original code directly from the author's repository and prepares it for Scriptable.">Vybrané komunitní projekty. Instalace načte originální kód přímo z repozitáře autora a připraví ho pro Scriptable.</p></div><div id="communityCount" class="count"></div></div>
         <div id="communityHealth" class="communityHealth" aria-live="polite"></div>
-        <div class="catalogBar"><div class="catalogFilters"><div class="filterWrap"><span class="filterLabel" data-cs="Kategorie" data-en="Category">Kategorie</span><select id="categoryFilter" class="categorySelect" onchange="setCategory(this.value)"></select></div><div class="searchWrap"><span class="filterLabel" data-cs="Hledat" data-en="Search">Hledat</span><input id="communitySearch" class="searchInput" type="search" autocomplete="off" placeholder="Hledat projekt…" data-placeholder-cs="Hledat projekt…" data-placeholder-en="Search projects…" oninput="setCommunitySearch(this.value)"></div></div><div class="catalogRight"><div id="pagination" class="pagination"></div><div id="pageInfo" class="pageInfo"></div></div></div>
+        <details class="content-disclosure filter-disclosure">
+          <summary>
+            <span class="disclosure-title" data-cs="⚙ Filtry · 🔎 Hledání" data-en="⚙ Filters · 🔎 Search">⚙ Filtry · 🔎 Hledání</span>
+            <span id="communityFilterSummaryActions" class="filter-summary-actions" hidden>
+              <span id="communityFilterSummaryCount" class="filter-summary-count"></span>
+              <button class="filter-summary-clear" type="button" onclick="clearCommunityFilters(event)"></button>
+            </span>
+          </summary>
+          <div class="disclosure-body">
+            <div class="catalog-filters filter-disclosure-grid">
+              <div class="filter-group">
+                <div class="filter-label">● <span data-cs="Stav" data-en="Status">Stav</span></div>
+                <div id="availabilityFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">🏷 <span data-cs="Kategorie" data-en="Category">Kategorie</span></div>
+                <div id="categoryFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">↕ <span data-cs="Řazení" data-en="Sort">Řazení</span></div>
+                <div id="sortFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">🔎 <span data-cs="Hledat" data-en="Search">Hledat</span></div>
+                <input id="sourceSearch" class="search" type="search" autocomplete="off" placeholder="Hledat projekty…" oninput="setCommunitySearch(this.value)">
+              </div>
+            </div>
+          </div>
+        </details>
+        <div class="catalogRight catalogPager"><div id="pagination" class="pagination"></div><div id="pageInfo" class="pageInfo"></div></div>
         <div id="communityGrid" class="grid"></div>
         <div class="catalogBottom"><div id="paginationBottom" class="pagination"></div><div id="pageInfoBottom" class="pageInfo"></div></div>
         <div class="notice" data-cs="ℹ️ Tyto projekty nejsou naše. Při instalaci se originální kód stáhne přímo od autora a pouze se vloží do formátu .scriptable; samotný kód neměníme. Před spuštěním doporučujeme otevřít původní projekt a přečíst jeho nastavení a požadavky na API." data-en="ℹ️ These projects are not ours. During installation, the original code is fetched directly from the author and only wrapped in the .scriptable format; the script code itself is not modified. Review the original project and its setup/API requirements before running third-party code.">ℹ️ Tyto projekty nejsou naše. Při instalaci se originální kód stáhne přímo od autora a pouze se vloží do formátu .scriptable; samotný kód neměníme. Před spuštěním doporučujeme otevřít původní projekt a přečíst jeho nastavení a požadavky na API.</div>
@@ -258,8 +287,12 @@
     let theme=localStorage.getItem('siteTheme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');
     let layout=localStorage.getItem('siteLayout')||'grid';
     let communityPage=0;
-    let communityCategory='all';
-    let communitySearch='';
+    let communityCategory=localStorage.getItem('scriptable-community-category')||'all';
+    let communityAvailability=localStorage.getItem('scriptable-community-availability')||'all';
+    let communitySort=localStorage.getItem('scriptable-community-sort')||'name';
+    let communitySearch=localStorage.getItem('scriptable-community-query')||'';
+    const COMMUNITY_AVAILABILITY=new Set(['all','online','offline']);
+    const COMMUNITY_SORTS=new Set(['name','author']);
     const CATEGORY_ORDER=['all','sport','weather','news','calendar','finance','space','tools','reading','cars','gaming','music','social','mobile','health','travel','art','shopping'];
     const CATEGORY_LABELS={all:{cs:'Vše',en:'All'},sport:{cs:'Sport',en:'Sport'},weather:{cs:'Počasí',en:'Weather'},news:{cs:'Zprávy',en:'News'},calendar:{cs:'Kalendář',en:'Calendar'},finance:{cs:'Finance',en:'Finance'},space:{cs:'Vesmír',en:'Space'},tools:{cs:'Nástroje',en:'Tools'},reading:{cs:'Čtení',en:'Reading'},cars:{cs:'Auta',en:'Cars'},gaming:{cs:'Hry',en:'Gaming'},music:{cs:'Hudba',en:'Music'},social:{cs:'Sociální',en:'Social'},mobile:{cs:'Mobil',en:'Mobile'},health:{cs:'Zdraví',en:'Health'},travel:{cs:'Cestování',en:'Travel'},art:{cs:'Design',en:'Design'},shopping:{cs:'Nakupování',en:'Shopping'}};
     const uiText=(cs,en)=>window.ScriptableI18n?.translate(cs,en,lang)||(lang==='cs'?cs:en);
@@ -279,15 +312,25 @@
 
     function categoryLabel(category){const x=CATEGORY_LABELS[category]||{cs:category,en:category};return uiText(x.cs||category,x.en||x.cs||category)}
     function normalizeSearch(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
-    function filteredCommunityApps(){let rows=communityCategory==='all'?communityApps:communityApps.filter(app=>app.category===communityCategory);const q=normalizeSearch(communitySearch);if(!q)return rows;return rows.filter(app=>{const haystack=[app.name,app.author,app.category,...(app.tags||[]),app.description?.cs,app.description?.en,...(app.features?.cs||[]),...(app.features?.en||[])].filter(Boolean).join(' ');return normalizeSearch(haystack).includes(q)})}
-    function renderCategoryFilter(){const select=document.getElementById('categoryFilter');const present=new Set(communityApps.map(app=>app.category));const options=CATEGORY_ORDER.filter(x=>x==='all'||present.has(x));select.innerHTML=options.map(x=>`<option value="${x}">${categoryLabel(x)}</option>`).join('');select.value=communityCategory}
-    function updateCommunityCount(){const filtered=filteredCommunityApps().length;const active=communityCategory!=='all'||normalizeSearch(communitySearch);document.getElementById('communityCount').textContent=(active?`${filtered} / ${communityApps.length}`:communityApps.length)+' '+tr('projektů','projects')}
-    function setCategory(category){communityCategory=CATEGORY_ORDER.includes(category)?category:'all';communityPage=0;renderCommunity();updateCommunityCount()}
-    function setCommunitySearch(value){communitySearch=value||'';communityPage=0;renderCommunity();updateCommunityCount()}
+    function toggleCommunityFilter(currentValue,requestedValue,allowedValues){const next=allowedValues.has(requestedValue)?requestedValue:'all';return next!=='all'&&next===currentValue?'all':next}
+    function communityAvailabilityValue(app){const item=communityStatusFor(app);if(item?.online===true)return 'online';if(item?.checkedAt)return 'offline';return 'checking'}
+    function compareCommunityApps(left,right){const byName=()=>String(left.name||'').localeCompare(String(right.name||''),lang,{sensitivity:'base'});if(communitySort==='author'){const diff=String(left.author||'').localeCompare(String(right.author||''),lang,{sensitivity:'base'});return diff||byName()}return byName()}
+    function filteredCommunityApps(){let rows=communityCategory==='all'?[...communityApps]:communityApps.filter(app=>app.category===communityCategory);if(communityAvailability!=='all')rows=rows.filter(app=>communityAvailabilityValue(app)===communityAvailability);const q=normalizeSearch(communitySearch);if(q)rows=rows.filter(app=>{const haystack=[app.name,app.author,app.category,...(app.tags||[]),app.description?.cs,app.description?.en,...(app.features?.cs||[]),...(app.features?.en||[])].filter(Boolean).join(' ');return normalizeSearch(haystack).includes(q)});return rows.sort(compareCommunityApps)}
+    function communityFilterButton(label,value,active,handler){return `<button class="filter ${active?'active':''}" type="button" aria-pressed="${active}" onclick="${handler}('${value}')">${label}</button>`}
+    function renderCommunityFilters(){if(!CATEGORY_ORDER.includes(communityCategory))communityCategory='all';if(!COMMUNITY_AVAILABILITY.has(communityAvailability))communityAvailability='all';if(!COMMUNITY_SORTS.has(communitySort))communitySort='name';const availabilityHost=document.getElementById('availabilityFilters');if(availabilityHost)availabilityHost.innerHTML=[['all',tr('Vše','All')],['online','Online'],['offline','Offline']].map(([value,label])=>communityFilterButton(label,value,communityAvailability===value,'setAvailabilityFilter')).join('');const categoryHost=document.getElementById('categoryFilters');if(categoryHost){const present=new Set(communityApps.map(app=>app.category));const options=CATEGORY_ORDER.filter(x=>x==='all'||present.has(x));categoryHost.innerHTML=options.map(value=>communityFilterButton(categoryLabel(value),value,communityCategory===value,'setCategory')).join('')}const sortHost=document.getElementById('sortFilters');if(sortHost)sortHost.innerHTML=[['name',tr('Název A–Z','Name A–Z')],['author',tr('Autor A–Z','Author A–Z')]].map(([value,label])=>communityFilterButton(label,value,communitySort===value,'setCommunitySort')).join('');const search=document.getElementById('sourceSearch');if(search){if(search.value!==communitySearch)search.value=communitySearch;search.placeholder=tr('Hledat projekty…','Search projects…')}setupCommunityFilterDisclosure();syncCommunityFilterSummary()}
+    function scrollActiveCommunityFilter(id){requestAnimationFrame(()=>document.getElementById(id)?.querySelector('.filter.active')?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'}))}
+    function updateCommunityCount(){const filtered=filteredCommunityApps().length;const active=communityCategory!=='all'||communityAvailability!=='all'||communitySort!=='name'||normalizeSearch(communitySearch);document.getElementById('communityCount').textContent=(active?`${filtered} / ${communityApps.length}`:communityApps.length)+' '+tr('projektů','projects');syncCommunityFilterSummary()}
+    function setCategory(category){const requested=CATEGORY_ORDER.includes(category)?category:'all';communityCategory=toggleCommunityFilter(communityCategory,requested,new Set(CATEGORY_ORDER));localStorage.setItem('scriptable-community-category',communityCategory);communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount();scrollActiveCommunityFilter('categoryFilters')}
+    function setAvailabilityFilter(value){communityAvailability=toggleCommunityFilter(communityAvailability,value,COMMUNITY_AVAILABILITY);localStorage.setItem('scriptable-community-availability',communityAvailability);communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount();scrollActiveCommunityFilter('availabilityFilters')}
+    function setCommunitySort(value){communitySort=COMMUNITY_SORTS.has(value)?value:'name';localStorage.setItem('scriptable-community-sort',communitySort);communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount();scrollActiveCommunityFilter('sortFilters')}
+    function setCommunitySearch(value){communitySearch=value||'';localStorage.setItem('scriptable-community-query',communitySearch);communityPage=0;renderCommunity();updateCommunityCount()}
+    function clearCommunityFilters(event){event?.preventDefault();event?.stopPropagation();communityCategory='all';communityAvailability='all';communitySort='name';communitySearch='';localStorage.setItem('scriptable-community-category','all');localStorage.setItem('scriptable-community-availability','all');localStorage.setItem('scriptable-community-sort','name');localStorage.setItem('scriptable-community-query','');communityPage=0;renderCommunityFilters();renderCommunity();updateCommunityCount()}
+    function setupCommunityFilterDisclosure(){const details=document.querySelector('details.filter-disclosure');if(!details||details.dataset.filterReady)return;details.dataset.filterReady='1';details.addEventListener('toggle',syncCommunityFilterSummary)}
+    function syncCommunityFilterSummary(){const details=document.querySelector('details.filter-disclosure');const actions=document.getElementById('communityFilterSummaryActions');const countNode=document.getElementById('communityFilterSummaryCount');const clear=document.querySelector('.filter-summary-clear');if(!details||!actions)return;let count=0;if(communityAvailability!=='all')count++;if(communityCategory!=='all')count++;if(communitySort!=='name')count++;if(normalizeSearch(communitySearch))count++;if(countNode)countNode.textContent=`${count} ${tr('aktivní','active')}`;if(clear){clear.textContent=`${tr('Smazat filtry','Clear filters')} ×`;clear.setAttribute('aria-label',tr('Smazat filtry','Clear filters'))}actions.hidden=details.open||count===0}
     function setCommunityPage(page){const rows=filteredCommunityApps();const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));communityPage=Math.max(0,Math.min(pages-1,page));renderCommunity();document.getElementById('community').scrollIntoView({behavior:'smooth',block:'start'})}
     function renderPagination(){const rows=filteredCommunityApps();const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(communityPage>=pages)communityPage=pages-1;let html=`<button class="pageBtn" ${communityPage===0?'disabled':''} onclick="setCommunityPage(${communityPage-1})">‹</button>`;for(let i=0;i<pages;i++)html+=`<button class="pageBtn ${i===communityPage?'active':''}" onclick="setCommunityPage(${i})">${i+1}</button>`;html+=`<button class="pageBtn" ${communityPage===pages-1?'disabled':''} onclick="setCommunityPage(${communityPage+1})">›</button>`;const info=rows.length?tr(`Stránka ${communityPage+1} z ${pages} · ${rows.length} vybraných`,`Page ${communityPage+1} of ${pages} · ${rows.length} selected`):tr('Žádné výsledky','No results');for(const id of ['pagination','paginationBottom'])document.getElementById(id).innerHTML=html;for(const id of ['pageInfo','pageInfoBottom'])document.getElementById(id).textContent=info;const currentPageCards=Math.max(0,Math.min(PAGE_SIZE,rows.length-communityPage*PAGE_SIZE));const bottom=document.getElementById('paginationBottom').closest('.catalogBottom');if(bottom)bottom.style.display=currentPageCards>=4?'':'none'}
     function renderCommunity(){const filtered=filteredCommunityApps();const start=communityPage*PAGE_SIZE;const rows=filtered.slice(start,start+PAGE_SIZE);document.getElementById('communityGrid').innerHTML=rows.length?rows.map((app,i)=>cardHtml(app,start+i,true)).join(''):`<div class="emptyState">${tr('Pro tento filtr nebo hledání nebyl nalezen žádný projekt.','No projects matched this filter or search.')}</div>`;renderPagination()}
-    function renderAll(){document.getElementById('ourCount').textContent=ourApps.length+' '+tr(ourApps.length===1?'aplikace':'aplikací',ourApps.length===1?'app':'apps');document.getElementById('ourGrid').innerHTML=ourApps.map((app,i)=>cardHtml(app,i,false)).join('');renderCategoryFilter();const search=document.getElementById('communitySearch');if(search)search.value=communitySearch;updateCommunityCount();renderCommunity();renderCommunityHealth()}
+    function renderAll(){document.getElementById('ourCount').textContent=ourApps.length+' '+tr(ourApps.length===1?'aplikace':'aplikací',ourApps.length===1?'app':'apps');document.getElementById('ourGrid').innerHTML=ourApps.map((app,i)=>cardHtml(app,i,false)).join('');renderCommunityFilters();updateCommunityCount();renderCommunity();renderCommunityHealth()}
 
     document.querySelectorAll('[data-language]').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.language)));
     document.getElementById('themeDark').addEventListener('click',()=>applyTheme('dark'));document.getElementById('themeLight').addEventListener('click',()=>applyTheme('light'));document.getElementById('layoutGrid').addEventListener('click',()=>applyLayout('grid'));document.getElementById('layoutList').addEventListener('click',()=>applyLayout('list'));
@@ -296,6 +339,21 @@
     document.getElementById('year').textContent=new Date().getFullYear();
     applyTheme(theme);applyLayout(layout);setLanguage(lang);
       loadCommunityStatus();
+  </script>
+
+  <script>
+  (()=>{
+    const selector='.filter-tabs';
+    const getScroller=target=>target instanceof Element?target.closest(selector):null;
+    const canScroll=scroller=>Boolean(scroller&&scroller.scrollWidth>scroller.clientWidth+1);
+    document.addEventListener('wheel',event=>{const scroller=getScroller(event.target);if(!canScroll(scroller))return;const delta=Math.abs(event.deltaX)>Math.abs(event.deltaY)?event.deltaX:event.deltaY;if(!delta)return;const max=Math.max(0,scroller.scrollWidth-scroller.clientWidth);const atStart=scroller.scrollLeft<=0;const atEnd=scroller.scrollLeft>=max-1;if((delta<0&&atStart)||(delta>0&&atEnd))return;scroller.scrollLeft+=delta;event.preventDefault()},{passive:false});
+    document.addEventListener('keydown',event=>{if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;const scroller=getScroller(event.target);if(!canScroll(scroller))return;if(event.target instanceof HTMLInputElement||event.target instanceof HTMLTextAreaElement)return;scroller.scrollBy({left:event.key==='ArrowLeft'?-120:120,behavior:'smooth'})});
+    document.addEventListener('click',event=>{const scroller=getScroller(event.target);if(!scroller)return;const item=event.target.closest('button,a,[role="option"],[role="tab"]');if(item&&scroller.contains(item))requestAnimationFrame(()=>item.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'}))});
+    let drag=null;
+    document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;const scroller=getScroller(event.target);if(!canScroll(scroller))return;const touch=event.touches[0];drag={scroller,startX:touch.clientX,startY:touch.clientY,startScrollLeft:scroller.scrollLeft,horizontal:false}},{passive:true});
+    document.addEventListener('touchmove',event=>{if(!drag||event.touches.length!==1)return;const touch=event.touches[0],dx=touch.clientX-drag.startX,dy=touch.clientY-drag.startY;if(!drag.horizontal){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;if(Math.abs(dy)>Math.abs(dx)){drag=null;return}drag.horizontal=true}drag.scroller.scrollLeft=drag.startScrollLeft-dx;event.preventDefault()},{passive:false});
+    const clear=()=>{drag=null};document.addEventListener('touchend',clear,{passive:true});document.addEventListener('touchcancel',clear,{passive:true});
+  })();
   </script>
 </body>
 </html>
