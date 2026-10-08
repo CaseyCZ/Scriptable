@@ -21,10 +21,10 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          replacements = {
+          footer_needles = {
               'index.html': [
-                  '          <a href="guide.html">Guide</a>\n',
-                  '          <a href="credits.html">Credits</a>\n',
+                  '<a href="guide.html">Guide</a>',
+                  '<a href="credits.html">Credits</a>',
               ],
               'credits.html': [
                   '<a href="guide.html">Guide</a>',
@@ -32,11 +32,15 @@ jobs:
               ],
           }
 
-          for filename, needles in replacements.items():
+          for filename, needles in footer_needles.items():
               path = Path(filename)
               text = path.read_text()
+              footer_start = text.index('<footer')
+              footer_end = text.index('</footer>', footer_start) + len('</footer>')
+              footer = text[footer_start:footer_end]
               for needle in needles:
-                  text = text.replace(needle, '', 1)
+                  footer = footer.replace(needle, '')
+              text = text[:footer_start] + footer + text[footer_end:]
               path.write_text(text)
 
           # Guide/Credits must remain in the primary header navigation on all public pages.
