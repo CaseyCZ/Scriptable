@@ -20,7 +20,7 @@ quote_repl="""{name:'Quote Widget',category:'reading',author:'rushhiii',icon:'ðŸ
 index,n=quote_pattern.subn(quote_repl,index,count=1)
 if n!=1: raise SystemExit(f'Quote built-in replacement count {n}')
 
-for name in ['MyCountdowns v2','Notion Countdowns','Notion Quotes','Quote Light']:
+for name in ['Countdown Widget','MyCountdowns v2','Notion Countdowns','Notion Quotes','Quote Light']:
     pattern=re.compile(r'^communityItem\("'+re.escape(name)+r'"[^\n]*\),\n?', re.M)
     extra,n=pattern.subn('',extra,count=1)
     if n!=1: raise SystemExit(f'Expected one extra entry for {name}, removed {n}')
@@ -43,4 +43,4 @@ index_path.write_text(index,encoding='utf-8')
 extra_path.write_text(extra,encoding='utf-8')
 print('Merged Countdown, Quote and Blend project variants.')
 
-# Trigger marker: matcher-fix
+# Trigger marker: remove-extra-countdown
