@@ -1,0 +1,126 @@
+name: Curate popular US and European Scriptable projects
+
+on:
+  push:
+    paths:
+      - '.github/workflows/curate-western-community.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  curate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Remove dompling and add curated US/EU projects
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json, re, urllib.request, urllib.error
+
+          path = Path('community-extra.js')
+          original = path.read_text(encoding='utf-8')
+          old_lines = original.splitlines()
+          removed_lines = [line for line in old_lines if 'dompling' in line.lower()]
+          kept_lines = [line for line in old_lines if 'dompling' not in line.lower()]
+          text = '\n'.join(kept_lines) + '\n'
+
+          candidates = [
+            dict(name='Weather Cal', category='weather', author='mzeryck', icon='🌦️', file='https://raw.githubusercontent.com/mzeryck/Weather-Cal/main/weather-cal.js', filename='weather-cal.js', source='https://github.com/mzeryck/Weather-Cal', repo='mzeryck/Weather-Cal', tags=['Weather','Calendar','Popular'], cs='Jeden z nejznámějších Scriptable widgetů pro počasí, kalendář, připomínky a vlastní layout.', en='One of the best-known Scriptable widgets for weather, calendar, reminders and custom layouts.'),
+            dict(name='Widget Blur', category='art', author='mzeryck', icon='🫥', file='https://raw.githubusercontent.com/mzeryck/Widget-Blur/main/widget-blur.js', filename='widget-blur.js', source='https://github.com/mzeryck/Widget-Blur', repo='mzeryck/Widget-Blur', tags=['Transparent','Background','Popular'], cs='Známý nástroj pro transparentní a rozmazané pozadí Scriptable widgetů.', en='Popular utility for transparent and blurred Scriptable widget backgrounds.'),
+            dict(name='HomeWidget Scribble', category='weather', author='richicarli', icon='✍️', file='https://raw.githubusercontent.com/richicarli/HomeWidget-Scribble-/main/homeWidget', filename='HomeWidget Scribble.js', source='https://github.com/richicarli/HomeWidget-Scribble-', repo='richicarli/HomeWidget-Scribble-', tags=['Weather','Calendar','Reddit'], cs='Populární minimalistický Home Screen widget sdílený komunitou r/Scriptable.', en='Popular minimalist Home Screen widget shared by the r/Scriptable community.'),
+            dict(name='Scriptable News Widget', category='news', author='Saudumm', icon='📰', file='https://raw.githubusercontent.com/Saudumm/scriptable-News-Widget/main/News%20Widget.js', filename='News Widget.js', source='https://github.com/Saudumm/scriptable-News-Widget', repo='Saudumm/scriptable-News-Widget', tags=['News','RSS','WordPress'], cs='Zpravodajský widget pro RSS a WordPress zdroje.', en='News widget for RSS and WordPress feeds.'),
+            dict(name='TeslaData Widget', category='travel', author='DrieStone', icon='🚘', file='https://raw.githubusercontent.com/DrieStone/TeslaData-Widget/main/TeslaData%20Widget.js', filename='TeslaData Widget.js', source='https://github.com/DrieStone/TeslaData-Widget', repo='DrieStone/TeslaData-Widget', tags=['Tesla','Vehicle','API'], cs='Přehled dat vozu Tesla přes TeslaFi, Teslalogger nebo Tronity.', en='Tesla vehicle data through TeslaFi, Teslalogger or Tronity.'),
+            dict(name='Tagesschau Widget', category='news', author='iamrbn', icon='🇩🇪', file='https://raw.githubusercontent.com/iamrbn/tagesschau-widget/main/tagesschau-widget.js', filename='tagesschau-widget.js', source='https://github.com/iamrbn/tagesschau-widget', repo='iamrbn/tagesschau-widget', tags=['Germany','News','Tagesschau'], cs='Německé zprávy Tagesschau přímo ve widgetu.', en='German Tagesschau news directly in a widget.'),
+            dict(name='Inline Weather', category='weather', author='iamrbn', icon='🌤️', file='https://raw.githubusercontent.com/iamrbn/Inline-Weather/main/Inline-Weather.js', filename='Inline-Weather.js', source='https://github.com/iamrbn/Inline-Weather', repo='iamrbn/Inline-Weather', tags=['Weather','Europe'], cs='Moderní kompaktní počasí pro Scriptable.', en='Modern compact weather widget for Scriptable.'),
+            dict(name='Netatmo Weather Widget', category='weather', author='olf', icon='🏠', file='https://raw.githubusercontent.com/olf/scriptable-netatmo-widget/master/Netatmo.js', filename='Netatmo.js', source='https://github.com/olf/scriptable-netatmo-widget', repo='olf/scriptable-netatmo-widget', tags=['Netatmo','Weather','Smart Home'], cs='Data z meteorologické stanice Netatmo ve widgetu.', en='Netatmo weather-station data in a Scriptable widget.'),
+            dict(name='NordPool Electricity Prices', category='finance', author='flopp999', icon='⚡', file='https://raw.githubusercontent.com/flopp999/Scriptable-NordPool/main/Nordpool.js', filename='Nordpool.js', source='https://github.com/flopp999/Scriptable-NordPool', repo='flopp999/Scriptable-NordPool', tags=['Electricity','NordPool','Europe'], cs='Aktuální ceny elektřiny Nord Pool pro evropské trhy.', en='Current Nord Pool electricity prices for European markets.'),
+            dict(name='Spotify Top Tracks', category='social', author='alexhfmnn', icon='🎵', file='https://raw.githubusercontent.com/alexhfmnn/spotify-top-tracks/main/spotify-top-tracks.js', filename='spotify-top-tracks.js', source='https://github.com/alexhfmnn/spotify-top-tracks', repo='alexhfmnn/spotify-top-tracks', tags=['Spotify','Music','API'], cs='Nejposlouchanější skladby ze Spotify ve widgetu.', en='Your top Spotify tracks in a Scriptable widget.'),
+            dict(name='Stock Widget', category='finance', author='wickenico', icon='📈', file='https://raw.githubusercontent.com/wickenico/stock-widget.js/master/stock-widget.js', filename='stock-widget.js', source='https://github.com/wickenico/stock-widget.js', repo='wickenico/stock-widget.js', tags=['Stocks','Finance'], cs='Jednoduchý widget pro sledování akcií.', en='Simple stock-market tracking widget.'),
+            dict(name='Exchange Rates', category='finance', author='wickenico', icon='💱', file='https://raw.githubusercontent.com/wickenico/exchange-rates.js/main/exchange-rates.js', filename='exchange-rates.js', source='https://github.com/wickenico/exchange-rates.js', repo='wickenico/exchange-rates.js', tags=['Currency','Exchange Rates'], cs='Kurzovní lístek a převody měn ve widgetu.', en='Currency exchange rates in a Scriptable widget.'),
+            dict(name='BTC USD Course', category='finance', author='wickenico', icon='₿', file='https://raw.githubusercontent.com/wickenico/btc-usd-course.js/main/btc-usd-course.js', filename='btc-usd-course.js', source='https://github.com/wickenico/btc-usd-course.js', repo='wickenico/btc-usd-course.js', tags=['Bitcoin','Crypto','USD'], cs='Jednoduchý přehled kurzu BTC/USD.', en='Simple BTC/USD price widget.'),
+            dict(name='Pocket Widget', category='reading', author='brianseidman', icon='📚', file='https://raw.githubusercontent.com/brianseidman/scriptable-pocket-widget/main/pocket_widget.js', filename='pocket_widget.js', source='https://github.com/brianseidman/scriptable-pocket-widget', repo='brianseidman/scriptable-pocket-widget', tags=['Pocket','Reading'], cs='Položky uložené v Pocket přímo na ploše.', en='Saved Pocket items directly on the Home Screen.'),
+            dict(name='Lichess Widget', category='gaming', author='bestmacfly', icon='♟️', file='https://raw.githubusercontent.com/bestmacfly/Scriptable-lichess-Widget/main/Lichess.js', filename='Lichess.js', source='https://github.com/bestmacfly/Scriptable-lichess-Widget', repo='bestmacfly/Scriptable-lichess-Widget', tags=['Chess','Lichess'], cs='Lichess profil a šachové statistiky.', en='Lichess profile and chess statistics.'),
+            dict(name='Steam Profile Widget', category='gaming', author='SolsticeLeaf', icon='🎮', file='https://raw.githubusercontent.com/SolsticeLeaf/Scriptable-Steam-Widget/master/widget.js', filename='Steam Profile Widget.js', source='https://github.com/SolsticeLeaf/Scriptable-Steam-Widget', repo='SolsticeLeaf/Scriptable-Steam-Widget', tags=['Steam','Gaming'], cs='Steam profil a herní stav ve widgetu.', en='Steam profile and gaming status in a widget.'),
+            dict(name='Word Clock', category='tools', author='bitKrakenCode', icon='🕒', file='https://raw.githubusercontent.com/bitKrakenCode/ScriptableWordClockWidget/main/Word%20Clock%20Widget.js', filename='Word Clock Widget.js', source='https://github.com/bitKrakenCode/ScriptableWordClockWidget', repo='bitKrakenCode/ScriptableWordClockWidget', tags=['Clock','Typography'], cs='Minimalistické slovní hodiny pro Scriptable.', en='Minimalist word-clock widget for Scriptable.'),
+            dict(name='Lock Screen RSS', category='news', author='leon47331', icon='📰', file='https://raw.githubusercontent.com/leon47331/scriptable-lockscreen-rss-widget/main/lockscreen-rss-widget_rotation.js', filename='lockscreen-rss-widget_rotation.js', source='https://github.com/leon47331/scriptable-lockscreen-rss-widget', repo='leon47331/scriptable-lockscreen-rss-widget', tags=['RSS','Lock Screen'], cs='RSS titulky v malém Lock Screen widgetu.', en='RSS headlines in a compact Lock Screen widget.'),
+          ]
+
+          def fetch_code(url):
+            req = urllib.request.Request(url, headers={'User-Agent':'CaseyCZ-Scriptable-Catalog','Range':'bytes=0-65535'})
+            try:
+              with urllib.request.urlopen(req, timeout=15) as r:
+                status = getattr(r, 'status', 200)
+                data = r.read(65536)
+              if not (200 <= status < 400) or not data.strip():
+                return None, f'HTTP {status}'
+              return data.decode('utf-8', errors='replace'), None
+            except Exception as e:
+              return None, f'{type(e).__name__}: {e}'
+
+          def local_dependency(code):
+            # Local Scriptable modules cannot be installed by our one-file installer.
+            patterns = [
+              r"(?:require|importModule)\(\s*['\"]\./",
+              r"importModule\(\s*['\"](?!https?://)[^'\"]+['\"]\s*\)",
+            ]
+            return any(re.search(p, code) for p in patterns)
+
+          existing_lower = text.lower()
+          added, duplicates, dependencies, offline = [], [], [], []
+
+          for c in candidates:
+            if c['file'].lower() in existing_lower or c['source'].lower() in existing_lower:
+              duplicates.append(c['name'])
+              continue
+            code, error = fetch_code(c['file'])
+            if error:
+              offline.append((c['name'], error))
+              continue
+            if local_dependency(code):
+              dependencies.append(c['name'])
+              continue
+            preview = f"https://opengraph.githubassets.com/caseycz-curated/{c['repo']}"
+            args = [c['name'], c['category'], c['author'], c['icon'], c['file'], c['filename'], c['source'], preview, c['tags'], c['cs'], c['en']]
+            encoded = []
+            for a in args:
+              encoded.append(json.dumps(a, ensure_ascii=False))
+            line = 'communityItem(' + ','.join(encoded) + '),'
+            pos = text.rfind('];')
+            if pos < 0:
+              raise SystemExit('community-extra.js closing array not found')
+            text = text[:pos] + line + '\n' + text[pos:]
+            existing_lower = text.lower()
+            added.append(c['name'])
+
+          path.write_text(text, encoding='utf-8')
+          print(f'Removed dompling rows: {len(removed_lines)}')
+          print(f'Added curated projects: {len(added)} -> {added}')
+          print(f'Already present: {len(duplicates)} -> {duplicates}')
+          print(f'Skipped local dependencies: {len(dependencies)} -> {dependencies}')
+          print(f'Skipped unavailable: {len(offline)} -> {offline}')
+          PY
+
+          node --check community-extra.js
+          python tools/update_community_status.py
+
+      - name: Commit curated catalog
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git rm .github/workflows/curate-western-community.yml
+          git add community-extra.js data/community-status.json
+          git commit -m 'Curate popular US and European Scriptable projects'
+          git push origin Master
+
+      - name: Deploy website
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref Master
