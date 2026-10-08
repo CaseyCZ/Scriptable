@@ -23,20 +23,16 @@ jobs:
 
           p = Path('credits.html')
           s = p.read_text()
-
           start = s.index('function renderCommunityCredits(){')
           end = s.index('async function loadCredits(){', start)
-
-          new = '''function widgetCountLabel(count){if(lang==='cs')return count===1?'widget':(count>=2&&count<=4?'widgety':'widgetů');if(lang==='de')return count===1?'Widget':'Widgets';if(lang==='es')return count===1?'widget':'widgets';if(lang==='fr')return count===1?'widget':'widgets';return count===1?'widget':'widgets'}
-function renderCommunityCredits(){if(!creditsData)return;const authors=creditsData.authors||{};document.getElementById('creditsSummary').innerHTML=`<span class="pill">${creditsData.total} ${esc(t('projektů','projects','Projekte','proyectos','projets'))}</span><span class="pill">${creditsData.authorCount} ${esc(t('autorů','authors','Autoren','autores','auteurs'))}</span>`;const groups=Object.entries(authors).sort(([a],[b])=>a.localeCompare(b,undefined,{sensitivity:'base'}));document.getElementById('communityCredits').innerHTML=groups.map(([author,projects])=>{const count=projects.length;const label=widgetCountLabel(count);return `<span class="catalog-credit-pill" title="${esc(author+' · '+count+' '+label)}"><span class="catalog-credit-author">${esc(author)}</span><span class="catalog-credit-dot">·</span><span class="catalog-credit-count">${count} ${esc(label)}</span></span>`}).join('')}
-'''
-
+          new = (
+              "function widgetCountLabel(count){if(lang==='cs')return count===1?'widget':(count>=2&&count<=4?'widgety':'widgetů');if(lang==='de')return count===1?'Widget':'Widgets';if(lang==='es')return count===1?'widget':'widgets';if(lang==='fr')return count===1?'widget':'widgets';return count===1?'widget':'widgets'}\n"
+              "function renderCommunityCredits(){if(!creditsData)return;const authors=creditsData.authors||{};document.getElementById('creditsSummary').innerHTML=`<span class=\"pill\">${creditsData.total} ${esc(t('projektů','projects','Projekte','proyectos','projets'))}</span><span class=\"pill\">${creditsData.authorCount} ${esc(t('autorů','authors','Autoren','autores','auteurs'))}</span>`;const groups=Object.entries(authors).sort(([a],[b])=>a.localeCompare(b,undefined,{sensitivity:'base'}));document.getElementById('communityCredits').innerHTML=groups.map(([author,projects])=>{const count=projects.length;const label=widgetCountLabel(count);return `<span class=\"catalog-credit-pill\" title=\"${esc(author+' · '+count+' '+label)}\"><span class=\"catalog-credit-author\">${esc(author)}</span><span class=\"catalog-credit-dot\">·</span><span class=\"catalog-credit-count\">${count} ${esc(label)}</span></span>`}).join('')}\n"
+          )
           s = s[:start] + new + s[end:]
-
           if '.catalog-credit-count{' not in s:
               marker = '.catalog-credit-dot{color:var(--muted)}'
               s = s.replace(marker, marker + '\n.catalog-credit-count{color:var(--accent);font-weight:900}', 1)
-
           p.write_text(s)
           PY
       - name: Validate and commit
