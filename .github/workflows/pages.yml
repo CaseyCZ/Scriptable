@@ -30,6 +30,9 @@ jobs:
         with:
           ref: Master
 
+      - name: Audit community catalog duplicates
+        run: node tools/audit-community-catalog.cjs
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
