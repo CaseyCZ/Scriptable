@@ -12,6 +12,7 @@ on:
       - "community-extra.js"
       - "index.html"
       - "tools/update_community_status.py"
+      - "tools/audit-community-catalog.cjs"
       - ".github/workflows/update-community-status.yml"
 
 permissions:
@@ -32,6 +33,9 @@ jobs:
           ref: Master
           fetch-depth: 0
 
+      - name: Audit community catalog duplicates
+        run: node tools/audit-community-catalog.cjs
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -48,6 +52,7 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch origin Master
             git reset --hard origin/Master
+            node tools/audit-community-catalog.cjs
             python tools/update_community_status.py
             git add data/community-status.json
 
