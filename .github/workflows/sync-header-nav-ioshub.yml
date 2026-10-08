@@ -1,0 +1,81 @@
+name: Sync header navigation with iOS Hub
+
+on:
+  push:
+    branches: [Master]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+      - name: Sync navigation structure
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          navs = {
+            'index.html': '''<nav class="nav" aria-label="Primary">
+        <a href="#ourApps"><span data-cs="Naše aplikace" data-en="Our apps" data-de="Unsere Apps" data-es="Nuestras apps" data-fr="Nos apps">Naše aplikace</span></a>
+        <a href="guide.html"><span data-cs="Průvodce" data-en="Guide" data-de="Anleitung" data-es="Guía" data-fr="Guide">Průvodce</span></a>
+        <a href="#community"><span data-cs="Komunita" data-en="Community" data-de="Community" data-es="Comunidad" data-fr="Communauté">Komunita</span></a>
+        <a href="credits.html">Credits</a>
+      </nav>''',
+            'guide.html': '''<nav class="nav" aria-label="Primary">
+        <a href="./#ourApps"><span data-cs="Naše aplikace" data-en="Our apps" data-de="Unsere Apps" data-es="Nuestras apps" data-fr="Nos apps">Naše aplikace</span></a>
+        <a href="guide.html" class="active" aria-current="page"><span data-cs="Průvodce" data-en="Guide" data-de="Anleitung" data-es="Guía" data-fr="Guide">Průvodce</span></a>
+        <a href="./#community"><span data-cs="Komunita" data-en="Community" data-de="Community" data-es="Comunidad" data-fr="Communauté">Komunita</span></a>
+        <a href="credits.html">Credits</a>
+      </nav>''',
+            'credits.html': '''<nav class="nav" aria-label="Primary">
+      <a href="./#ourApps"><span data-cs="Naše aplikace" data-en="Our apps" data-de="Unsere Apps" data-es="Nuestras apps" data-fr="Nos apps">Naše aplikace</span></a>
+      <a href="guide.html"><span data-cs="Průvodce" data-en="Guide" data-de="Anleitung" data-es="Guía" data-fr="Guide">Průvodce</span></a>
+      <a href="./#community"><span data-cs="Komunita" data-en="Community" data-de="Community" data-es="Comunidad" data-fr="Communauté">Komunita</span></a>
+      <a href="credits.html" class="active" aria-current="page">Credits</a>
+    </nav>'''
+          }
+
+          for filename, new_nav in navs.items():
+              p = Path(filename)
+              text = p.read_text()
+              start = text.index('<nav class="nav"')
+              end = text.index('</nav>', start) + len('</nav>')
+              text = text[:start] + new_nav + text[end:]
+              p.write_text(text)
+
+          css = Path('ios-hub-visual.css')
+          text = css.read_text()
+          active = '.nav a.active{background:var(--accent-soft);color:var(--accent)}'
+          if active not in text:
+              marker = '.nav a:hover{background:var(--panel2);color:var(--text)}'
+              text = text.replace(marker, marker + '\n' + active, 1)
+              css.write_text(text)
+
+          # Validate iOS Hub-style order and active state.
+          for filename in ('index.html','guide.html','credits.html'):
+              text = Path(filename).read_text()
+              start = text.index('<nav class="nav"')
+              end = text.index('</nav>', start)
+              nav = text[start:end]
+              assert 'scriptable.app' not in nav
+              assert nav.index('ourApps') < nav.index('guide.html') < nav.index('community') < nav.index('credits.html')
+          assert 'class="active" aria-current="page"' in Path('guide.html').read_text()
+          assert 'class="active" aria-current="page"' in Path('credits.html').read_text()
+          PY
+      - name: Validate and commit
+        run: |
+          node tools/audit-community-catalog.cjs
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git rm .github/workflows/sync-header-nav-ioshub.yml
+          git add index.html guide.html credits.html ios-hub-visual.css
+          git commit -m "Match header navigation to iOS Hub"
+          git pull --rebase origin Master
+          git push origin Master
