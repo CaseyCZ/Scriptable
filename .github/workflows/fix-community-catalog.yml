@@ -1,0 +1,58 @@
+name: Fix community catalog expansion
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-community-catalog.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Reuse candidate list with corrected array insertion
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re, textwrap
+
+          workflow = Path('.github/workflows/expand-community-catalog.yml').read_text(encoding='utf-8')
+          match = re.search(r"python3 <<'PY'\n(.*?)\n\s+PY", workflow, re.S)
+          if not match:
+              raise SystemExit('Embedded catalog builder not found')
+
+          code = textwrap.dedent(match.group(1))
+          old = "text = text[:marker] + block + text[marker:]"
+          new = "prefix = text[:marker].rstrip()\nif prefix and not prefix.endswith(','):\n    prefix += ','\ntext = prefix + block + text[marker:]"
+          if old not in code:
+              raise SystemExit('Expected insertion line not found')
+          code = code.replace(old, new)
+          exec(compile(code, '<catalog-builder>', 'exec'), {})
+          PY
+
+          node --check community-extra.js
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('community-extra.js').read_text(encoding='utf-8')
+          total=len(re.findall(r'^\s*communityItem\(',text,re.M))
+          print(f'FINAL COMMUNITY TOTAL: {total}')
+          if total < 150:
+              raise SystemExit(f'Expected at least 150 items, got {total}')
+          PY
+
+      - name: Commit expanded catalog and clean temporary workflows
+        run: |
+          git config user.name 'CaseyCZ'
+          git config user.email '25530709+CaseyCZ@users.noreply.github.com'
+          git rm .github/workflows/expand-community-catalog.yml .github/workflows/fix-community-catalog.yml
+          git add community-extra.js
+          git commit -m 'Expand community Scriptable catalog'
+          git push origin Master
