@@ -3,8 +3,6 @@ name: Complete UI translations once
 on:
   push:
     branches: [Master]
-    paths:
-      - '.github/workflows/complete-ui-translations-once.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,7 +30,6 @@ jobs:
               s=s.replace(old,new,1)
               p.write_text(s,encoding='utf-8')
 
-          # Main catalog: translate status labels too (card descriptions/features intentionally remain CZ/EN only).
           replace_once(
               'assets/js/index-page.js',
               "function communityStatusBadge(app){const item=communityStatusFor(app);if(item?.online===true)return `<span class=\"communityAvailability online\">● Online</span>`;if(item?.checkedAt)return `<span class=\"communityAvailability offline\">● Offline</span>`;return `<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`}",
@@ -48,15 +45,12 @@ jobs:
               "[['all',tr('Vše','All')],['online','Online'],['offline','Offline']]",
               "[['all',tr('Vše','All')],['online',tr('Online','Online')],['offline',tr('Offline','Offline')]]"
           )
-
-          # Credits: browser language detection must recognize all five supported languages.
           replace_once(
               'assets/js/credits-page.js',
               "let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang))lang=(navigator.language||'en').toLowerCase().startsWith('cs')?'cs':'en';",
               "let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang)){const browserLang=(navigator.language||'en').slice(0,2).toLowerCase();lang=SUPPORTED.includes(browserLang)?browserLang:'en'};"
           )
 
-          # Cookie dialog/footer copy follows language changes immediately, including an already open banner.
           analytics=Path('analytics-consent.js')
           s=analytics.read_text(encoding='utf-8')
           marker="  function init() {\n"
@@ -87,9 +81,7 @@ jobs:
           s=s.replace(marker,addition+marker,1)
           analytics.write_text(s,encoding='utf-8')
 
-          # Cache-bust updated shared translation/runtime files on all public pages.
-          pages=['index.html','guide.html','credits.html','privacy.html']
-          for name in pages:
+          for name in ['index.html','guide.html','credits.html','privacy.html']:
               p=Path(name); s=p.read_text(encoding='utf-8')
               s=s.replace('site-i18n.js?v=20261005-full1','site-i18n.js?v=20261009-full2')
               s=s.replace('analytics-consent.js?v=20261001-footer3','analytics-consent.js?v=20261009-i18n2')
@@ -118,5 +110,3 @@ jobs:
           git add site-i18n.js analytics-consent.js assets/js/index-page.js assets/js/credits-page.js index.html guide.html credits.html privacy.html .github/workflows/complete-ui-translations-once.yml
           git commit -m "Complete five-language website UI"
           git push origin HEAD:Master
-
-# trigger
