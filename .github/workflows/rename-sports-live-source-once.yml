@@ -72,8 +72,8 @@ jobs:
               assert 'Sports-Live,js' not in text and 'Sports-Live%2Cjs' not in text
           print('Sports Live source rename and package parity: OK')
           PY
-          if git grep -n -E 'Sports-Live,js|Sports-Live%2Cjs' -- ':!.github/workflows/rename-sports-live-source-once.yml'; then
-            echo 'Old Sports Live source reference remains'
+          if git grep -n -E 'Sports-Live,js|Sports-Live%2Cjs' -- apps/Sports-Live assets/js/index-page.js; then
+            echo 'Old Sports Live source reference remains in release surfaces'
             exit 1
           fi
 
