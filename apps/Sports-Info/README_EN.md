@@ -22,13 +22,56 @@
   <a href="./Sports%20Info.scriptable"><img src="https://img.shields.io/badge/Install-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Install Sports Info" /></a>
 </p>
 
-## About
+## What it does
 
-**Sports Info** brings sports data into a single widget and lets you choose a sport, competition and favorite team. The layout adapts automatically to the widget size and its individual sections.
+**Sports Info** brings results, upcoming games and league standings to your iPhone Home Screen. Follow different sports and select a favorite team.
 
-## Origin and reference
+## Supported sports
 
-**Sports Info** is our own multi-sport implementation. During its initial development, we used the architecture and some design principles of our **LockScreen Generator** as a reference for the app structure, settings and responsive interface. The sports data layer, multi-sport and competition support, standings, diagnostics and other features were then developed specifically for Sports Info.
+⚽ Football · 🏒 Ice hockey · 🏀 Basketball · 🥅 Floorball · ⚾ Baseball
+
+## What the widget shows
+
+- 🔴 Live scores for games in progress.
+- ⏭️ Upcoming fixtures and previous results.
+- 📊 League tables and team form.
+- 🎯 Your selected sport, competition and favorite team.
+- 📱 Small, Medium and Large widget sizes.
+- 👁️ Preview and customizable layout and appearance.
+- 🌍 Czech, English, German and Spanish.
+- 🔄 In-app updates through Scriptable.
+
+<p align="center">
+  <img src="./Sports%20Info.jpg" alt="Sports Info widget preview" width="420" />
+</p>
+
+## Getting started
+
+1. Install **Sports Info** in Scriptable and open it.
+2. Choose a sport and competition.
+3. Optionally select your favorite team and customize the widget.
+4. Add a Scriptable widget to your iPhone Home Screen and select Sports Info.
+
+**Example:** Follow an ice hockey league and see the next game, recent results and league standings without opening a sports website.
+
+## Sports Info or Sports Live?
+
+**Sports Info** provides a broader view of competitions, results and standings. **Sports Live** is a simpler widget focused mainly on one team.
+
+## Good to know
+
+Sports information comes from external sources. Availability and refresh speed can vary by competition.
+
+## Origin and credits
+
+Some interface ideas came from our LockScreen Generator. Sports data and functionality were developed separately for Sports Info.
+
+## Links
+
+<p>
+  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable App Store" /></a>
+  <a href="./Sports%20Info.js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download JavaScript" /></a>
+</p>
 
 ## Supported sports
 
