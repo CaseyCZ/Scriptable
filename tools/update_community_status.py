@@ -426,7 +426,7 @@ def main() -> None:
 
             if (
                 reachable is True and meta.get("expectsHtml") is True and markers and
-                body and looks_like_html(body, content_type)
+                body
             ):
                 present = [marker for marker in markers if selector_present(body, marker)]
                 if not present:
