@@ -24,7 +24,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: update-scriptable-community-status-v2
+  group: update-scriptable-community-status-v3
   cancel-in-progress: true
 
 jobs:
