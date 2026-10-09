@@ -230,7 +230,7 @@ def direct_requests(text: str, install_url: str) -> list[dict[str, object]]:
             )
             if method_match:
                 method = method_match.group(1).upper()
-            expects_html = bool(re.search(rf"\b{re.escape(variable)}\.loadString\s*\(", tail))
+            expects_html = bool(re.search(rf"\b{re.escape(variable)}\.loadString\s*\(", tail)) or bool(re.search(r"\.loadString\s*\(", tail[:1200]))
 
         seen.add(url)
         out.append({"url": url, "method": method, "expectsHtml": expects_html})
@@ -244,7 +244,7 @@ def html_markers(text: str) -> list[str]:
         return []
     normalized = text.replace("\\", "")
     markers: list[str] = []
-    for match in re.finditer(r"(?:class|id)\s*=\s*[\"']([A-Za-z0-9_-]{5,})[\"']", normalized):
+    for match in re.finditer(r"(?:class|id)[^A-Za-z0-9_-]{1,16}([A-Za-z][A-Za-z0-9_-]{4,})", normalized):
         marker = match.group(1)
         if marker not in markers:
             markers.append(marker)
