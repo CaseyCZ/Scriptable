@@ -22,21 +22,32 @@
   <a href="./Sideload%20Watch.scriptable"><img src="https://img.shields.io/badge/Instalovat-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Instalovat Sideload Watch" /></a>
 </p>
 
-## O aplikaci
+## Co aplikace umí
 
-**Sideload Watch** používá katalog iOS-Hub a umožňuje vybrat konkrétní sources a aplikace, jejichž nové verze chceš sledovat přímo ve widgetu.
+**Sideload Watch** hlídá nové verze aplikací, které tě zajímají, pomocí katalogu **iOS-Hub**. Místo ručního procházení zdrojů uvidíš změny přehledně na iPhonu.
 
-## Hlavní funkce
+## Hlavní možnosti
 
-- 📦 výběr sources a konkrétních aplikací
-- 🆕 přehled dostupných aktualizací
-- 👁️ Small / Medium / Large widget + demo náhled
-- ⚡ práce s lokální cache pro rychlé zobrazení
-- 🔄 ruční obnovení katalogu iOS-Hub
-- ✅ označení aktualizací jako přečtených a reset baseline
-- 🎨 vlastní barvy a zobrazované údaje
-- 🌍 čeština, angličtina, němčina a španělština
-- 🔄 aktualizace skriptu přímo z aplikace
+- 📦 Vybereš si zdroje a konkrétní aplikace, které chceš sledovat.
+- 🆕 Uvidíš nové verze a dostupné aktualizace.
+- ✅ Změny můžeš označit jako přečtené.
+- 📱 Widgety Small, Medium a Large ukážou přehled přímo na ploše.
+- 🎨 Přizpůsobíš barvy a zobrazené informace.
+- 🌍 Prostředí je dostupné v češtině, angličtině, němčině a španělštině.
+- 🔄 Katalog lze ručně obnovit; aplikace také podporuje vlastní aktualizace.
+
+## Jak začít
+
+1. Nainstaluj **Sideload Watch** do Scriptable a otevři nastavení.
+2. Vyber zdroje iOS-Hub a aplikace, které používáš.
+3. Nech načíst jejich aktuální verze.
+4. Přidej widget Scriptable na plochu a vyber Sideload Watch.
+
+**Příklad:** Sleduješ několik aplikací z různých zdrojů. Když se v katalogu objeví nová verze, poznáš to z přehledu bez procházení každého zdroje zvlášť.
+
+## Dobré vědět
+
+Widget vychází z informací dostupných v katalogu iOS-Hub. Nová verze se proto objeví až ve chvíli, kdy ji příslušný zdroj zveřejní a katalog ji načte.
 
 ## Odkazy
 
