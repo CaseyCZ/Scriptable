@@ -36,6 +36,48 @@ def js_strings(text: str) -> list[str]:
     return out
 
 
+def top_level_objects(text: str) -> list[str]:
+    out: list[str] = []
+    start: int | None = None
+    depth = 0
+    quote: str | None = None
+    escaped = False
+
+    for index, char in enumerate(text):
+        if quote is not None:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            continue
+        if char in ("'", '"', "`"):
+            quote = char
+            continue
+        if char == "{":
+            if depth == 0:
+                start = index
+            depth += 1
+        elif char == "}" and depth:
+            depth -= 1
+            if depth == 0 and start is not None:
+                out.append(text[start:index + 1])
+                start = None
+    return out
+
+
+def field_string(chunk: str, field: str) -> str | None:
+    pattern = re.compile(
+        rf"\b{re.escape(field)}\s*:\s*(?:'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\")"
+    )
+    match = pattern.search(chunk)
+    if not match:
+        return None
+    raw = match.group(1) if match.group(1) is not None else match.group(2)
+    return decode_js_string(raw)
+
+
 def variant_files(chunk: str) -> list[str]:
     if "variants" not in chunk:
         return []
@@ -57,9 +99,14 @@ def collect_projects() -> list[dict[str, object]]:
     except IndexError as exc:
         raise RuntimeError("Unable to locate communityApps in index.html") from exc
 
-    object_pattern = re.compile(r"\{name:(['\"])(.*?)\1.*?file:(['\"])(.*?)\3.*?\}", re.S)
-    for match in object_pattern.finditer(community_block):
-        projects.append({"name": match.group(2), "files": [match.group(4)]})
+    for chunk in top_level_objects(community_block):
+        name = field_string(chunk, "name")
+        file_url = field_string(chunk, "file")
+        if not name or not file_url:
+            continue
+        files = [file_url, *variant_files(chunk)]
+        files = list(dict.fromkeys(url.strip() for url in files if url.strip()))
+        projects.append({"name": name, "files": files})
 
     extra_text = EXTRA.read_text(encoding="utf-8")
     for line in extra_text.splitlines():
