@@ -53,6 +53,8 @@ Sports Live původně vychází ze skriptu [**ONE-NBA**](https://github.com/Nico
 
 > Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript i `.scriptable` instalační balíček jsou dostupné v repozitáři.
 
+Instalace z webového katalogu nyní používá přímo balíček `Sports Live.scriptable`.
+
 ## Podpora
 
 <p align="center">
