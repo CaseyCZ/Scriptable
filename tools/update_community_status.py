@@ -84,7 +84,7 @@ def variant_files(chunk: str) -> list[str]:
     if "variants" not in chunk:
         return []
     tail = chunk.split("variants", 1)[1]
-    pattern = re.compile(r"\bfile\s*:\s*(?:'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\")")
+    pattern = re.compile(r"(?:\bfile\b|['\"]file['\"])\s*:\s*(?:'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\")")
     out: list[str] = []
     for match in pattern.finditer(tail):
         raw = match.group(1) if match.group(1) is not None else match.group(2)
