@@ -28,7 +28,7 @@ jobs:
                 reachable is True and meta.get("expectsHtml") is True and markers and
                 body
             ):
-'''
+          '''
           insert = '''            if reachable is True and meta.get("expectsHtml") is True and final_url != dep:
                 old_host = (urllib.parse.urlparse(dep).hostname or "").lower()
                 new_host = (urllib.parse.urlparse(final_url).hostname or "").lower()
@@ -37,8 +37,11 @@ jobs:
                     definite_broken = True
                     reason = f"HTML scraper redirected to different host and selectors could not be verified: {final_url}"
 
-'''
+          '''
+          target = target.replace('          \'\'\'\n', '\'\'\'\n') if False else target
           if target not in s:
+              # Triple-quoted indentation above is only for valid workflow YAML.
+              target = target.replace('\n          ', '\n', 1) if False else target
               raise SystemExit('scraper validation target not found')
           p.write_text(s.replace(target, insert + target, 1))
           PY
