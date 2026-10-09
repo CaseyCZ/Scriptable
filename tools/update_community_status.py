@@ -11,7 +11,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = ROOT / "index.html"
+REGISTRY = ROOT / "assets" / "js" / "index-page.js"
+if not REGISTRY.exists():
+    REGISTRY = ROOT / "index.html"
 EXTRA = ROOT / "community-extra.js"
 OUTPUT = ROOT / "data" / "community-status.json"
 USER_AGENT = "CaseyCZ-Scriptable-Catalog (+https://caseycz.github.io/Scriptable/)"
@@ -93,11 +95,11 @@ def variant_files(chunk: str) -> list[str]:
 def collect_projects() -> list[dict[str, object]]:
     projects: list[dict[str, object]] = []
 
-    index_text = INDEX.read_text(encoding="utf-8")
+    registry_text = REGISTRY.read_text(encoding="utf-8")
     try:
-        community_block = index_text.split("const communityApps=[", 1)[1].split("];\n    communityApps.push", 1)[0]
+        community_block = registry_text.split("const communityApps=[", 1)[1].split("];\n    communityApps.push", 1)[0]
     except IndexError as exc:
-        raise RuntimeError("Unable to locate communityApps in index.html") from exc
+        raise RuntimeError(f"Unable to locate communityApps in {REGISTRY.relative_to(ROOT)}") from exc
 
     for chunk in top_level_objects(community_block):
         name = field_string(chunk, "name")
