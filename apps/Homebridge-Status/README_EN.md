@@ -2,39 +2,42 @@
 
 Homebridge Status is a Scriptable widget for monitoring Homebridge in the shared CaseyCZ Scriptable Apps style.
 
+## What it does
+
+**Homebridge Status** gives you a quick view of your Homebridge from your iPhone. See whether it is running, how busy it is and whether updates are available.
+
+## What you can see
+
+- 🟢 Homebridge availability and connection status.
+- 🔄 Available Homebridge, plugin and Node.js updates.
+- 📊 Processor and memory usage, temperature, uptime and charts.
+- 📱 Home Screen and Lock Screen widgets.
+- 🎨 Custom colors and appearance.
+- 🔔 Notifications when the status changes.
+- 🔄 In-app updates through Scriptable.
+
+## Getting started
+
+1. Install **Homebridge Status** in Scriptable and open it.
+2. Open **Connection** and enter your Homebridge address, for example `http://192.168.1.50:8581`.
+3. Enter your Homebridge sign-in details.
+4. Optionally add a second address for remote access, such as Tailscale.
+5. Choose your appearance and add a Scriptable widget to your iPhone.
+
+## How the connection works
+
+The app tries your home network first. If that connection fails and you configured a backup address, it automatically tries the second one. On the next refresh, it checks the home connection first again.
+
+## Good to know
+
+You need a working Homebridge installation and access to its web interface. Your password is kept in Scriptable's secure storage. On first launch, the app also attempts to carry over basic settings from an older version of the widget.
+
 ## Origin and credits
 
-Homebridge Status is based on [**homebridgeStatusWidget**](https://github.com/lwitzani/homebridgeStatusWidget) by [**lwitzani**](https://github.com/lwitzani), whose Homebridge API logic was used as the original foundation and reference. The current version was then extensively redesigned and expanded with its own interface, LAN → VPN fallback, multiple widget sizes, notifications, custom settings and additional features.
-
-## Main features
-
-- keeps the proven Homebridge UI API logic from the original `homebridgeStatusWidget`,
-- primary LAN address with automatic fallback to a second VPN address,
-- LAN is preferred again on every new refresh,
-- Homebridge, Plugins and Node.js update status,
-- CPU load, RAM usage, CPU temperature, uptime and charts,
-- Small / Medium / Large widgets,
-- Lock Screen Inline / Circular / Rectangular,
-- settings appearance and navigation aligned with Home Dashboard,
-- customizable widget colors and themes,
-- status notifications,
-- self-update from `Master`,
-- password stored in Scriptable Keychain.
-
-## Connection
-
-Open **Connection** in the app and configure:
-
-1. **Primary address (LAN)** – for example `http://192.168.1.50:8581`
-2. **Fallback address (VPN)** – for example a Tailscale IP / hostname with port `8581`
-3. Homebridge username and password
-
-Each refresh tries LAN first. If it cannot connect, the VPN address is tried automatically.
-
-## Legacy settings
-
-On first launch the script attempts to migrate the main settings from the old `homebridgeStatus/black.json`, if it exists. The migrated password is stored in Keychain.
+Based on [homebridgeStatusWidget](https://github.com/lwitzani/homebridgeStatusWidget) by [lwitzani](https://github.com/lwitzani). The original project provided the foundation; this version has a redesigned interface and additional features.
 
 ## Version
 
 Current version: **v0.1.13**
+
+
