@@ -395,6 +395,13 @@ def main() -> None:
         if module_matches:
             results[url]["moduleDependencies"] = module_matches[:8]
             results[url]["contentWarning"] = "Requires additional importModule file(s): " + ", ".join(module_matches[:3])
+        requires_setup = bool(re.search(r"['\"]Authorization['\"]\s*:", sample_text, re.IGNORECASE))
+        requires_setup = requires_setup or bool(
+            re.search(r"\b(?:username|password|api[_-]?key|client[_-]?secret)\b", sample_text, re.IGNORECASE)
+            and re.search(r"\bRequest\s*\(", sample_text)
+        )
+        if requires_setup:
+            results[url]["requiresSetup"] = True
 
     dependency_results: dict[str, dict[str, object]] = {}
     if dependency_meta:
@@ -463,19 +470,52 @@ def main() -> None:
             results[install_url]["online"] = False
             results[install_url]["error"] = ("Runtime dependency failed: " + " | ".join(hard_broken))[:700]
 
-    project_online = sum(
-        1 for project in projects
-        if any(results.get(url, {}).get("online") is True for url in project["files"])
-    )
-    project_offline = len(projects) - project_online
-    endpoint_online = sum(1 for item in results.values() if item.get("online") is True)
-    endpoint_offline = len(results) - endpoint_online
+    for item in results.values():
+        if item.get("online") is not True:
+            item["health"] = "offline"
+            item["verificationReason"] = item.get("error")
+            continue
+
+        limited_reasons: list[str] = []
+        if item.get("requiresSetup") is True:
+            limited_reasons.append("Requires credentials or account-specific setup")
+        if item.get("moduleDependencies"):
+            limited_reasons.append("Requires additional Scriptable module file(s)")
+        if item.get("contentWarning"):
+            limited_reasons.append(str(item["contentWarning"]))
+        for dep in item.get("runtimeDependencies", []):
+            if isinstance(dep, dict) and dep.get("reachable") is None:
+                limited_reasons.append("At least one runtime dependency could not be verified safely")
+                break
+
+        if limited_reasons:
+            item["health"] = "limited"
+            item["verificationReason"] = "; ".join(dict.fromkeys(limited_reasons))[:500]
+        else:
+            item["health"] = "online"
+            item["verificationReason"] = None
+
+    def project_health(project: dict[str, object]) -> str:
+        healths = [str(results.get(url, {}).get("health") or "offline") for url in project["files"]]
+        if "online" in healths:
+            return "online"
+        if "limited" in healths:
+            return "limited"
+        return "offline"
+
+    project_health_values = [project_health(project) for project in projects]
+    project_online = project_health_values.count("online")
+    project_limited = project_health_values.count("limited")
+    project_offline = project_health_values.count("offline")
+    endpoint_online = sum(1 for item in results.values() if item.get("health") == "online")
+    endpoint_limited = sum(1 for item in results.values() if item.get("health") == "limited")
+    endpoint_offline = sum(1 for item in results.values() if item.get("health") == "offline")
 
     payload = {
         "generatedAt": now_iso(),
-        "total": len(projects), "online": project_online, "offline": project_offline,
+        "total": len(projects), "online": project_online, "limited": project_limited, "offline": project_offline,
         "endpointsTotal": len(results), "endpointsOnline": endpoint_online,
-        "endpointsOffline": endpoint_offline,
+        "endpointsLimited": endpoint_limited, "endpointsOffline": endpoint_offline,
         "runtimeDependenciesChecked": len(dependency_results),
         "runtimeWarnings": runtime_warnings,
         "items": dict(sorted(results.items())),
@@ -485,7 +525,8 @@ def main() -> None:
     print(
         f"Checked {len(projects)} community projects / {len(results)} download endpoints / "
         f"{len(dependency_results)} runtime dependencies: "
-        f"{project_online} projects online, {project_offline} offline, {runtime_warnings} unverified deps"
+        f"{project_online} online, {project_limited} limited, {project_offline} offline, "
+        f"{runtime_warnings} unverified deps"
     )
 
 
