@@ -118,3 +118,5 @@ jobs:
           git add site-i18n.js analytics-consent.js assets/js/index-page.js assets/js/credits-page.js index.html guide.html credits.html privacy.html .github/workflows/complete-ui-translations-once.yml
           git commit -m "Complete five-language website UI"
           git push origin HEAD:Master
+
+# trigger
