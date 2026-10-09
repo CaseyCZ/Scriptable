@@ -1,0 +1,106 @@
+name: Build Sports Live package once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/build-sports-live-package-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Build Sports Live scriptable package
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          root = Path('.')
+          js_path = root / 'apps/Sports-Live/Sports-Live,js'
+          pkg_path = root / 'apps/Sports-Live/Sports Live.scriptable'
+          version_path = root / 'apps/Sports-Live/version.json'
+          index_path = root / 'assets/js/index-page.js'
+          readme_cs = root / 'apps/Sports-Live/README.md'
+          readme_en = root / 'apps/Sports-Live/README_EN.md'
+
+          script = js_path.read_text(encoding='utf-8')
+
+          def match(pattern, default=None):
+              m = re.search(pattern, script, re.M)
+              return m.group(1).strip() if m else default
+
+          name = match(r'^const APP_NAME\s*=\s*["\']([^"\']+)["\'];', 'Sports Live')
+          version = match(r'^const APP_VERSION\s*=\s*["\']([^"\']+)["\'];', '0.3.3')
+          color = match(r'^//\s*icon-color:\s*([^;\r\n]+);', 'orange')
+          glyph = match(r'^//\s*icon-color:[^\r\n]*icon-glyph:\s*([^;\r\n]+);', None)
+          if not glyph:
+              glyph = match(r'icon-glyph:\s*([^;\r\n]+);', 'trophy')
+
+          package = {
+              'always_run_in_app': False,
+              'icon': {'color': color, 'glyph': glyph},
+              'name': name,
+              'script': script,
+              'share_sheet_inputs': []
+          }
+          pkg_path.write_text(json.dumps(package, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          version_path.write_text(json.dumps({'version': version}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          index = index_path.read_text(encoding='utf-8')
+          old = "install:'./apps/Sports-Live/Sports-Live%2Cjs'"
+          new = "install:'./apps/Sports-Live/Sports%20Live.scriptable'"
+          if old not in index and new not in index:
+              raise SystemExit('Sports Live install entry not found in index-page.js')
+          index = index.replace(old, new)
+          index_path.write_text(index, encoding='utf-8')
+
+          cs = readme_cs.read_text(encoding='utf-8')
+          cs = cs.replace(
+              '> Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript je dostupný v repozitáři; samostatný `.scriptable` instalační balíček zatím není zveřejněn.',
+              '> Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript i `.scriptable` instalační balíček jsou dostupné v repozitáři.'
+          )
+          cs = cs.replace(
+              '<a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout Sports Live JavaScript" /></a>',
+              '<a href="./Sports%20Live.scriptable"><img src="https://img.shields.io/badge/Scriptable-Instalovat-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Instalovat Sports Live" /></a>\n  <a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout Sports Live JavaScript" /></a>'
+          )
+          readme_cs.write_text(cs, encoding='utf-8')
+
+          en = readme_en.read_text(encoding='utf-8')
+          en = en.replace(
+              '> Sports Live is still under development. The current JavaScript source is available in the repository; a standalone `.scriptable` install package has not been published yet.',
+              '> Sports Live is still under development. The current JavaScript source and `.scriptable` install package are both available in the repository.'
+          )
+          en = en.replace(
+              '<a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download Sports Live JavaScript" /></a>',
+              '<a href="./Sports%20Live.scriptable"><img src="https://img.shields.io/badge/Scriptable-Install-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Install Sports Live" /></a>\n  <a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download Sports Live JavaScript" /></a>'
+          )
+          readme_en.write_text(en, encoding='utf-8')
+
+          loaded = json.loads(pkg_path.read_text(encoding='utf-8'))
+          assert loaded['name'] == 'Sports Live'
+          assert loaded['script'] == script
+          assert loaded['icon']['color'] == 'orange'
+          assert loaded['icon']['glyph'] == 'trophy'
+          assert json.loads(version_path.read_text(encoding='utf-8'))['version'] == version
+          print(f'Built {pkg_path} for Sports Live v{version} ({len(script)} chars).')
+          PY
+
+          node tools/audit-community-catalog.cjs
+          node tools/audit-web-csp.cjs
+
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add 'apps/Sports-Live/Sports Live.scriptable' 'apps/Sports-Live/version.json' 'apps/Sports-Live/README.md' 'apps/Sports-Live/README_EN.md' 'assets/js/index-page.js'
+          git rm '.github/workflows/build-sports-live-package-once.yml'
+          git commit -m 'Add Sports Live Scriptable package'
+          git push origin HEAD:Master
