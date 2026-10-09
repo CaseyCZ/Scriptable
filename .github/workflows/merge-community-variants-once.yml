@@ -70,7 +70,8 @@ jobs:
               renamed = primary.replace(f'communityItem("{primary_name}"', f'communityItem({json.dumps(display_name, ensure_ascii=False)}', 1)
               if not renamed.rstrip().endswith('),'):
                   raise RuntimeError(f'Unexpected row ending for {primary_name}')
-              renamed = renamed.rstrip()[:-2] + '),{variants:' + json.dumps(variants, ensure_ascii=False, separators=(',', ':')) + '}),'
+              base = renamed.rstrip()[:-1]
+              renamed = 'Object.assign(' + base + ',{variants:' + json.dumps(variants, ensure_ascii=False, separators=(',', ':')) + '}),'
               lines[primary_idx] = renamed
               for name, _ in members[1:]:
                   removals.add(by_name[name])
