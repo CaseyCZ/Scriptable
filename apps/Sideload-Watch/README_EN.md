@@ -22,21 +22,32 @@
   <a href="./Sideload%20Watch.scriptable"><img src="https://img.shields.io/badge/Install-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Install Sideload Watch" /></a>
 </p>
 
-## About
+## What it does
 
-**Sideload Watch** uses the iOS-Hub catalog and lets you choose specific sources and apps whose new versions you want to track directly in a widget.
+**Sideload Watch** tracks new versions of apps you care about using the **iOS-Hub** catalog. Instead of checking every source manually, you get a simple overview on your iPhone.
 
 ## Main features
 
-- 📦 choose sources and exact apps
-- 🆕 available update overview
-- 👁️ Small / Medium / Large widgets plus demo preview
-- ⚡ local cache for fast rendering
-- 🔄 manual iOS-Hub catalog refresh
-- ✅ mark updates as seen and reset the saved baseline
-- 🎨 custom colors and displayed values
-- 🌍 Czech, English, German and Spanish
-- 🔄 in-app script updates
+- 📦 Choose the sources and individual apps you want to follow.
+- 🆕 See new versions and available updates.
+- ✅ Mark changes as read.
+- 📱 View updates in Small, Medium or Large Home Screen widgets.
+- 🎨 Customize colors and displayed information.
+- 🌍 Available in Czech, English, German and Spanish.
+- 🔄 Refresh the catalog manually and update the app itself.
+
+## Getting started
+
+1. Install **Sideload Watch** in Scriptable and open its settings.
+2. Select your iOS-Hub sources and apps.
+3. Load their current versions.
+4. Add a Scriptable widget to your Home Screen and select Sideload Watch.
+
+**Example:** Follow several apps from different sources. When a new version appears in the catalog, you can spot it without checking every source separately.
+
+## Good to know
+
+The widget uses information available in the iOS-Hub catalog. Updates appear after a source publishes them and the catalog refreshes.
 
 ## Links
 
