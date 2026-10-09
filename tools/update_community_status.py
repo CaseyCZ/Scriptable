@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import ipaddress
 import json
 import re
 import time
@@ -23,6 +24,7 @@ TIMEOUT = 15
 SCRIPT_SAMPLE_BYTES = 131072
 DEPENDENCY_SAMPLE_BYTES = 131072
 MAX_RUNTIME_DEPENDENCIES = 4
+SAFE_METHODS = {"GET", "HEAD"}
 
 
 def now_iso() -> str:
@@ -48,7 +50,6 @@ def top_level_objects(text: str) -> list[str]:
     depth = 0
     quote: str | None = None
     escaped = False
-
     for index, char in enumerate(text):
         if quote is not None:
             if escaped:
@@ -74,9 +75,7 @@ def top_level_objects(text: str) -> list[str]:
 
 
 def field_string(chunk: str, field: str) -> str | None:
-    pattern = re.compile(
-        rf"\b{re.escape(field)}\s*:\s*(?:'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\")"
-    )
+    pattern = re.compile(rf"\b{re.escape(field)}\s*:\s*(?:'((?:\\.|[^'\\])*)'|\"((?:\\.|[^\"\\])*)\")")
     match = pattern.search(chunk)
     if not match:
         return None
@@ -98,7 +97,6 @@ def variant_files(chunk: str) -> list[str]:
 
 def collect_projects() -> list[dict[str, object]]:
     projects: list[dict[str, object]] = []
-
     registry_text = REGISTRY.read_text(encoding="utf-8")
     try:
         community_block = registry_text.split("const communityApps=[", 1)[1].split("];\n    communityApps.push", 1)[0]
@@ -110,8 +108,7 @@ def collect_projects() -> list[dict[str, object]]:
         file_url = field_string(chunk, "file")
         if not name or not file_url:
             continue
-        files = [file_url, *variant_files(chunk)]
-        files = list(dict.fromkeys(url.strip() for url in files if url.strip()))
+        files = list(dict.fromkeys([file_url, *variant_files(chunk)]))
         projects.append({"name": name, "files": files})
 
     extra_text = EXTRA.read_text(encoding="utf-8")
@@ -122,8 +119,7 @@ def collect_projects() -> list[dict[str, object]]:
         values = js_strings(chunk)
         if len(values) < 5:
             continue
-        files = [values[4], *variant_files(chunk)]
-        files = list(dict.fromkeys(url.strip() for url in files if url.strip()))
+        files = list(dict.fromkeys([values[4], *variant_files(chunk)]))
         projects.append({"name": values[0], "files": files})
 
     dedup: dict[tuple[str, ...], dict[str, object]] = {}
@@ -132,15 +128,13 @@ def collect_projects() -> list[dict[str, object]]:
             url for url in project["files"]
             if isinstance(url, str) and url.startswith(("https://", "http://"))
         )
-        if not files:
-            continue
-        project["files"] = list(files)
-        dedup.setdefault(files, project)
-
+        if files:
+            project["files"] = list(files)
+            dedup.setdefault(files, project)
     return list(dedup.values())
 
 
-def request(url: str, sample_bytes: int, accept: str = "text/plain,*/*") -> tuple[int, str, bytes]:
+def request(url: str, sample_bytes: int, accept: str = "text/plain,*/*") -> tuple[int, str, bytes, str]:
     req = urllib.request.Request(
         url,
         headers={
@@ -153,70 +147,95 @@ def request(url: str, sample_bytes: int, accept: str = "text/plain,*/*") -> tupl
     with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
         status = getattr(response, "status", 200)
         final_url = response.geturl()
+        content_type = str(response.headers.get("Content-Type", ""))
         sample = response.read(sample_bytes)
-    return status, final_url, sample
+    return status, final_url, sample, content_type
 
 
 def scriptable_score(text: str) -> int:
     markers = [
-        "Variables used by Scriptable",
-        "ListWidget",
-        "Script.setWidget",
-        "Script.complete",
-        "Script.name(",
-        "config.runsInWidget",
-        "args.widgetParameter",
-        "FileManager.",
-        "Notification(",
-        "CalendarEvent.",
-        "Reminder.",
-        "Location.",
-        "Photos.",
-        "Safari.open",
-        "WebView(",
-        "Alert(",
+        "Variables used by Scriptable", "ListWidget", "Script.setWidget", "Script.complete",
+        "Script.name(", "config.runsInWidget", "args.widgetParameter", "FileManager.",
+        "Notification(", "CalendarEvent.", "Reminder.", "Location.", "Photos.",
+        "Safari.open", "WebView(", "Alert(",
     ]
     return sum(1 for marker in markers if marker in text)
 
 
-def direct_request_urls(text: str, install_url: str) -> list[str]:
+def is_placeholder_or_local(url: str) -> bool:
+    try:
+        parsed = urllib.parse.urlparse(url)
+        host = (parsed.hostname or "").lower().strip(".")
+    except Exception:
+        return True
+    if not host:
+        return True
+    if host in {"localhost", "example.com", "www.example.com"} or host.endswith((".example.com", ".local", ".lan")):
+        return True
+    if any(token in url.lower() for token in ("your-domain", "your_domain", "yourhost", "example.com")):
+        return True
+    try:
+        address = ipaddress.ip_address(host)
+        if address.is_private or address.is_loopback or address.is_link_local:
+            return True
+    except ValueError:
+        pass
+    return False
+
+
+def literal_request_matches(text: str) -> list[tuple[re.Match[str], str, str | None]]:
+    # Captures optional variable name plus a literal URL. The variable lets us detect
+    # loadString() HTML scrapers and non-GET methods without executing unsafe requests.
     pattern = re.compile(
+        r"(?:(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*)?"
         r"(?:new\s+)?Request\s*\(\s*(?:'([^']+)'|\"([^\"]+)\"|`([^`$]+)`)\s*\)",
         re.IGNORECASE,
     )
-    ignored_hosts = {
-        "raw.githubusercontent.com",
-        "github.com",
-        "www.github.com",
-        "api.github.com",
-        "gist.githubusercontent.com",
-        "scriptable.app",
-        "www.buymeacoffee.com",
-        "buymeacoffee.com",
-        "ko-fi.com",
-        "www.ko-fi.com",
-    }
-    out: list[str] = []
+    out: list[tuple[re.Match[str], str, str | None]] = []
     for match in pattern.finditer(text):
-        url = next((value for value in match.groups() if value), "").strip()
-        if not url.startswith(("https://", "http://")) or url == install_url:
+        url = next((value for value in match.groups()[1:] if value), "").strip()
+        out.append((match, url, match.group(1)))
+    return out
+
+
+def direct_requests(text: str, install_url: str) -> list[dict[str, object]]:
+    ignored_hosts = {
+        "raw.githubusercontent.com", "github.com", "www.github.com", "api.github.com",
+        "gist.githubusercontent.com", "scriptable.app", "www.buymeacoffee.com",
+        "buymeacoffee.com", "ko-fi.com", "www.ko-fi.com",
+    }
+    out: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for match, url, variable in literal_request_matches(text):
+        if not url.startswith(("https://", "http://")) or url == install_url or is_placeholder_or_local(url):
             continue
-        try:
-            parsed = urllib.parse.urlparse(url)
-        except Exception:
-            continue
+        parsed = urllib.parse.urlparse(url)
         host = (parsed.hostname or "").lower()
         if host in ignored_hosts:
             continue
         if parsed.path in ("", "/") and not parsed.query:
-            # Usually a base URL that is combined with a runtime path later.
             continue
         if any(token in url for token in ("${", "{", "}")):
             continue
         if re.search(r"\.(?:png|jpe?g|gif|webp|svg|ico)(?:$|[?#])", parsed.path, re.IGNORECASE):
             continue
-        if url not in out:
-            out.append(url)
+        if url in seen:
+            continue
+
+        method = "GET"
+        expects_html = False
+        if variable:
+            tail = text[match.end(): match.end() + 2500]
+            method_match = re.search(
+                rf"\b{re.escape(variable)}\.method\s*=\s*['\"]([A-Za-z]+)['\"]", tail,
+                re.IGNORECASE,
+            )
+            if method_match:
+                method = method_match.group(1).upper()
+            expects_html = bool(re.search(rf"\b{re.escape(variable)}\.loadString\s*\(", tail))
+
+        seen.add(url)
+        out.append({"url": url, "method": method, "expectsHtml": expects_html})
         if len(out) >= MAX_RUNTIME_DEPENDENCIES:
             break
     return out
@@ -225,17 +244,28 @@ def direct_request_urls(text: str, install_url: str) -> list[str]:
 def html_markers(text: str) -> list[str]:
     if "loadString" not in text:
         return []
-    # HTML scrapers often depend on a class/id name. Remove regex escaping first,
-    # then capture those stable selectors and verify that the remote page still has one.
     normalized = text.replace("\\", "")
     markers: list[str] = []
     for match in re.finditer(r"(?:class|id)\s*=\s*[\"']([A-Za-z0-9_-]{5,})[\"']", normalized):
         marker = match.group(1)
         if marker not in markers:
             markers.append(marker)
-        if len(markers) >= 5:
+        if len(markers) >= 6:
             break
     return markers
+
+
+def selector_present(body: str, marker: str) -> bool:
+    # Require an actual class/id attribute, not the selector text hidden in CSS/JS.
+    escaped = re.escape(marker)
+    class_pattern = rf"\bclass\s*=\s*['\"][^'\"]*(?:^|\s){escaped}(?:\s|$)[^'\"]*['\"]"
+    id_pattern = rf"\bid\s*=\s*['\"]{escaped}['\"]"
+    return bool(re.search(class_pattern, body, re.IGNORECASE) or re.search(id_pattern, body, re.IGNORECASE))
+
+
+def looks_like_html(body: str, content_type: str) -> bool:
+    prefix = body.lstrip()[:1000].lower()
+    return "text/html" in content_type.lower() or prefix.startswith("<!doctype html") or "<html" in prefix or "<body" in prefix
 
 
 def probe_install(item: dict[str, str]) -> tuple[str, dict[str, object], str]:
@@ -243,19 +273,15 @@ def probe_install(item: dict[str, str]) -> tuple[str, dict[str, object], str]:
     checked_at = now_iso()
     last_error = None
     last_status = None
-
     for attempt in range(2):
         try:
-            status, final_url, sample = request(url, SCRIPT_SAMPLE_BYTES)
+            status, final_url, sample, _ = request(url, SCRIPT_SAMPLE_BYTES)
             if 200 <= status < 400 and sample.strip():
                 text = sample.decode("utf-8", errors="replace")
                 score = scriptable_score(text)
                 return url, {
-                    "name": item["name"],
-                    "online": True,
-                    "sourceOnline": True,
-                    "checkedAt": checked_at,
-                    "httpStatus": status,
+                    "name": item["name"], "online": True, "sourceOnline": True,
+                    "checkedAt": checked_at, "httpStatus": status,
                     "finalUrl": final_url if final_url != url else None,
                     "scriptableScore": score,
                     "contentWarning": None if score else "No clear Scriptable API markers found in sampled source",
@@ -268,70 +294,64 @@ def probe_install(item: dict[str, str]) -> tuple[str, dict[str, object], str]:
             last_error = f"HTTPError: {exc.code} {exc.reason}"
         except Exception as exc:
             last_error = f"{type(exc).__name__}: {exc}"
-
         if attempt == 0:
             time.sleep(0.25)
 
     return url, {
-        "name": item["name"],
-        "online": False,
-        "sourceOnline": False,
-        "checkedAt": checked_at,
-        "httpStatus": last_status,
-        "scriptableScore": 0,
-        "contentWarning": None,
-        "error": (last_error or "Unknown error")[:300],
+        "name": item["name"], "online": False, "sourceOnline": False,
+        "checkedAt": checked_at, "httpStatus": last_status, "scriptableScore": 0,
+        "contentWarning": None, "error": (last_error or "Unknown error")[:300],
     }, ""
 
 
-def probe_dependency(url: str) -> tuple[str, dict[str, object]]:
+def probe_dependency(meta: dict[str, object]) -> tuple[str, dict[str, object]]:
+    url = str(meta["url"])
+    method = str(meta.get("method") or "GET").upper()
+    if method not in SAFE_METHODS:
+        return url, {
+            "reachable": None, "definiteBroken": False, "status": None, "finalUrl": url,
+            "body": "", "contentType": "", "error": f"Not probed: script uses {method}",
+        }
+
     last_error = None
     last_status = None
     final_url = url
-    sample = b""
-
     for attempt in range(2):
         try:
-            status, final_url, sample = request(url, DEPENDENCY_SAMPLE_BYTES, "text/html,application/json,text/plain,*/*")
-            # Protected endpoints are still alive. A script may authenticate at runtime.
+            status, final_url, sample, content_type = request(
+                url, DEPENDENCY_SAMPLE_BYTES, "text/html,application/json,text/plain,*/*"
+            )
             return url, {
                 "reachable": 200 <= status < 500 and status not in (404, 410),
-                "status": status,
-                "finalUrl": final_url,
+                "definiteBroken": status in (404, 410),
+                "status": status, "finalUrl": final_url,
                 "body": sample.decode("utf-8", errors="replace"),
-                "error": None,
+                "contentType": content_type, "error": None,
             }
         except urllib.error.HTTPError as exc:
             last_status = exc.code
             last_error = f"HTTPError: {exc.code} {exc.reason}"
             if exc.code in (401, 403, 405, 429):
                 return url, {
-                    "reachable": True,
-                    "status": exc.code,
-                    "finalUrl": url,
-                    "body": "",
-                    "error": None,
+                    "reachable": True, "definiteBroken": False, "status": exc.code,
+                    "finalUrl": url, "body": "", "contentType": "", "error": None,
                 }
             if exc.code in (404, 410):
                 return url, {
-                    "reachable": False,
-                    "status": exc.code,
-                    "finalUrl": url,
-                    "body": "",
-                    "error": last_error,
+                    "reachable": False, "definiteBroken": True, "status": exc.code,
+                    "finalUrl": url, "body": "", "contentType": "", "error": last_error,
                 }
         except Exception as exc:
             last_error = f"{type(exc).__name__}: {exc}"
-
         if attempt == 0:
             time.sleep(0.25)
 
+    # DNS failures/timeouts can be temporary or runner-specific. Record them as
+    # unverified, but never turn the whole project red solely because of them.
     return url, {
-        "reachable": False if last_status in (404, 410) or last_status is None else True,
-        "status": last_status,
-        "finalUrl": final_url,
-        "body": "",
-        "error": (last_error or "Unknown dependency error")[:300],
+        "reachable": None, "definiteBroken": False, "status": last_status,
+        "finalUrl": final_url, "body": "", "contentType": "",
+        "error": (last_error or "Dependency could not be verified")[:300],
     }
 
 
@@ -365,15 +385,16 @@ def main() -> None:
             results[url] = status
             samples[url] = sample_text
 
-    endpoint_dependencies: dict[str, list[str]] = {}
-    dependency_urls: set[str] = set()
+    endpoint_dependencies: dict[str, list[dict[str, object]]] = {}
+    dependency_meta: dict[str, dict[str, object]] = {}
     endpoint_markers: dict[str, list[str]] = {}
     for url, sample_text in samples.items():
         if not sample_text or not results[url].get("sourceOnline"):
             continue
-        deps = direct_request_urls(sample_text, url)
+        deps = direct_requests(sample_text, url)
         endpoint_dependencies[url] = deps
-        dependency_urls.update(deps)
+        for dep in deps:
+            dependency_meta.setdefault(str(dep["url"]), dep)
         endpoint_markers[url] = html_markers(sample_text)
         module_matches = sorted(set(re.findall(r"\bimportModule\s*\(\s*['\"]([^'\"]+)['\"]", sample_text)))
         if module_matches:
@@ -381,76 +402,86 @@ def main() -> None:
             results[url]["contentWarning"] = "Requires additional importModule file(s): " + ", ".join(module_matches[:3])
 
     dependency_results: dict[str, dict[str, object]] = {}
-    if dependency_urls:
+    if dependency_meta:
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-            futures = [pool.submit(probe_dependency, url) for url in sorted(dependency_urls)]
+            futures = [pool.submit(probe_dependency, meta) for meta in dependency_meta.values()]
             for future in as_completed(futures):
-                url, status = future.result()
-                dependency_results[url] = status
+                url, state = future.result()
+                dependency_results[url] = state
 
+    runtime_warnings = 0
     for install_url, deps in endpoint_dependencies.items():
-        broken: list[str] = []
+        hard_broken: list[str] = []
         checked: list[dict[str, object]] = []
         markers = endpoint_markers.get(install_url, [])
-        for dep in deps:
+        for meta in deps:
+            dep = str(meta["url"])
             state = dependency_results.get(dep, {})
-            reachable = state.get("reachable") is True
+            reachable = state.get("reachable")
+            definite_broken = state.get("definiteBroken") is True
             final_url = str(state.get("finalUrl") or dep)
-            reason = None
-            if not reachable:
-                reason = str(state.get("error") or f"HTTP {state.get('status')}")
-            elif dependency_is_homepage_redirect(dep, final_url):
-                reachable = False
-                reason = f"Redirected to homepage: {final_url}"
-            elif markers and state.get("body"):
-                body = str(state.get("body") or "")
-                if not any(marker in body for marker in markers):
-                    reachable = False
-                    reason = "Expected page marker missing: " + ", ".join(markers[:2])
+            reason = str(state.get("error") or "") or None
+            body = str(state.get("body") or "")
+            content_type = str(state.get("contentType") or "")
 
-            checked.append({
+            if reachable is True and dependency_is_homepage_redirect(dep, final_url):
+                reachable = False
+                definite_broken = True
+                reason = f"Redirected to homepage: {final_url}"
+
+            if (
+                reachable is True and meta.get("expectsHtml") is True and markers and
+                body and looks_like_html(body, content_type)
+            ):
+                present = [marker for marker in markers if selector_present(body, marker)]
+                if not present:
+                    reachable = False
+                    definite_broken = True
+                    reason = "Expected HTML selector missing: " + ", ".join(markers[:3])
+
+            public_state: dict[str, object] = {
                 "url": dep,
+                "method": meta.get("method") or "GET",
                 "reachable": reachable,
                 "httpStatus": state.get("status"),
                 "finalUrl": final_url if final_url != dep else None,
                 "error": reason,
-            })
-            if not reachable:
-                broken.append(f"{dep} ({reason or 'unreachable'})")
+            }
+            checked.append(public_state)
+            if definite_broken:
+                hard_broken.append(f"{dep} ({reason or f'HTTP {state.get("status")}'})")
+            elif reachable is None:
+                runtime_warnings += 1
 
         if checked:
             results[install_url]["runtimeDependencies"] = checked
-        if broken and results[install_url].get("sourceOnline") is True:
+        if hard_broken and results[install_url].get("sourceOnline") is True:
             results[install_url]["online"] = False
-            results[install_url]["error"] = ("Runtime dependency failed: " + " | ".join(broken))[:600]
+            results[install_url]["error"] = ("Runtime dependency failed: " + " | ".join(hard_broken))[:700]
 
-    project_online = 0
-    for project in projects:
-        statuses = [results.get(url, {}) for url in project["files"]]
-        if any(status.get("online") is True for status in statuses):
-            project_online += 1
+    project_online = sum(
+        1 for project in projects
+        if any(results.get(url, {}).get("online") is True for url in project["files"])
+    )
     project_offline = len(projects) - project_online
-
     endpoint_online = sum(1 for item in results.values() if item.get("online") is True)
     endpoint_offline = len(results) - endpoint_online
+
     payload = {
         "generatedAt": now_iso(),
-        "total": len(projects),
-        "online": project_online,
-        "offline": project_offline,
-        "endpointsTotal": len(results),
-        "endpointsOnline": endpoint_online,
+        "total": len(projects), "online": project_online, "offline": project_offline,
+        "endpointsTotal": len(results), "endpointsOnline": endpoint_online,
         "endpointsOffline": endpoint_offline,
         "runtimeDependenciesChecked": len(dependency_results),
+        "runtimeWarnings": runtime_warnings,
         "items": dict(sorted(results.items())),
     }
-
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(
         f"Checked {len(projects)} community projects / {len(results)} download endpoints / "
-        f"{len(dependency_results)} direct runtime dependencies: "
-        f"{project_online} projects online, {project_offline} offline"
+        f"{len(dependency_results)} runtime dependencies: "
+        f"{project_online} projects online, {project_offline} offline, {runtime_warnings} unverified deps"
     )
 
 
