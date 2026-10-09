@@ -1,0 +1,45 @@
+name: Diagnose England Bridge scraper
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - ".github/workflows/diagnose-england-bridge.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Probe current bridge page
+        run: |
+          python - <<'PY'
+          import urllib.request
+          url = 'https://highwaysengland.co.uk/travel-updates/the-severn-bridges/'
+          req = urllib.request.Request(url, headers={'User-Agent':'CaseyCZ-Scriptable-Catalog (+https://caseycz.github.io/Scriptable/)'})
+          with urllib.request.urlopen(req, timeout=20) as response:
+              body = response.read(512000).decode('utf-8', errors='replace')
+              print('FINAL_URL=' + response.geturl())
+              print('HTTP_STATUS=' + str(response.status))
+              print('CONTENT_TYPE=' + str(response.headers.get('Content-Type')))
+              print('BODY_BYTES=' + str(len(body.encode('utf-8'))))
+              print('OLD_SELECTOR_PRESENT=' + str('severn-crossing-status__heading' in body))
+              print('OLD_MATCH_COUNT=' + str(body.count('severn-crossing-status__heading')))
+              print('CURRENT_STATUS_TEXT_PRESENT=' + str('Prince Of Wales Bridge' in body or 'Prince of Wales Bridge' in body))
+          PY
+
+      - name: Remove diagnostic workflow
+        run: |
+          rm .github/workflows/diagnose-england-bridge.yml
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add .github/workflows/diagnose-england-bridge.yml
+          git commit -m "Remove England Bridge diagnostic helper"
+          git push origin HEAD:Master
