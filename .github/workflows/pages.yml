@@ -33,6 +33,9 @@ jobs:
       - name: Audit community catalog duplicates
         run: node tools/audit-community-catalog.cjs
 
+      - name: Audit CSP-safe website interactions
+        run: node tools/audit-web-csp.cjs
+
       - name: Generate Credits from catalog
         run: node tools/build-credits.cjs
 
