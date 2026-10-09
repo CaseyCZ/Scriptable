@@ -23,37 +23,44 @@
   <a href="./Sports%20Live.js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout Sports Live JavaScript" /></a>
 </p>
 
-## O aplikaci
+## Co aplikace umí
 
-**Sports Live** je jednodušší doplněk ke Sports Info. Zaměřuje se na jeden vybraný tým a rychle zobrazuje live stav, nejbližší zápas, další program a základní týmové informace. Používá stejnou multi-provider datovou vrstvu jako Sports Info a vizuální systém navazuje na Homebridge Status.
-
-## Původ a poděkování
-
-Sports Live původně vychází ze skriptu [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **Nicolas-kings**, který navazuje na původní [**NBA MyTeam widget**](https://github.com/thisisevanfox/nba-my-team-ios-widget) od [**thisisevanfox**](https://github.com/thisisevanfox). Samotná hlavička ONE-NBA uvádí jako autory **thisisevanfox & Nicolas-kings**. Tento NBA základ jsme použili jako předlohu a výchozí bod; současný Sports Live byl následně zásadně přepracován na vícesportovní aplikaci s vlastními datovými zdroji, výběrem sportu, soutěže a týmu, novým nastavením a vzhledem CaseyCZ Scriptable Apps.
+**Sports Live** je rychlý sportovní přehled pro fanoušky jednoho týmu. Přímo na ploše iPhonu uvidíš jeho aktuální zápas, nejbližší utkání a další program.
 
 ## Podporované sporty
 
-- ⚽ fotbal
-- 🏒 hokej
-- 🏀 basketbal
-- 🥅 florbal
-- ⚾ baseball
+⚽ Fotbal · 🏒 Hokej · 🏀 Basketbal · 🥅 Florbal · ⚾ Baseball
 
-## Hlavní funkce
+## Hlavní možnosti
 
-- 🔴 live stav vybraného týmu
-- ⏭️ nejbližší zápas a další program
-- 📊 základní statistiky týmu
-- 🎯 výběr sportu, soutěže a jednoho týmu
-- 📱 Small / Medium widgety
-- 🎨 vlastní motiv, barvy a obrázek pozadí
-- 🌍 vícejazyčné prostředí
-- 🔄 aktualizace přímo ze Scriptable
-- 🧰 diagnostika, cache a záloha nastavení
+- 🔴 Živý stav zápasu vybraného týmu.
+- ⏭️ Nejbližší zápas a další program.
+- 📊 Základní týmové informace a statistiky.
+- 🎯 Výběr sportu, soutěže a oblíbeného týmu.
+- 📱 Widgety Small a Medium.
+- 🎨 Vlastní barvy, motiv a obrázek pozadí.
+- 🌍 Vícejazyčné prostředí, aktualizace a záloha nastavení.
 
-> Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript i `.scriptable` instalační balíček jsou dostupné v repozitáři.
+## Jak začít
 
-Instalace z webového katalogu nyní používá přímo balíček `Sports Live.scriptable`.
+1. Nainstaluj **Sports Live** do Scriptable a spusť jej.
+2. Vyber sport, soutěž a jeden tým, který chceš sledovat.
+3. Uprav vzhled widgetu podle sebe.
+4. Přidej widget Scriptable na plochu iPhonu a vyber Sports Live.
+
+**Příklad:** Sleduješ svůj fotbalový klub a chceš rychle vědět, jestli právě hraje a kdy nastoupí příště.
+
+## Sports Live, nebo Sports Info?
+
+**Sports Live** se soustředí na jeden tým. Pokud chceš širší přehled soutěže, výsledků a tabulek, vyzkoušej **Sports Info**.
+
+## Dobré vědět
+
+Aplikace je stále ve vývoji. Dostupnost živých výsledků závisí na sportu, soutěži a externích zdrojích dat.
+
+## Původ a poděkování
+
+Sports Live vychází z projektu [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **Nicolas-kings**, který navazuje na [NBA MyTeam widget](https://github.com/thisisevanfox/nba-my-team-ios-widget) od [thisisevanfox](https://github.com/thisisevanfox). Původní NBA řešení posloužilo jako výchozí bod; současná aplikace byla zásadně přepracována pro více sportů a vlastní nastavení.
 
 ## Podpora
 
