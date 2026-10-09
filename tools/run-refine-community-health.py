@@ -24,13 +24,9 @@ def needs_deep_check(item: dict[str, object]) -> bool:
     if item.get("sourceOnline") is not True:
         return False
     score = int(item.get("scriptableScore") or 0)
-    return bool(
-        item.get("runtimeDependencies")
-        or item.get("contentWarning")
-        or item.get("moduleDependencies")
-        or item.get("requiresSetup")
-        or score <= 1
-    )
+    # Setup requirements and helper modules are not failures by themselves.
+    # Deep-check only actual runtime dependencies or suspiciously weak sources.
+    return bool(item.get("runtimeDependencies") or score <= 1)
 
 
 def main() -> None:
