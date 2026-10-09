@@ -1,0 +1,162 @@
+name: Fix web CSP interactions once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-web-csp-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Audit and repair CSP-safe interactions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_required(text, old, new, label):
+              if old not in text:
+                  raise RuntimeError(f'Missing expected pattern: {label}')
+              return text.replace(old, new)
+
+          # 1) Remove inline HTML event handlers blocked by the strict CSP.
+          html_path = Path('index.html')
+          html = html_path.read_text(encoding='utf-8')
+          html = replace_required(
+              html,
+              '<button class="filter-summary-clear" type="button" onclick="clearCommunityFilters(event)"></button>',
+              '<button class="filter-summary-clear" type="button" data-community-clear></button>',
+              'clear filters inline onclick',
+          )
+          html = replace_required(
+              html,
+              ' placeholder="Hledat projekty…" oninput="setCommunitySearch(this.value)">',
+              ' placeholder="Hledat projekty…">',
+              'search inline oninput',
+          )
+          html = html.replace('index-page.js?v=20261009-csp1', 'index-page.js?v=20261009-csp2')
+          html_path.write_text(html, encoding='utf-8')
+
+          # 2) Replace generated inline event handlers with data attributes + delegated listeners.
+          js_path = Path('assets/js/index-page.js')
+          js = js_path.read_text(encoding='utf-8')
+
+          anchor = "    const appTr=(cs,en)=>lang==='cs'?cs:en;\n"
+          escape_fn = "    const escapeAttr=value=>String(value??'').replace(/&/g,'&amp;').replace(/\\\"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');\n"
+          if escape_fn not in js:
+              js = replace_required(js, anchor, anchor + escape_fn, 'appTr anchor for escapeAttr')
+
+          old_variant = "const variantButtons=app.variants.map(v=>`<button class=\"btn primary\" type=\"button\" onclick='installRemote(${JSON.stringify(v.file)},${JSON.stringify(v.filename||app.filename)},${JSON.stringify(app.name+' · '+(v.label||''))},${JSON.stringify(statusId)})'>📲 ${v.label||tr('Varianta','Variant')}</button>`).join('');"
+          new_variant = "const variantButtons=app.variants.map(v=>`<button class=\"btn primary\" type=\"button\" data-install-remote data-file=\"${escapeAttr(v.file)}\" data-filename=\"${escapeAttr(v.filename||app.filename)}\" data-name=\"${escapeAttr(app.name+' · '+(v.label||''))}\" data-status-id=\"${escapeAttr(statusId)}\">📲 ${v.label||tr('Varianta','Variant')}</button>`).join('');"
+          js = replace_required(js, old_variant, new_variant, 'variant install onclick')
+
+          old_single = "actions=`<button class=\"btn primary\" type=\"button\" onclick='installRemote(${JSON.stringify(app.file)},${JSON.stringify(app.filename)},${JSON.stringify(app.name)},${JSON.stringify(statusId)})'>${tr('📲 Instalovat','📲 Install')}</button><a class=\"btn secondary\" href=\"${app.source}\" target=\"_blank\" rel=\"noopener\">${tr('↗ Projekt','↗ Project')}</a>`"
+          new_single = "actions=`<button class=\"btn primary\" type=\"button\" data-install-remote data-file=\"${escapeAttr(app.file)}\" data-filename=\"${escapeAttr(app.filename)}\" data-name=\"${escapeAttr(app.name)}\" data-status-id=\"${escapeAttr(statusId)}\">${tr('📲 Instalovat','📲 Install')}</button><a class=\"btn secondary\" href=\"${app.source}\" target=\"_blank\" rel=\"noopener\">${tr('↗ Projekt','↗ Project')}</a>`"
+          js = replace_required(js, old_single, new_single, 'single install onclick')
+
+          js = replace_required(
+              js,
+              ' loading="lazy" onerror="this.style.display=\'none\'">',
+              ' loading="lazy">',
+              'preview image inline onerror',
+          )
+
+          old_filter = "    function communityFilterButton(label,value,active,handler){return `<button class=\"filter ${active?'active':''}\" type=\"button\" aria-pressed=\"${active}\" onclick=\"${handler}('${value}')\">${label}</button>`}\n"
+          new_filter = "    function communityFilterButton(label,value,active,handler){return `<button class=\"filter ${active?'active':''}\" type=\"button\" aria-pressed=\"${active}\" data-community-filter=\"${handler}\" data-filter-value=\"${escapeAttr(value)}\">${label}</button>`}\n"
+          js = replace_required(js, old_filter, new_filter, 'filter inline onclick')
+
+          js = replace_required(js, ' onclick="setCommunityPage(${communityPage-1})"', ' data-community-page="${communityPage-1}"', 'previous page onclick')
+          js = replace_required(js, ' onclick="setCommunityPage(${i})"', ' data-community-page="${i}"', 'numbered page onclick')
+          js = replace_required(js, ' onclick="setCommunityPage(${communityPage+1})"', ' data-community-page="${communityPage+1}"', 'next page onclick')
+
+          listener_anchor = "    document.querySelectorAll('[data-language]').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.language)));\n"
+          delegated = """    const communityFilterHandlers={setAvailabilityFilter,setCategory,setCommunitySort};
+    document.querySelector('[data-community-clear]')?.addEventListener('click',clearCommunityFilters);
+    document.getElementById('sourceSearch')?.addEventListener('input',event=>setCommunitySearch(event.currentTarget.value));
+    document.addEventListener('click',event=>{const target=event.target instanceof Element?event.target:null;if(!target)return;const install=target.closest('[data-install-remote]');if(install){installRemote(install.dataset.file||'',install.dataset.filename||'',install.dataset.name||'',install.dataset.statusId||'');return}const filter=target.closest('[data-community-filter]');if(filter){const handler=communityFilterHandlers[filter.dataset.communityFilter];if(handler)handler(filter.dataset.filterValue||'all');return}const pageButton=target.closest('[data-community-page]');if(pageButton&&!pageButton.disabled){const page=Number.parseInt(pageButton.dataset.communityPage||'',10);if(Number.isFinite(page))setCommunityPage(page)}});
+    document.addEventListener('error',event=>{const image=event.target;if(image instanceof HTMLImageElement&&image.closest('.preview'))image.style.display='none'},true);
+"""
+          if delegated not in js:
+              js = replace_required(js, listener_anchor, delegated + listener_anchor, 'event listener anchor')
+
+          js_path.write_text(js, encoding='utf-8')
+
+          # 3) Add a permanent CSP regression audit for the website sources.
+          audit = r'''const fs=require('fs');
+const path=require('path');
+
+const files=[];
+for(const name of fs.readdirSync('.')){
+  if(/\.(?:html|js)$/i.test(name)&&fs.statSync(name).isFile())files.push(name);
+}
+if(fs.existsSync('assets/js')){
+  for(const name of fs.readdirSync('assets/js')){
+    if(/\.js$/i.test(name))files.push(path.join('assets/js',name));
+  }
+}
+
+const issues=[];
+const inlineHandler=/<[^>]*\son[a-z]+\s*=\s*["']/gi;
+const javascriptUrl=/(?:href|src)\s*=\s*["']\s*javascript:/gi;
+
+for(const file of files){
+  const text=fs.readFileSync(file,'utf8');
+  for(const match of text.matchAll(inlineHandler))issues.push(`${file}: inline event handler: ${match[0].slice(0,120)}`);
+  for(const match of text.matchAll(javascriptUrl))issues.push(`${file}: javascript: URL: ${match[0]}`);
+
+  if(/\.html$/i.test(file)&&/Content-Security-Policy/i.test(text)){
+    const csp=(text.match(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]+content=["']([^"']*)["']/i)||[])[1]||'';
+    const scriptSrc=(csp.match(/script-src\s+([^;]+)/i)||[])[1]||'';
+    if(scriptSrc.includes("'unsafe-inline'"))issues.push(`${file}: script-src must not contain unsafe-inline`);
+    const inlineScripts=[...text.matchAll(/<script(?![^>]*\bsrc\s*=)[^>]*>([\s\S]*?)<\/script>/gi)].filter(m=>m[1].trim());
+    if(inlineScripts.length)issues.push(`${file}: ${inlineScripts.length} inline <script> block(s) blocked by CSP`);
+  }
+}
+
+if(issues.length){
+  console.error('Web CSP audit failed:');
+  for(const issue of issues)console.error(`- ${issue}`);
+  process.exit(1);
+}
+console.log(`Web CSP audit: OK (${files.length} website source files checked; no inline handlers/javascript URLs/blocked inline scripts).`);
+'''
+          Path('tools/audit-web-csp.cjs').write_text(audit, encoding='utf-8')
+
+          # 4) Run this regression audit on every Pages deployment.
+          pages_path=Path('.github/workflows/pages.yml')
+          pages=pages_path.read_text(encoding='utf-8')
+          audit_step="""      - name: Audit CSP-safe website interactions
+        run: node tools/audit-web-csp.cjs
+
+"""
+          anchor_pages="""      - name: Generate Credits from catalog
+        run: node tools/build-credits.cjs
+
+"""
+          if audit_step not in pages:
+              pages=replace_required(pages, anchor_pages, audit_step+anchor_pages, 'Pages audit insertion point')
+          pages_path.write_text(pages, encoding='utf-8')
+          PY
+
+          node --check assets/js/index-page.js
+          node --check assets/js/guide-page.js
+          node --check assets/js/credits-page.js
+          node --check assets/js/privacy-page.js
+          node tools/audit-web-csp.cjs
+          node tools/audit-community-catalog.cjs
+
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add index.html assets/js/index-page.js tools/audit-web-csp.cjs .github/workflows/pages.yml
+          git rm .github/workflows/fix-web-csp-once.yml
+          git commit -m "Fix CSP-safe web interactions and add regression audit"
+          git push origin HEAD:Master
