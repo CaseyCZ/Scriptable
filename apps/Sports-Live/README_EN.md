@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Website-Catalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable catalog" /></a>
   <a href="./Sports%20Live.scriptable"><img src="https://img.shields.io/badge/Scriptable-Install-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Install Sports Live" /></a>
-  <a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download Sports Live JavaScript" /></a>
+  <a href="./Sports%20Live.js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download Sports Live JavaScript" /></a>
 </p>
 
 ## About

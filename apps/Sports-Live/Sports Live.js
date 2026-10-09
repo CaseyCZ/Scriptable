@@ -13,7 +13,7 @@ const APP_VERSION = "0.3.3";
 const SETTINGS_FILE = "SportsLive_settings.json";
 const CACHE_FILE = "SportsLive_cache.json";
 const API_TIMEOUT = 7;
-const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Live/Sports-Live%2Cjs";
+const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Live/Sports%20Live.js";
 const UPDATE_MIN_BYTES = 22000;
 
 const SPORTS = [
