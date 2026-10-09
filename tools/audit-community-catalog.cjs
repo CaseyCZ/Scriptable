@@ -2,17 +2,18 @@
 const fs=require('fs');
 const vm=require('vm');
 
-const index=fs.readFileSync('index.html','utf8');
+const registryPath=fs.existsSync('assets/js/index-page.js')?'assets/js/index-page.js':'index.html';
+const index=fs.readFileSync(registryPath,'utf8');
 const extraSource=fs.readFileSync('community-extra.js','utf8');
 
 const startToken='const communityApps=[';
 const start=index.indexOf(startToken);
-if(start<0)throw new Error('communityApps start not found in index.html');
+if(start<0)throw new Error(`communityApps start not found in ${registryPath}`);
 const guard=index.indexOf('function canonicalCommunityUrl',start);
-if(guard<0)throw new Error('community duplicate runtime guard not found in index.html');
+if(guard<0)throw new Error(`community duplicate runtime guard not found in ${registryPath}`);
 const between=index.slice(start+startToken.length,guard);
 const end=between.lastIndexOf('];');
-if(end<0)throw new Error('communityApps end not found in index.html');
+if(end<0)throw new Error(`communityApps end not found in ${registryPath}`);
 
 const builtCtx={};
 vm.runInNewContext(`communityApps=[${between.slice(0,end)}]`,builtCtx,{timeout:2000});
@@ -82,7 +83,7 @@ function allowedVariantWarning(repo,items){
   return names.size===2&&names.has('Shortcut Community Dashboard')&&names.has('Shortcut Box Dashboard');
 }
 
-const rows=[...builtins.map(app=>({app,where:'index.html'})),...extras.map(app=>({app,where:'community-extra.js'}))];
+const rows=[...builtins.map(app=>({app,where:registryPath})),...extras.map(app=>({app,where:'community-extra.js'}))];
 const seenUrls=new Map();
 const seenNames=new Map();
 const repoCoreGroups=new Map();
