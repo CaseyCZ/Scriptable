@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta id="themeColor" name="theme-color" content="#070b14">
 <meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <link rel="canonical" href="https://caseycz.github.io/Scriptable/credits.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Scriptable Apps">
@@ -115,37 +116,8 @@ html[data-theme="light"]{color-scheme:light;--page:#f1f5f9;--bg:#f8fafc;--panel:
 
 <div id="supportModal" class="support-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="supportTitle"><div class="support-dialog"><button class="support-close" type="button" data-support-close aria-label="Close">×</button><div class="badge" data-cs="PODPOŘIT PROJEKT" data-en="SUPPORT THE PROJECT" data-de="PROJEKT UNTERSTÜTZEN" data-es="APOYAR EL PROYECTO" data-fr="SOUTENIR LE PROJET">PODPOŘIT PROJEKT</div><h2 id="supportTitle" data-cs="Podpoř další vývoj." data-en="Support further development." data-de="Unterstütze die weitere Entwicklung." data-es="Apoya el desarrollo futuro." data-fr="Soutenez le développement futur.">Podpoř další vývoj.</h2><p data-cs="Pokud ti Scriptable Apps šetří čas, můžeš podpořit další vývoj přes Buy Me a Coffee." data-en="If Scriptable Apps saves you time, you can support further development through Buy Me a Coffee." data-de="Wenn dir Scriptable Apps Zeit spart, kannst du die weitere Entwicklung über Buy Me a Coffee unterstützen." data-es="Si Scriptable Apps te ahorra tiempo, puedes apoyar el desarrollo futuro mediante Buy Me a Coffee." data-fr="Si Scriptable Apps vous fait gagner du temps, vous pouvez soutenir son développement via Buy Me a Coffee.">Pokud ti Scriptable Apps šetří čas, můžeš podpořit další vývoj přes Buy Me a Coffee.</p><a href="https://www.buymeacoffee.com/caseycz" target="_blank" rel="noopener"><img class="support-qr" src="https://caseycz.github.io/support-qr.svg" alt="Buy Me a Coffee QR code"></a><a class="btn primary" style="width:100%" href="https://www.buymeacoffee.com/caseycz" target="_blank" rel="noopener"><span data-cs="Otevřít Buy Me a Coffee" data-en="Open Buy Me a Coffee" data-de="Buy Me a Coffee öffnen" data-es="Abrir Buy Me a Coffee" data-fr="Ouvrir Buy Me a Coffee">Otevřít Buy Me a Coffee</span></a></div></div>
 
-<script>
-const SUPPORTED=['cs','en','de','es','fr'];
-let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang))lang=(navigator.language||'en').toLowerCase().startsWith('cs')?'cs':'en';
-let theme=localStorage.getItem('siteTheme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');
-function applyTheme(next){theme=next==='light'?'light':'dark';localStorage.setItem('siteTheme',theme);document.documentElement.dataset.theme=theme;document.getElementById('themeDark').classList.toggle('active',theme==='dark');document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeColor').content=theme==='dark'?'#070b14':'#eef3f8'}
-function setLanguage(next){lang=SUPPORTED.includes(next)?next:'en';localStorage.setItem('siteLang',lang);document.documentElement.lang=lang;document.querySelectorAll('[data-cs]').forEach(el=>el.textContent=el.getAttribute('data-'+lang)||el.getAttribute('data-en')||el.textContent);document.querySelectorAll('[data-language]').forEach(btn=>btn.classList.toggle('active',btn.dataset.language===lang));renderCommunityCredits()}
-document.getElementById('themeDark').addEventListener('click',()=>applyTheme('dark'));document.getElementById('themeLight').addEventListener('click',()=>applyTheme('light'));document.querySelectorAll('[data-language]').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.language)));
-document.getElementById('settingsBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('settingsPanel').classList.toggle('open')});document.getElementById('settingsPanel').addEventListener('click',e=>e.stopPropagation());document.addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
-let supportReturnFocus=null;function openSupport(){const modal=document.getElementById('supportModal');supportReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;modal.classList.add('open');document.body.classList.add('modal-open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>modal.querySelector('[data-support-close]')?.focus())}function closeSupport(){const modal=document.getElementById('supportModal');modal.classList.remove('open');document.body.classList.remove('modal-open');modal.setAttribute('aria-hidden','true');supportReturnFocus?.focus?.();supportReturnFocus=null}document.querySelectorAll('[data-support-open]').forEach(btn=>btn.addEventListener('click',openSupport));document.querySelectorAll('[data-support-close]').forEach(btn=>btn.addEventListener('click',closeSupport));document.getElementById('supportModal').addEventListener('click',e=>{if(e.target.id==='supportModal')closeSupport()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSupport()});
-let creditsData=null;function t(cs,en,de,es,fr){return({cs,en,de,es,fr})[lang]||en}function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function widgetCountLabel(count){if(lang==='cs')return count===1?'widget':(count>=2&&count<=4?'widgety':'widgetů');if(lang==='de')return count===1?'Widget':'Widgets';if(lang==='es')return count===1?'widget':'widgets';if(lang==='fr')return count===1?'widget':'widgets';return count===1?'widget':'widgets'}
-function renderCommunityCredits(){if(!creditsData)return;const authors=creditsData.authors||{};document.getElementById('creditsSummary').innerHTML=`<span class="pill">${creditsData.total} ${esc(t('projektů','projects','Projekte','proyectos','projets'))}</span><span class="pill">${creditsData.authorCount} ${esc(t('autorů','authors','Autoren','autores','auteurs'))}</span>`;const groups=Object.entries(authors).sort(([a],[b])=>a.localeCompare(b,undefined,{sensitivity:'base'}));document.getElementById('communityCredits').innerHTML=groups.map(([author,projects])=>{const count=projects.length;const label=widgetCountLabel(count);return `<span class="catalog-credit-pill" title="${esc(author+' · '+count+' '+label)}"><span class="catalog-credit-author">${esc(author)}</span><span class="catalog-credit-dot">·</span><span class="catalog-credit-count">${count} ${esc(label)}</span></span>`}).join('')}
-async function loadCredits(){try{const r=await fetch('./data/credits.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);creditsData=await r.json();renderCommunityCredits()}catch(_){document.getElementById('creditsSummary').innerHTML=`<span class="pill">${esc(t('Credits se nepodařilo načíst','Credits could not be loaded','Credits konnten nicht geladen werden','No se pudieron cargar los créditos','Impossible de charger les crédits'))}</span>`}}
-document.getElementById('year').textContent=new Date().getFullYear();applyTheme(theme);setLanguage(lang);loadCredits();
-</script>
-<script id="settingsA11ySync">
-(()=>{
-  const sync=()=>{
-    const lang=(localStorage.getItem('siteLang')||document.documentElement.lang||'en').slice(0,2);
-    document.querySelectorAll('[data-language]').forEach(btn=>btn.setAttribute('aria-checked',String(btn.dataset.language===lang)));
-    const theme=document.documentElement.dataset.theme||localStorage.getItem('siteTheme')||'dark';
-    document.getElementById('themeDark')?.setAttribute('aria-pressed',String(theme==='dark'));
-    document.getElementById('themeLight')?.setAttribute('aria-pressed',String(theme==='light'));
-    const layout=localStorage.getItem('siteLayout')||'grid';
-    document.getElementById('layoutGrid')?.setAttribute('aria-pressed',String(layout==='grid'));
-    document.getElementById('layoutList')?.setAttribute('aria-pressed',String(layout==='list'));
-  };
-  sync();
-  document.addEventListener('click',e=>{if(e.target.closest('[data-language],#themeDark,#themeLight,#layoutGrid,#layoutList'))requestAnimationFrame(sync)});
-})();
-</script>
+<script src="./assets/js/credits-page.js?v=20261009-csp1"></script>
+
 <script src="mobile-menu.js?v=20261008-mobile2"></script>
 </body>
 </html>

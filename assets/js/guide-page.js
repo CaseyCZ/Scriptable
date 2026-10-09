@@ -1,0 +1,30 @@
+const SUPPORTED_LANGS=['cs','en','de','es','fr'];
+const savedLang=localStorage.getItem('siteLang');
+const browserLang=(navigator.language||'en').slice(0,2).toLowerCase();
+let lang=SUPPORTED_LANGS.includes(savedLang)?savedLang:(SUPPORTED_LANGS.includes(browserLang)?browserLang:'en');
+let theme=localStorage.getItem('siteTheme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');
+let layout=localStorage.getItem('siteLayout')||'grid';
+const uiText=(cs,en)=>window.ScriptableI18n?.translate(cs,en,lang)||(lang==='cs'?cs:en);
+function applyTheme(next){theme=next==='light'?'light':'dark';localStorage.setItem('siteTheme',theme);document.documentElement.dataset.theme=theme;document.getElementById('themeDark').classList.toggle('active',theme==='dark');document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeColor').content=theme==='dark'?'#070b14':'#eef3f8'}
+function applyLayout(next){layout=next==='list'?'list':'grid';localStorage.setItem('siteLayout',layout);document.getElementById('layoutGrid').classList.toggle('active',layout==='grid');document.getElementById('layoutList').classList.toggle('active',layout==='list')}
+function setLanguage(next){lang=SUPPORTED_LANGS.includes(next)?next:'en';localStorage.setItem('siteLang',lang);document.documentElement.lang=lang;document.querySelectorAll('[data-cs]').forEach(el=>{el.textContent=el.getAttribute('data-'+lang)||uiText(el.getAttribute('data-cs'),el.getAttribute('data-en'))||el.textContent});document.querySelectorAll('[data-language]').forEach(btn=>btn.classList.toggle('active',btn.dataset.language===lang));const label=uiText('Nastavení','Settings');document.getElementById('settingsBtn').title=label;document.getElementById('settingsBtn').setAttribute('aria-label',label);document.querySelector('[data-support-close]')?.setAttribute('aria-label',uiText('Zavřít','Close'));document.querySelector('nav.nav')?.setAttribute('aria-label',uiText('Hlavní navigace','Primary'))}
+document.querySelectorAll('[data-language]').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.language)));
+document.getElementById('themeDark').addEventListener('click',()=>applyTheme('dark'));document.getElementById('themeLight').addEventListener('click',()=>applyTheme('light'));document.getElementById('layoutGrid').addEventListener('click',()=>applyLayout('grid'));document.getElementById('layoutList').addEventListener('click',()=>applyLayout('list'));
+const settingsBtn=document.getElementById('settingsBtn'),settingsPanel=document.getElementById('settingsPanel');settingsBtn.addEventListener('click',e=>{e.stopPropagation();const open=settingsPanel.classList.toggle('open');settingsBtn.setAttribute('aria-expanded',String(open));settingsPanel.setAttribute('aria-hidden',String(!open))});settingsPanel.addEventListener('click',e=>e.stopPropagation());document.addEventListener('click',()=>{settingsPanel.classList.remove('open');settingsBtn.setAttribute('aria-expanded','false');settingsPanel.setAttribute('aria-hidden','true')});
+let supportReturnFocus=null;function openSupport(){const modal=document.getElementById('supportModal');supportReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;modal?.classList.add('open');document.body.classList.add('modal-open');modal?.setAttribute('aria-hidden','false');requestAnimationFrame(()=>modal?.querySelector('[data-support-close]')?.focus())}function closeSupport(){const modal=document.getElementById('supportModal');const wasOpen=modal?.classList.contains('open');modal?.classList.remove('open');document.body.classList.remove('modal-open');modal?.setAttribute('aria-hidden','true');if(wasOpen&&supportReturnFocus){const target=supportReturnFocus;supportReturnFocus=null;requestAnimationFrame(()=>target.focus?.())}}document.querySelectorAll('[data-support-open]').forEach(btn=>btn.addEventListener('click',openSupport));document.querySelectorAll('[data-support-close]').forEach(btn=>btn.addEventListener('click',closeSupport));document.getElementById('supportModal')?.addEventListener('click',e=>{if(e.target.id==='supportModal')closeSupport()});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSupport();settingsPanel.classList.remove('open');settingsBtn.setAttribute('aria-expanded','false');settingsPanel.setAttribute('aria-hidden','true')}});
+document.getElementById('year').textContent=new Date().getFullYear();applyTheme(theme);applyLayout(layout);setLanguage(lang);
+
+(()=>{
+  const sync=()=>{
+    const lang=(localStorage.getItem('siteLang')||document.documentElement.lang||'en').slice(0,2);
+    document.querySelectorAll('[data-language]').forEach(btn=>btn.setAttribute('aria-checked',String(btn.dataset.language===lang)));
+    const theme=document.documentElement.dataset.theme||localStorage.getItem('siteTheme')||'dark';
+    document.getElementById('themeDark')?.setAttribute('aria-pressed',String(theme==='dark'));
+    document.getElementById('themeLight')?.setAttribute('aria-pressed',String(theme==='light'));
+    const layout=localStorage.getItem('siteLayout')||'grid';
+    document.getElementById('layoutGrid')?.setAttribute('aria-pressed',String(layout==='grid'));
+    document.getElementById('layoutList')?.setAttribute('aria-pressed',String(layout==='list'));
+  };
+  sync();
+  document.addEventListener('click',e=>{if(e.target.closest('[data-language],#themeDark,#themeLight,#layoutGrid,#layoutList'))requestAnimationFrame(sync)});
+})();
