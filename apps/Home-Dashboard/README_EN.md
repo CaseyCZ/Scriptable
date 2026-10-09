@@ -22,21 +22,32 @@
   <a href="./Home%20Dashboard.js"><img src="https://img.shields.io/badge/JavaScript-Download-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Download Home Dashboard" /></a>
 </p>
 
-## About
+## What it does
 
-**Home Dashboard** combines several monitoring types in one widget. You can add HTTP services, JSON APIs, Homebridge or other local services and monitor selected GitHub repositories.
+**Home Dashboard** brings the status of your websites, home servers and other services into one place. Check them from an iPhone widget without opening each service separately.
 
-## Main features
+## What you can monitor
 
-- 🌐 website and HTTP service monitoring
-- 🧩 JSON API checks and selected response values
-- 🏠 Homebridge and other LAN service templates
-- 🔎 local-network device and service discovery
-- 🐙 GitHub repository, Actions and release monitoring
-- 👁️ Small / Medium / Large widgets plus live and demo previews
-- 🎨 custom colors and displayed values
-- 🔄 in-app update checking
-- 📤 settings export and import
+- 🌐 Whether websites and services are reachable.
+- 🏠 Homebridge and other services on your home network.
+- 🐙 Selected GitHub projects, updates and automated jobs.
+- 📊 Useful information provided by your services.
+- 📱 Clear Small, Medium and Large widgets.
+- 🎨 Custom colors, appearance and displayed information.
+- 🔄 In-app updates and settings backup or restore.
+
+## Getting started
+
+1. Install the app in **Scriptable** and open it.
+2. Add a website, server or service you want to monitor.
+3. Choose what to display and customize its appearance.
+4. Add a Scriptable widget to your iPhone Home Screen and select Home Dashboard.
+
+**Example:** One widget can show whether your Homebridge is running, your website responds and a GitHub project has a new release.
+
+## Good to know
+
+Some services require an address or sign-in details. Your iPhone must be able to reach devices you monitor on your home network.
 
 ## Links
 
