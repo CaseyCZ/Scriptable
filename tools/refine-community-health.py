@@ -88,6 +88,7 @@ def expected_html_markers(text: str) -> list[str]:
     markers: list[str] = []
     patterns = (
         r"(?:class|id)\s*=\s*[\"']([A-Za-z][A-Za-z0-9_-]{3,})",
+        r"(?:class|id)\s*=\s*\"?([A-Za-z][A-Za-z0-9_-]{3,})",
         r"querySelector(?:All)?\s*\(\s*[\"'][.#]([A-Za-z][A-Za-z0-9_-]{3,})",
         r"getElementById\s*\(\s*[\"']([A-Za-z][A-Za-z0-9_-]{3,})",
     )
@@ -186,9 +187,9 @@ def refine(url: str, item: dict[str, object]) -> None:
             elif dep.get("json"):
                 if dstatus in (401, 403, 429):
                     if setup:
-                        set_limited(item, f"API requires credentials or rate-limit handling (HTTP {dstatus})")
-                    else:
-                        set_limited(item, f"API could not be fully verified (HTTP {dstatus}): {dep_url}")
+                        # Expected for private/account-bound APIs. This is configuration, not downtime.
+                        continue
+                    set_limited(item, f"API could not be fully verified (HTTP {dstatus}): {dep_url}")
                 elif not (200 <= dstatus < 400):
                     set_limited(item, f"API returned HTTP {dstatus}: {dep_url}")
         except urllib.error.HTTPError as exc:
@@ -196,6 +197,8 @@ def refine(url: str, item: dict[str, object]) -> None:
                 set_offline(item, f"Runtime dependency is gone: {dep_url} (HTTP {exc.code})")
             elif dep.get("html"):
                 set_limited(item, f"HTML source cannot be verified (HTTP {exc.code}): {dep_url}")
+            elif setup and exc.code in (401, 403, 405, 429):
+                continue
             else:
                 set_limited(item, f"Runtime dependency could not be verified (HTTP {exc.code})")
         except Exception as exc:
@@ -218,8 +221,6 @@ def main() -> None:
     payload["endpointsLimited"] = endpoint_healths.count("limited")
     payload["endpointsOffline"] = endpoint_healths.count("offline")
 
-    # Project counters cannot be reconstructed perfectly from the flattened endpoint map here.
-    # Keep the updater's total, but never overstate fully-online projects after a deep check.
     limited_delta = max(0, payload["endpointsLimited"] - int(payload.get("endpointsLimited") or 0))
     offline_delta = max(0, payload["endpointsOffline"] - int(payload.get("endpointsOffline") or 0))
     if limited_delta or offline_delta:
