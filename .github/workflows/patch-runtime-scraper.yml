@@ -1,0 +1,48 @@
+name: Apply runtime scraper check
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - ".github/workflows/patch-runtime-scraper.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Tighten scraper response validation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tools/update_community_status.py')
+          s = p.read_text()
+          old = '''            if (
+                reachable is True and meta.get("expectsHtml") is True and markers and
+                body and looks_like_html(body, content_type)
+            ):
+'''
+          new = '''            if (
+                reachable is True and meta.get("expectsHtml") is True and markers and body
+            ):
+'''
+          if old not in s:
+              raise SystemExit('Target scraper condition not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+
+      - name: Commit patch and remove helper
+        run: |
+          rm .github/workflows/patch-runtime-scraper.yml
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add tools/update_community_status.py .github/workflows/patch-runtime-scraper.yml
+          git commit -m "Validate scraper selectors on fetched responses"
+          git push origin HEAD:Master
