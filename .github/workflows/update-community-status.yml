@@ -12,6 +12,7 @@ on:
     paths:
       - "community-extra.js"
       - "index.html"
+      - "assets/js/index-page.js"
       - "tools/update_community_status.py"
       - "tools/audit-community-catalog.cjs"
       - ".github/workflows/update-community-status.yml"
