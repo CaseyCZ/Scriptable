@@ -19,6 +19,7 @@
 
 <p align="center">
   <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Web-Katalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable katalog" /></a>
+  <a href="./Sports%20Live.scriptable"><img src="https://img.shields.io/badge/Scriptable-Instalovat-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Instalovat Sports Live" /></a>
   <a href="./Sports-Live,js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout Sports Live JavaScript" /></a>
 </p>
 
@@ -50,7 +51,7 @@ Sports Live původně vychází ze skriptu [**ONE-NBA**](https://github.com/Nico
 - 🔄 aktualizace přímo ze Scriptable
 - 🧰 diagnostika, cache a záloha nastavení
 
-> Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript je dostupný v repozitáři; samostatný `.scriptable` instalační balíček zatím není zveřejněn.
+> Sports Live je stále ve vývoji. Aktuální zdrojový JavaScript i `.scriptable` instalační balíček jsou dostupné v repozitáři.
 
 ## Podpora
 
