@@ -23,13 +23,44 @@
   <a href="./Sports%20Live.js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download Sports Live JavaScript" /></a>
 </p>
 
-## About
+## What it does
 
-**Sports Live** is a simpler companion to Sports Info. It focuses on one selected team and quickly shows live status, the nearest game, upcoming schedule and basic team information. It uses the same multi-provider data layer as Sports Info, while its visual system follows Homebridge Status.
+**Sports Live** is a quick sports overview for fans of one team. See its current game, next fixture and upcoming schedule right on your iPhone Home Screen.
+
+## Supported sports
+
+⚽ Football · 🏒 Ice hockey · 🏀 Basketball · 🥅 Floorball · ⚾ Baseball
+
+## Main features
+
+- 🔴 Live game status for your selected team.
+- ⏭️ Next fixture and upcoming schedule.
+- 📊 Basic team information and statistics.
+- 🎯 Select a sport, competition and favorite team.
+- 📱 Small and Medium widgets.
+- 🎨 Custom colors, theme and background image.
+- 🌍 Multiple languages, in-app updates and settings backup.
+
+## Getting started
+
+1. Install **Sports Live** in Scriptable and open it.
+2. Choose a sport, competition and the team you want to follow.
+3. Customize the widget appearance.
+4. Add a Scriptable widget to your iPhone Home Screen and select Sports Live.
+
+**Example:** Follow your football club and quickly see whether it is playing now and when its next game starts.
+
+## Sports Live or Sports Info?
+
+**Sports Live** focuses on one team. For broader competition coverage, results and standings, try **Sports Info**.
+
+## Good to know
+
+The app is still under development. Live score availability depends on the sport, competition and external data sources.
 
 ## Origin and credits
 
-Sports Live originally started from [**ONE-NBA**](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **Nicolas-kings**, which in turn builds on the original [**NBA MyTeam widget**](https://github.com/thisisevanfox/nba-my-team-ios-widget) by [**thisisevanfox**](https://github.com/thisisevanfox). The ONE-NBA source header itself credits **thisisevanfox & Nicolas-kings** as authors. We used that NBA codebase as a reference and starting point; the current Sports Live was then substantially redesigned into a multi-sport app with its own data sources, sport/competition/team selection, new settings and the CaseyCZ Scriptable Apps visual style.
+Sports Live builds on [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **Nicolas-kings**, itself based on the [NBA MyTeam widget](https://github.com/thisisevanfox/nba-my-team-ios-widget) by [thisisevanfox](https://github.com/thisisevanfox). The original NBA project provided a starting point; this version has been extensively redesigned for multiple sports and its own settings.
 
 ## Supported sports
 
