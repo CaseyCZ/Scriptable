@@ -155,6 +155,27 @@
     banner.querySelector('[data-reject]')?.addEventListener('click', () => setConsent('denied'));
     document.body.appendChild(banner);
   }
+  function refreshLanguageCopy() {
+    const t = copy();
+    if (settingsButton) {
+      settingsButton.textContent = t.settings;
+      settingsButton.setAttribute('aria-label', t.title);
+    }
+    if (banner) {
+      banner.setAttribute('aria-label', t.title);
+      const title = banner.querySelector('.caseycz-consent-copy strong');
+      const text = banner.querySelector('.caseycz-consent-copy span');
+      const accept = banner.querySelector('[data-accept]');
+      const reject = banner.querySelector('[data-reject]');
+      if (title) title.textContent = t.title;
+      if (text) text.textContent = t.text;
+      if (accept) accept.textContent = t.accept;
+      if (reject) reject.textContent = t.reject;
+    }
+  }
+  new MutationObserver(mutations => {
+    if (mutations.some(m => m.type === 'attributes' && m.attributeName === 'lang')) refreshLanguageCopy();
+  }).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
   function init() {
     const consent = readConsent();
     if (consent === 'granted') loadAnalytics();

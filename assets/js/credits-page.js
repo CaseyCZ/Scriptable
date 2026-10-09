@@ -1,5 +1,5 @@
 const SUPPORTED=['cs','en','de','es','fr'];
-let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang))lang=(navigator.language||'en').toLowerCase().startsWith('cs')?'cs':'en';
+let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang)){const browserLang=(navigator.language||'en').slice(0,2).toLowerCase();lang=SUPPORTED.includes(browserLang)?browserLang:'en'};
 let theme=localStorage.getItem('siteTheme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');
 function applyTheme(next){theme=next==='light'?'light':'dark';localStorage.setItem('siteTheme',theme);document.documentElement.dataset.theme=theme;document.getElementById('themeDark').classList.toggle('active',theme==='dark');document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeColor').content=theme==='dark'?'#070b14':'#eef3f8'}
 function setLanguage(next){lang=SUPPORTED.includes(next)?next:'en';localStorage.setItem('siteLang',lang);document.documentElement.lang=lang;document.querySelectorAll('[data-cs]').forEach(el=>el.textContent=el.getAttribute('data-'+lang)||el.getAttribute('data-en')||el.textContent);document.querySelectorAll('[data-language]').forEach(btn=>btn.classList.toggle('active',btn.dataset.language===lang));renderCommunityCredits()}
