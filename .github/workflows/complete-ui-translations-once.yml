@@ -56,28 +56,29 @@ jobs:
           marker="  function init() {\n"
           if marker not in s:
               raise SystemExit('analytics init marker not found')
-          addition="""  function refreshLanguageCopy() {
-    const t = copy();
-    if (settingsButton) {
-      settingsButton.textContent = t.settings;
-      settingsButton.setAttribute('aria-label', t.title);
-    }
-    if (banner) {
-      banner.setAttribute('aria-label', t.title);
-      const title = banner.querySelector('.caseycz-consent-copy strong');
-      const text = banner.querySelector('.caseycz-consent-copy span');
-      const accept = banner.querySelector('[data-accept]');
-      const reject = banner.querySelector('[data-reject]');
-      if (title) title.textContent = t.title;
-      if (text) text.textContent = t.text;
-      if (accept) accept.textContent = t.accept;
-      if (reject) reject.textContent = t.reject;
-    }
-  }
-  new MutationObserver(mutations => {
-    if (mutations.some(m => m.type === 'attributes' && m.attributeName === 'lang')) refreshLanguageCopy();
-  }).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
-"""
+          addition=(
+              "  function refreshLanguageCopy() {\n"
+              "    const t = copy();\n"
+              "    if (settingsButton) {\n"
+              "      settingsButton.textContent = t.settings;\n"
+              "      settingsButton.setAttribute('aria-label', t.title);\n"
+              "    }\n"
+              "    if (banner) {\n"
+              "      banner.setAttribute('aria-label', t.title);\n"
+              "      const title = banner.querySelector('.caseycz-consent-copy strong');\n"
+              "      const text = banner.querySelector('.caseycz-consent-copy span');\n"
+              "      const accept = banner.querySelector('[data-accept]');\n"
+              "      const reject = banner.querySelector('[data-reject]');\n"
+              "      if (title) title.textContent = t.title;\n"
+              "      if (text) text.textContent = t.text;\n"
+              "      if (accept) accept.textContent = t.accept;\n"
+              "      if (reject) reject.textContent = t.reject;\n"
+              "    }\n"
+              "  }\n"
+              "  new MutationObserver(mutations => {\n"
+              "    if (mutations.some(m => m.type === 'attributes' && m.attributeName === 'lang')) refreshLanguageCopy();\n"
+              "  }).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });\n"
+          )
           s=s.replace(marker,addition+marker,1)
           analytics.write_text(s,encoding='utf-8')
 
