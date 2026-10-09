@@ -254,10 +254,10 @@ def html_markers(text: str) -> list[str]:
 
 
 def selector_present(body: str, marker: str) -> bool:
-    escaped = re.escape(marker)
-    class_pattern = rf"\bclass\s*=\s*['\"][^'\"]*(?:^|\s){escaped}(?:\s|$)[^'\"]*['\"]"
-    id_pattern = rf"\bid\s*=\s*['\"]{escaped}['\"]"
-    return bool(re.search(class_pattern, body, re.IGNORECASE) or re.search(id_pattern, body, re.IGNORECASE))
+    for match in re.finditer(r"\bclass\s*=\s*['\"]([^'\"]*)['\"]", body, re.IGNORECASE):
+        if marker in match.group(1).split():
+            return True
+    return bool(re.search(rf"\bid\s*=\s*['\"]{re.escape(marker)}['\"]", body, re.IGNORECASE))
 
 
 def looks_like_html(body: str, content_type: str) -> bool:
