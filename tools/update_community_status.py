@@ -184,8 +184,6 @@ def is_placeholder_or_local(url: str) -> bool:
 
 
 def literal_request_matches(text: str) -> list[tuple[re.Match[str], str, str | None]]:
-    # Captures optional variable name plus a literal URL. The variable lets us detect
-    # loadString() HTML scrapers and non-GET methods without executing unsafe requests.
     pattern = re.compile(
         r"(?:(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*)?"
         r"(?:new\s+)?Request\s*\(\s*(?:'([^']+)'|\"([^\"]+)\"|`([^`$]+)`)\s*\)",
@@ -256,7 +254,6 @@ def html_markers(text: str) -> list[str]:
 
 
 def selector_present(body: str, marker: str) -> bool:
-    # Require an actual class/id attribute, not the selector text hidden in CSS/JS.
     escaped = re.escape(marker)
     class_pattern = rf"\bclass\s*=\s*['\"][^'\"]*(?:^|\s){escaped}(?:\s|$)[^'\"]*['\"]"
     id_pattern = rf"\bid\s*=\s*['\"]{escaped}['\"]"
@@ -346,8 +343,6 @@ def probe_dependency(meta: dict[str, object]) -> tuple[str, dict[str, object]]:
         if attempt == 0:
             time.sleep(0.25)
 
-    # DNS failures/timeouts can be temporary or runner-specific. Record them as
-    # unverified, but never turn the whole project red solely because of them.
     return url, {
         "reachable": None, "definiteBroken": False, "status": last_status,
         "finalUrl": final_url, "body": "", "contentType": "",
@@ -449,7 +444,8 @@ def main() -> None:
             }
             checked.append(public_state)
             if definite_broken:
-                hard_broken.append(f"{dep} ({reason or f'HTTP {state.get("status")}'})")
+                fallback_reason = reason or ("HTTP " + str(state.get("status")))
+                hard_broken.append(f"{dep} ({fallback_reason})")
             elif reachable is None:
                 runtime_warnings += 1
 
