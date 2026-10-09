@@ -47,6 +47,14 @@ function normalizedText(value){
 }
 function nameKey(app){return normalizedText(app.author)+'|'+normalizedText(app.name)}
 function installUrls(app){return [...new Set([app.file,...((app.variants||[]).map(v=>v&&v.file))].map(canonicalUrl).filter(Boolean))]}
+function configFileReason(value){
+  try{
+    const u=new URL(String(value));
+    const base=decodeURIComponent(u.pathname.split('/').filter(Boolean).pop()||'');
+    const config=/^(?:\.eslintrc(?:\.[^.]+)?|eslint\.config\.[cm]?js|webpack\.config\.[cm]?js|rollup\.config\.[cm]?js|vite\.config\.[cm]?js|babel\.config\.[cm]?js|jest\.config\.[cm]?js|prettier\.config\.[cm]?js|metro\.config\.js|next\.config\.js|nuxt\.config\.[cm]?js)$/i;
+    return config.test(base)?`configuration file ${base}`:'';
+  }catch(_){return ''}
+}
 function githubRepoKey(value){
   if(!value)return '';
   try{
@@ -87,6 +95,8 @@ for(const {app,where} of rows){
   const urls=installUrls(app);
   if(!urls.length)errors.push(`${label} has no install URL`);
   for(const url of urls){
+    const bad=configFileReason(url);
+    if(bad)errors.push(`${label} points to a non-Scriptable ${bad}\n  URL: ${url}`);
     if(seenUrls.has(url))errors.push(`duplicate install URL\n  first: ${seenUrls.get(url)}\n  again: ${label}\n  URL: ${url}`);
     else seenUrls.set(url,label);
   }
@@ -139,4 +149,4 @@ if(errors.length){
   for(const err of errors)console.error(`\n- ${err}`);
   process.exit(1);
 }
-console.log('OK: no duplicate install URLs or author/name identities found.');
+console.log('OK: no duplicate install URLs, author/name identities, or known config files found.');
