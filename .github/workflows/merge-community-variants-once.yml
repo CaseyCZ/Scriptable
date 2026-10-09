@@ -62,21 +62,15 @@ jobs:
               for name, label in members:
                   row = lines[by_name[name]]
                   vals = fields(row)
-                  variants.append({
-                      'label': label,
-                      'file': vals[4],
-                      'filename': vals[5],
-                  })
+                  variants.append({'label': label, 'file': vals[4], 'filename': vals[5]})
               renamed = primary.replace(f'communityItem("{primary_name}"', f'communityItem({json.dumps(display_name, ensure_ascii=False)}', 1)
               if not renamed.rstrip().endswith('),'):
                   raise RuntimeError(f'Unexpected row ending for {primary_name}')
               base = renamed.rstrip()[:-1]
-              renamed = 'Object.assign(' + base + ',{variants:' + json.dumps(variants, ensure_ascii=False, separators=(',', ':')) + '}),'
-              lines[primary_idx] = renamed
+              lines[primary_idx] = 'Object.assign(' + base + ',{variants:' + json.dumps(variants, ensure_ascii=False, separators=(',', ':')) + '}),'
               for name, _ in members[1:]:
                   removals.add(by_name[name])
 
-          # This is a maintenance helper for the existing News Widget, not a separate widget card.
           helper = 'scriptable-news-Widget.js'
           if helper in by_name:
               removals.add(by_name[helper])
@@ -90,7 +84,7 @@ jobs:
           node tools/build-credits.cjs
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add community-extra.js data/credits.json
+          git add community-extra.js
           git rm .github/workflows/merge-community-variants-once.yml
           git commit -m "Group related community scripts as variants"
           git push origin HEAD:Master
