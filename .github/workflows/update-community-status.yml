@@ -2,7 +2,7 @@ name: Update Scriptable community status
 
 # Mirrors the iOS-Hub approach: probe third-party download endpoints in Actions,
 # publish one small status JSON, and let the website render cached availability.
-# Redirected scraper validation refresh: 2026-10-09.
+# Deep runtime/content validation refresh: 2026-10-09.
 on:
   workflow_dispatch:
   schedule:
@@ -14,6 +14,7 @@ on:
       - "index.html"
       - "assets/js/index-page.js"
       - "tools/update_community_status.py"
+      - "tools/refine-community-health.py"
       - "tools/audit-community-catalog.cjs"
       - ".github/workflows/update-community-status.yml"
 
@@ -44,7 +45,9 @@ jobs:
           python-version: "3.12"
 
       - name: Check community download URLs
-        run: python tools/update_community_status.py
+        run: |
+          python tools/update_community_status.py
+          python tools/refine-community-health.py
 
       - name: Commit generated status
         run: |
@@ -56,6 +59,7 @@ jobs:
             git reset --hard origin/Master
             node tools/audit-community-catalog.cjs
             python tools/update_community_status.py
+            python tools/refine-community-health.py
             git add data/community-status.json
 
             if git diff --cached --quiet; then
