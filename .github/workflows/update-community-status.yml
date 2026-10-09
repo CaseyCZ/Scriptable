@@ -2,7 +2,7 @@ name: Update Scriptable community status
 
 # Mirrors the iOS-Hub approach: probe third-party download endpoints in Actions,
 # publish one small status JSON, and let the website render cached availability.
-# Deep runtime/content validation refresh: 2026-10-09.
+# Final public-release readiness refresh: 2026-10-09.
 on:
   workflow_dispatch:
   schedule:
@@ -14,8 +14,6 @@ on:
       - "index.html"
       - "assets/js/index-page.js"
       - "tools/update_community_status.py"
-      - "tools/refine-community-health.py"
-      - "tools/run-refine-community-health.py"
       - "tools/audit-community-catalog.cjs"
       - ".github/workflows/update-community-status.yml"
 
@@ -24,7 +22,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: update-scriptable-community-status-v4
+  group: update-scriptable-community-status
   cancel-in-progress: true
 
 jobs:
@@ -46,10 +44,7 @@ jobs:
           python-version: "3.12"
 
       - name: Check community download URLs
-        run: |
-          python tools/update_community_status.py
-          python tools/run-refine-community-health.py
-          cp data/community-status.json /tmp/community-status.json
+        run: python tools/update_community_status.py
 
       - name: Commit generated status
         run: |
@@ -59,7 +54,8 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch origin Master
             git reset --hard origin/Master
-            cp /tmp/community-status.json data/community-status.json
+            node tools/audit-community-catalog.cjs
+            python tools/update_community_status.py
             git add data/community-status.json
 
             if git diff --cached --quiet; then
