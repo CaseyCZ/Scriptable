@@ -1,0 +1,53 @@
+name: Handle redirected HTML scrapers
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - ".github/workflows/patch-runtime-redirect-scraper.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Patch checker
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tools/update_community_status.py')
+          s = p.read_text()
+          target = '''            if (
+                reachable is True and meta.get("expectsHtml") is True and markers and
+                body
+            ):
+'''
+          insert = '''            if reachable is True and meta.get("expectsHtml") is True and final_url != dep:
+                old_host = (urllib.parse.urlparse(dep).hostname or "").lower()
+                new_host = (urllib.parse.urlparse(final_url).hostname or "").lower()
+                if old_host and new_host and old_host != new_host and (not markers or not body):
+                    reachable = False
+                    definite_broken = True
+                    reason = f"HTML scraper redirected to different host and selectors could not be verified: {final_url}"
+
+'''
+          if target not in s:
+              raise SystemExit('scraper validation target not found')
+          p.write_text(s.replace(target, insert + target, 1))
+          PY
+
+      - name: Commit patch and remove helper
+        run: |
+          rm .github/workflows/patch-runtime-redirect-scraper.yml
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add tools/update_community_status.py .github/workflows/patch-runtime-redirect-scraper.yml
+          git commit -m "Handle redirected HTML scraper dependencies"
+          git push origin HEAD:Master
