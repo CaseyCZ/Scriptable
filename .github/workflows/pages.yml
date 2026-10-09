@@ -1,5 +1,6 @@
 name: Deploy Scriptable Apps website
 
+# Deploy the current Master branch to GitHub Pages.
 on:
   push:
     branches: [Master]
