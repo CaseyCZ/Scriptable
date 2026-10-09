@@ -53,6 +53,14 @@ Při vzniku projektu jsme použili [**LSWeather**](https://github.com/ajatkj/scr
   <a href="./LockScreenGenerator.js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout JavaScript" /></a>
 </p>
 
+
+## Zkratky pro nastavení tapety
+
+Pro nastavení vygenerované tapety si můžeš přidat tyto dvě Apple Zkratky:
+
+- [Nastavení tapety – zkratka 1](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
+- [Nastavení tapety – zkratka 2](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
+
 ## Podpora
 
 <p align="center">
