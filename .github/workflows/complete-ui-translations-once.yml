@@ -1,0 +1,120 @@
+name: Complete UI translations once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/complete-ui-translations-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Complete five-language UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              if old not in s:
+                  raise SystemExit(f'Expected text not found in {path}: {old[:120]!r}')
+              s=s.replace(old,new,1)
+              p.write_text(s,encoding='utf-8')
+
+          # Main catalog: translate status labels too (card descriptions/features intentionally remain CZ/EN only).
+          replace_once(
+              'assets/js/index-page.js',
+              "function communityStatusBadge(app){const item=communityStatusFor(app);if(item?.online===true)return `<span class=\"communityAvailability online\">● Online</span>`;if(item?.checkedAt)return `<span class=\"communityAvailability offline\">● Offline</span>`;return `<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`}",
+              "function communityStatusBadge(app){const item=communityStatusFor(app);if(item?.online===true)return `<span class=\"communityAvailability online\">● ${tr('Online','Online')}</span>`;if(item?.checkedAt)return `<span class=\"communityAvailability offline\">● ${tr('Offline','Offline')}</span>`;return `<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`}"
+          )
+          replace_once(
+              'assets/js/index-page.js',
+              "host.innerHTML=checked?`<span class=\"communityAvailability online\">● Online ${online}</span><span class=\"communityAvailability offline\">● Offline ${offline}</span>${stamp?`<span class=\"communityChecked\">${tr('Poslední kontrola','Last checked')}: ${stamp}</span>`:''}`:`<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`",
+              "host.innerHTML=checked?`<span class=\"communityAvailability online\">● ${tr('Online','Online')} ${online}</span><span class=\"communityAvailability offline\">● ${tr('Offline','Offline')} ${offline}</span>${stamp?`<span class=\"communityChecked\">${tr('Poslední kontrola','Last checked')}: ${stamp}</span>`:''}`:`<span class=\"communityAvailability checking\">● ${tr('Čeká na kontrolu','Checking')}</span>`"
+          )
+          replace_once(
+              'assets/js/index-page.js',
+              "[['all',tr('Vše','All')],['online','Online'],['offline','Offline']]",
+              "[['all',tr('Vše','All')],['online',tr('Online','Online')],['offline',tr('Offline','Offline')]]"
+          )
+
+          # Credits: browser language detection must recognize all five supported languages.
+          replace_once(
+              'assets/js/credits-page.js',
+              "let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang))lang=(navigator.language||'en').toLowerCase().startsWith('cs')?'cs':'en';",
+              "let lang=localStorage.getItem('siteLang');if(!SUPPORTED.includes(lang)){const browserLang=(navigator.language||'en').slice(0,2).toLowerCase();lang=SUPPORTED.includes(browserLang)?browserLang:'en'};"
+          )
+
+          # Cookie dialog/footer copy follows language changes immediately, including an already open banner.
+          analytics=Path('analytics-consent.js')
+          s=analytics.read_text(encoding='utf-8')
+          marker="  function init() {\n"
+          if marker not in s:
+              raise SystemExit('analytics init marker not found')
+          addition="""  function refreshLanguageCopy() {
+    const t = copy();
+    if (settingsButton) {
+      settingsButton.textContent = t.settings;
+      settingsButton.setAttribute('aria-label', t.title);
+    }
+    if (banner) {
+      banner.setAttribute('aria-label', t.title);
+      const title = banner.querySelector('.caseycz-consent-copy strong');
+      const text = banner.querySelector('.caseycz-consent-copy span');
+      const accept = banner.querySelector('[data-accept]');
+      const reject = banner.querySelector('[data-reject]');
+      if (title) title.textContent = t.title;
+      if (text) text.textContent = t.text;
+      if (accept) accept.textContent = t.accept;
+      if (reject) reject.textContent = t.reject;
+    }
+  }
+  new MutationObserver(mutations => {
+    if (mutations.some(m => m.type === 'attributes' && m.attributeName === 'lang')) refreshLanguageCopy();
+  }).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
+"""
+          s=s.replace(marker,addition+marker,1)
+          analytics.write_text(s,encoding='utf-8')
+
+          # Cache-bust updated shared translation/runtime files on all public pages.
+          pages=['index.html','guide.html','credits.html','privacy.html']
+          for name in pages:
+              p=Path(name); s=p.read_text(encoding='utf-8')
+              s=s.replace('site-i18n.js?v=20261005-full1','site-i18n.js?v=20261009-full2')
+              s=s.replace('analytics-consent.js?v=20261001-footer3','analytics-consent.js?v=20261009-i18n2')
+              p.write_text(s,encoding='utf-8')
+
+          p=Path('index.html'); s=p.read_text(encoding='utf-8').replace('assets/js/index-page.js?v=20261009-csp2','assets/js/index-page.js?v=20261009-i18n3'); p.write_text(s,encoding='utf-8')
+          p=Path('credits.html'); s=p.read_text(encoding='utf-8').replace('assets/js/credits-page.js?v=20261009-csp1','assets/js/credits-page.js?v=20261009-i18n2'); p.write_text(s,encoding='utf-8')
+          PY
+
+          node --check site-i18n.js
+          node --check analytics-consent.js
+          node --check assets/js/index-page.js
+          node --check assets/js/credits-page.js
+          node tools/audit-web-csp.cjs
+          node tools/audit-community-catalog.cjs
+          grep -q "'Shopping': {de:'Einkaufen'" site-i18n.js
+          grep -q "tr('Online','Online')" assets/js/index-page.js
+          grep -q "SUPPORTED.includes(browserLang)?browserLang:'en'" assets/js/credits-page.js
+          grep -q "site-i18n.js?v=20261009-full2" index.html
+
+      - name: Commit translation fixes and remove one-time workflow
+        run: |
+          rm -f .github/workflows/complete-ui-translations-once.yml
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add site-i18n.js analytics-consent.js assets/js/index-page.js assets/js/credits-page.js index.html guide.html credits.html privacy.html .github/workflows/complete-ui-translations-once.yml
+          git commit -m "Complete five-language website UI"
+          git push origin HEAD:Master
