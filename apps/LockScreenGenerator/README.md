@@ -58,8 +58,8 @@ Při vzniku projektu jsme použili [**LSWeather**](https://github.com/ajatkj/scr
 
 Pro nastavení vygenerované tapety jsou dostupné dvě Apple Zkratky:
 
-- [Přímé nastavení tapety](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
-- [Nastavení tapety z alba (album vybrané v nastavení aplikace)](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
+- [Nastavit tapetu přímo (fotka uložená v generátoru)](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
+- [Nastavit tapetu z alba (fotka vybraná Zkratkou)](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
 
 ## Podpora
 
