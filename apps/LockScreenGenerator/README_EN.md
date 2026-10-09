@@ -22,29 +22,50 @@
   <a href="./LockScreenGenerator.scriptable"><img src="https://img.shields.io/badge/Install-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Install LockScreen Generator" /></a>
 </p>
 
-## About
+## What it does
 
-**LockScreen Generator** lets you build a wallpaper around the information you actually want to see on your Lock Screen. Content, order, appearance and individual modules can all be customized directly in the app.
+**LockScreen Generator** creates a personalized iPhone Lock Screen wallpaper. Add your calendar, weather, sports and other useful information on top of a photo.
+
+## What your wallpaper can show
+
+- 📅 Calendar events and reminders.
+- 🌤️ Weather and forecasts.
+- 🏎️ Formula 1 and other sports information.
+- 📈 Stocks, cryptocurrencies and exchange rates.
+- 🌙 World time, Moon phases and other information.
+- 👁️ A live preview before using the wallpaper.
+- 🎨 Custom appearance, information order and automatic sizing for your iPhone.
+
+<p align="center">
+  <img src="./LockScreenPreview.png" alt="LockScreen Generator wallpaper preview" width="250" />
+</p>
+
+## Getting started
+
+1. Install **LockScreen Generator** in Scriptable and open its settings.
+2. Choose the information you want on your wallpaper.
+3. Under **Wallpaper**, choose where the background photo comes from.
+4. Check the result in the preview.
+5. Add the matching Apple Shortcut to create and set your wallpaper.
+
+## Two ways to choose a photo
+
+**Photo saved in the generator:** Choose one photo in the app settings. The generator reuses it as the background for future wallpapers.
+
+**Photo from Shortcuts:** A Shortcut selects a photo from an album and passes it to the generator. For example, it can choose a random photo from your selected album.
+
+## Apple Shortcuts for setting your wallpaper
+
+- [⚡ Direct setup – photo saved in the generator](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
+- [🖼️ Album setup – photo selected by the Shortcut](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
+
+## Good to know
+
+The generator creates the wallpaper image; Apple Shortcuts set it as your wallpaper and can run it on a schedule. Some information modules require permission to access their data.
 
 ## Origin and credits
 
-When the project started, we used [**LSWeather**](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) by [**ajatkj (Ankit Jain)**](https://github.com/ajatkj) as a reference and starting point for generating dynamic Lock Screen wallpapers with Scriptable and Shortcuts. The current **LockScreen Generator** was then extensively redesigned and expanded with its own user interface, modules, localization, automatic layout, diagnostics and additional features.
-
-## Main features
-
-- 📅 calendar and reminders
-- 🌤️ weather and forecast
-- 🏎️ Formula 1 and sports
-- 📈 stocks, crypto and exchange rates
-- 🌙 extra information modules including world clocks and Moon phases
-- 👁️ live wallpaper preview
-- 📐 automatic adaptation for different iPhones
-- 🌍 Czech, English, German and Spanish
-- 🔄 in-app updates
-
-<p align="center">
-  <img src="./LockScreenPreview.png" alt="LockScreen Generator preview" width="250" />
-</p>
+Inspired by [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) by [ajatkj (Ankit Jain)](https://github.com/ajatkj). The current generator has since been extensively redesigned with its own settings, appearance and additional information modules.
 
 ## Links
 
@@ -52,14 +73,6 @@ When the project started, we used [**LSWeather**](https://github.com/ajatkj/scri
   <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable App Store" /></a>
   <a href="./LockScreenGenerator.js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download JavaScript" /></a>
 </p>
-
-
-## Wallpaper setup shortcuts
-
-Two Apple Shortcuts are available to set your generated wallpaper:
-
-- [Set wallpaper directly (photo saved in generator)](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
-- [Set wallpaper from an album (photo selected by Shortcut)](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
 
 ## Support
 
