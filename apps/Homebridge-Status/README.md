@@ -2,6 +2,8 @@
 
 Homebridge Status je Scriptable widget pro přehled stavu Homebridge v jednotném stylu CaseyCZ Scriptable Apps.
 
+![Homebridge Status preview](./Homebridge%20Status.jpg)
+
 ## Původ a poděkování
 
 Homebridge Status vychází z projektu [**homebridgeStatusWidget**](https://github.com/lwitzani/homebridgeStatusWidget) od [**lwitzani**](https://github.com/lwitzani), jehož Homebridge API logika byla použita jako základ a předloha. Současná verze byla následně výrazně přepracována a rozšířena o vlastní rozhraní, LAN → VPN fallback, více velikostí widgetů, notifikace, vlastní nastavení a další funkce.
