@@ -424,6 +424,14 @@ def main() -> None:
                 definite_broken = True
                 reason = f"Redirected to homepage: {final_url}"
 
+            if reachable is True and meta.get("expectsHtml") is True and final_url != dep:
+                old_host = (urllib.parse.urlparse(dep).hostname or "").lower()
+                new_host = (urllib.parse.urlparse(final_url).hostname or "").lower()
+                if old_host and new_host and old_host != new_host and (not markers or not body):
+                    reachable = False
+                    definite_broken = True
+                    reason = f"HTML scraper redirected to different host and selectors could not be verified: {final_url}"
+
             if (
                 reachable is True and meta.get("expectsHtml") is True and markers and
                 body
