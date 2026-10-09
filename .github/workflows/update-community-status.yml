@@ -24,7 +24,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: update-scriptable-community-status-v3
+  group: update-scriptable-community-status-v4
   cancel-in-progress: true
 
 jobs:
@@ -49,6 +49,7 @@ jobs:
         run: |
           python tools/update_community_status.py
           python tools/run-refine-community-health.py
+          cp data/community-status.json /tmp/community-status.json
 
       - name: Commit generated status
         run: |
@@ -58,9 +59,7 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch origin Master
             git reset --hard origin/Master
-            node tools/audit-community-catalog.cjs
-            python tools/update_community_status.py
-            python tools/run-refine-community-health.py
+            cp /tmp/community-status.json data/community-status.json
             git add data/community-status.json
 
             if git diff --cached --quiet; then
