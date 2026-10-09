@@ -1,0 +1,70 @@
+name: Build Sports Live package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/Sports-Live/Sports Live.js'
+      - '.github/scripts/build_sports_live_package.py'
+      - '.github/workflows/build-sports-live-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/Sports-Live/Sports Live.js' /tmp/SportsLive.mjs
+          node --check /tmp/SportsLive.mjs
+
+      - name: Build package
+        run: python .github/scripts/build_sports_live_package.py
+
+      - name: Validate package and release references
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          app=Path('apps/Sports-Live')
+          src=(app/'Sports Live.js').read_text(encoding='utf-8')
+          pkg=json.loads((app/'Sports Live.scriptable').read_text(encoding='utf-8'))
+          vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
+          assert vm, 'APP_VERSION missing'
+          version=vm.group(1)
+          assert pkg['name']=='Sports Live'
+          assert pkg['script']==src, '.scriptable does not contain exact Sports Live.js'
+          assert pkg.get('always_run_in_app') is False
+          assert pkg.get('icon')=={'color':'orange','glyph':'trophy'}
+          assert json.loads((app/'version.json').read_text(encoding='utf-8'))['version']==version
+          assert 'https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Sports-Live/Sports%20Live.js' in src
+          assert 'Sports-Live,js' not in src and 'Sports-Live%2Cjs' not in src
+          site=Path('assets/js/index-page.js').read_text(encoding='utf-8')
+          assert "file:'./apps/Sports-Live/Sports%20Live.js'" in site
+          assert "install:'./apps/Sports-Live/Sports%20Live.scriptable'" in site
+          for p in [app/'README.md',app/'README_EN.md']:
+              text=p.read_text(encoding='utf-8')
+              assert './Sports%20Live.js' in text
+              assert 'Sports-Live,js' not in text
+          print(f'Sports Live v{version}: source, package, website and README references synchronized')
+          PY
+
+      - name: Commit synchronized package
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add 'apps/Sports-Live/Sports Live.scriptable' 'apps/Sports-Live/version.json'
+          if git diff --cached --quiet; then
+            echo "Sports Live package already synchronized"
+            exit 0
+          fi
+          git commit -m "Sync Sports Live package"
+          git push origin HEAD:Master
