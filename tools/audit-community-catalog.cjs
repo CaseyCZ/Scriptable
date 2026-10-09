@@ -74,7 +74,11 @@ function variantCoreName(value){
 }
 function previewKey(value){
   const url=canonicalUrl(value);
-  if(!url||url.includes('opengraph.githubassets.com'))return '';
+  if(!url)return '';
+  try{
+    const u=new URL(url);
+    if(u.hostname.toLowerCase()==='opengraph.githubassets.com')return '';
+  }catch(_){}
   return url;
 }
 function allowedVariantWarning(repo,items){
