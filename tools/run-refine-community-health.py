@@ -20,15 +20,29 @@ def load_module(path: Path, name: str):
     return module
 
 
+def needs_deep_check(item: dict[str, object]) -> bool:
+    if item.get("sourceOnline") is not True:
+        return False
+    score = int(item.get("scriptableScore") or 0)
+    return bool(
+        item.get("runtimeDependencies")
+        or item.get("contentWarning")
+        or item.get("moduleDependencies")
+        or item.get("requiresSetup")
+        or score <= 1
+    )
+
+
 def main() -> None:
     refine_mod = load_module(ROOT / "tools" / "refine-community-health.py", "community_refine")
     updater_mod = load_module(ROOT / "tools" / "update_community_status.py", "community_updater")
 
     payload = json.loads(STATUS.read_text(encoding="utf-8"))
     items = payload.get("items") or {}
+    candidates = [(str(url), item) for url, item in items.items() if isinstance(item, dict) and needs_deep_check(item)]
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        futures = [pool.submit(refine_mod.refine, str(url), item) for url, item in items.items() if isinstance(item, dict)]
+        futures = [pool.submit(refine_mod.refine, url, item) for url, item in candidates]
         for future in as_completed(futures):
             future.result()
 
@@ -58,11 +72,12 @@ def main() -> None:
     payload["online"] = project_states.count("online")
     payload["limited"] = project_states.count("limited")
     payload["offline"] = project_states.count("offline")
+    payload["deepCheckCandidates"] = len(candidates)
     payload["deepCheckWarnings"] = payload["limited"] + payload["offline"]
 
     STATUS.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(
-        "Deep community health check: "
+        f"Deep checked {len(candidates)} suspicious endpoint(s): "
         f"projects online={payload['online']} limited={payload['limited']} offline={payload['offline']}; "
         f"endpoints online={payload['endpointsOnline']} limited={payload['endpointsLimited']} offline={payload['endpointsOffline']}"
     )
