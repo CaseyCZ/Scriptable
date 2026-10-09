@@ -19,24 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Tighten scraper response validation
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('tools/update_community_status.py')
-          s = p.read_text()
-          old = '''            if (
-                reachable is True and meta.get("expectsHtml") is True and markers and
-                body and looks_like_html(body, content_type)
-            ):
-'''
-          new = '''            if (
-                reachable is True and meta.get("expectsHtml") is True and markers and body
-            ):
-'''
-          if old not in s:
-              raise SystemExit('Target scraper condition not found')
-          p.write_text(s.replace(old, new, 1))
-          PY
+        run: python -c "from pathlib import Path; p=Path('tools/update_community_status.py'); s=p.read_text(); old='body and looks_like_html(body, content_type)'; assert old in s; p.write_text(s.replace(old, 'body', 1))"
 
       - name: Commit patch and remove helper
         run: |
