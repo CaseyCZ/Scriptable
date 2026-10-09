@@ -22,21 +22,32 @@
   <a href="./Home%20Dashboard.js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Stáhnout Home Dashboard" /></a>
 </p>
 
-## O aplikaci
+## Co aplikace umí
 
-**Home Dashboard** spojuje více typů monitoringu do jednoho widgetu. Lze přidat vlastní HTTP služby, JSON API, Homebridge nebo jiné lokální služby a také sledovat vybrané GitHub repozitáře.
+**Home Dashboard** ti na jednom místě ukáže, zda fungují tvoje weby, domácí servery a další služby. Stav můžeš sledovat přímo ve widgetu na iPhonu, aniž bys musel každou službu otevírat zvlášť.
 
-## Hlavní funkce
+## Co můžeš sledovat
 
-- 🌐 monitoring webů a HTTP služeb
-- 🧩 kontrola JSON API a vybrané hodnoty v odpovědi
-- 🏠 šablona pro Homebridge a další služby v LAN
-- 🔎 vyhledání zařízení a služeb v lokální síti
-- 🐙 monitoring GitHub repozitářů, Actions a releases
-- 👁️ Small / Medium / Large widget + živé a demo náhledy
-- 🎨 vlastní barvy a zobrazované údaje
-- 🔄 kontrola aktualizací přímo z aplikace
-- 📤 export a import nastavení
+- 🌐 Dostupnost webových stránek a služeb.
+- 🏠 Homebridge a další zařízení nebo služby v domácí síti.
+- 🐙 Vybrané projekty na GitHubu, jejich aktualizace a automatické úlohy.
+- 📊 Důležité údaje, které služba poskytuje.
+- 📱 Přehledné widgety ve velikostech Small, Medium a Large.
+- 🎨 Vlastní vzhled, barvy a uspořádání informací.
+- 🔄 Aktualizace aplikace a záloha nebo obnovení nastavení.
+
+## Jak začít
+
+1. Nainstaluj aplikaci do **Scriptable** a spusť ji.
+2. V nastavení přidej web, server nebo službu, kterou chceš sledovat.
+3. Vyber údaje a vzhled, které ti vyhovují.
+4. Přidej widget Scriptable na plochu iPhonu a přiřaď mu Home Dashboard.
+
+**Příklad:** Na jednom widgetu můžeš vidět, zda běží domácí Homebridge, jestli odpovídá tvůj web a zda má sledovaný projekt na GitHubu novou verzi.
+
+## Dobré vědět
+
+Některé služby potřebují vlastní adresu nebo přístupové údaje. Pro sledování zařízení v domácí síti musí být iPhone schopen se k nim připojit.
 
 ## Odkazy
 
