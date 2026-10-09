@@ -5,7 +5,7 @@
   const PAGE_LOCATION = `${location.origin}${location.pathname}${location.search}`;
   let loaded = false;
   let banner = null;
-  let settingsButton = null;
+  let fallbackSettingsButton = null;
 
   const COPY = {
     en: { title:'Analytics cookies', text:'This site uses Google Analytics only if you choose Accept. Rejecting keeps analytics disabled.', accept:'Accept analytics', reject:'Reject', settings:'Cookie settings' },
@@ -94,26 +94,27 @@
     banner.remove();
     banner = null;
   }
-  function showSettingsButton() {
+  function bindSettings() {
     if (!document.body) return;
     ensureStyle();
 
-    const existing = document.querySelector('[data-cookie-settings]');
-    if (existing) {
-      settingsButton = existing;
-      settingsButton.textContent = copy().settings;
-      settingsButton.setAttribute('aria-label', copy().title);
-      if (settingsButton.dataset.cookieSettingsBound !== 'true') {
-        settingsButton.dataset.cookieSettingsBound = 'true';
-        settingsButton.addEventListener('click', event => {
+    const existing = [...document.querySelectorAll('[data-cookie-settings]')];
+    if (existing.length) {
+      const t = copy();
+      existing.forEach(button => {
+        button.textContent = t.settings;
+        button.setAttribute('aria-label', t.title);
+        if (button.dataset.cookieSettingsBound === 'true') return;
+        button.dataset.cookieSettingsBound = 'true';
+        button.addEventListener('click', event => {
           event.preventDefault();
           showBanner(true);
         });
-      }
+      });
       return;
     }
 
-    if (settingsButton) return;
+    if (fallbackSettingsButton) return;
     let footer = document.querySelector('[data-cookie-settings-host], footer, .foot, .footer, .site-footer');
     if (!footer) {
       footer = document.createElement('footer');
@@ -123,15 +124,15 @@
 
     const wrap = document.createElement('div');
     wrap.className = 'caseycz-cookie-settings-wrap';
-    settingsButton = document.createElement('button');
-    settingsButton.type = 'button';
-    settingsButton.className = 'caseycz-cookie-settings';
-    settingsButton.dataset.cookieSettings = '';
-    settingsButton.textContent = copy().settings;
-    settingsButton.setAttribute('aria-label', copy().title);
-    settingsButton.dataset.cookieSettingsBound = 'true';
-    settingsButton.addEventListener('click', () => showBanner(true));
-    wrap.appendChild(settingsButton);
+    fallbackSettingsButton = document.createElement('button');
+    fallbackSettingsButton.type = 'button';
+    fallbackSettingsButton.className = 'caseycz-cookie-settings';
+    fallbackSettingsButton.dataset.cookieSettings = '';
+    fallbackSettingsButton.textContent = copy().settings;
+    fallbackSettingsButton.setAttribute('aria-label', copy().title);
+    fallbackSettingsButton.dataset.cookieSettingsBound = 'true';
+    fallbackSettingsButton.addEventListener('click', () => showBanner(true));
+    wrap.appendChild(fallbackSettingsButton);
     footer.appendChild(wrap);
   }
   function setConsent(value) {
@@ -139,7 +140,7 @@
     if (value === 'granted') loadAnalytics();
     else disableAnalytics();
     closeBanner();
-    showSettingsButton();
+    bindSettings();
   }
   function showBanner(force = false) {
     if (banner || !document.body) return;
@@ -149,6 +150,7 @@
     banner = document.createElement('section');
     banner.className = 'caseycz-consent';
     banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-modal', 'true');
     banner.setAttribute('aria-label', t.title);
     banner.innerHTML = `<div class="caseycz-consent-copy"><strong>${t.title}</strong><span>${t.text}</span></div><div class="caseycz-consent-actions"><button type="button" data-accept>${t.accept}</button><button type="button" data-reject>${t.reject}</button></div>`;
     banner.querySelector('[data-accept]')?.addEventListener('click', () => setConsent('granted'));
@@ -157,10 +159,10 @@
   }
   function refreshLanguageCopy() {
     const t = copy();
-    if (settingsButton) {
-      settingsButton.textContent = t.settings;
-      settingsButton.setAttribute('aria-label', t.title);
-    }
+    document.querySelectorAll('[data-cookie-settings]').forEach(button => {
+      button.textContent = t.settings;
+      button.setAttribute('aria-label', t.title);
+    });
     if (banner) {
       banner.setAttribute('aria-label', t.title);
       const title = banner.querySelector('.caseycz-consent-copy strong');
@@ -177,11 +179,11 @@
     if (mutations.some(m => m.type === 'attributes' && m.attributeName === 'lang')) refreshLanguageCopy();
   }).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
   function init() {
+    bindSettings();
     const consent = readConsent();
     if (consent === 'granted') loadAnalytics();
     else if (consent === 'denied') disableAnalytics();
     else showBanner();
-    showSettingsButton();
   }
   window.CaseyCZAnalytics = Object.freeze({
     consent: readConsent,
