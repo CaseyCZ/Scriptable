@@ -58,8 +58,8 @@ When the project started, we used [**LSWeather**](https://github.com/ajatkj/scri
 
 Two Apple Shortcuts are available to set your generated wallpaper:
 
-- [Set wallpaper directly](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
-- [Set wallpaper from album (selected in the app settings)](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
+- [Set wallpaper directly (photo saved in generator)](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
+- [Set wallpaper from an album (photo selected by Shortcut)](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
 
 ## Support
 
