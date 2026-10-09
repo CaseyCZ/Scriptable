@@ -1,11 +1,12 @@
 const fs=require('fs');
 const vm=require('vm');
 
-const index=fs.readFileSync('index.html','utf8');
+const registryPath=fs.existsSync('assets/js/index-page.js')?'assets/js/index-page.js':'index.html';
+const index=fs.readFileSync(registryPath,'utf8');
 const extra=fs.readFileSync('community-extra.js','utf8');
 
 const match=index.match(/const communityApps\s*=\s*(\[[\s\S]*?\n\s*\]);/);
-if(!match) throw new Error('communityApps registry not found in index.html');
+if(!match) throw new Error(`communityApps registry not found in ${registryPath}`);
 const builtIn=vm.runInNewContext('('+match[1]+')',Object.create(null),{timeout:1000});
 
 const sandbox={window:{}};
