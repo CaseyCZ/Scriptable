@@ -4,6 +4,15 @@
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta id="themeColor" name="theme-color" content="#070b14">
+<meta name="referrer" content="no-referrer">
+<link rel="canonical" href="https://caseycz.github.io/Scriptable/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Scriptable Apps">
+<meta property="og:title" content="Scriptable Apps">
+<meta property="og:description" content="Useful Scriptable apps and a curated catalog of community widgets for iPhone.">
+<meta property="og:url" content="https://caseycz.github.io/Scriptable/">
+<meta name="twitter:card" content="summary">
+<meta name="analytics-page-title" content="Scriptable Apps">
   <meta name="description" content="Scriptable Apps – užitečné iPhone nástroje a vybrané komunitní projekty ke stažení.">
   <title>Scriptable Apps</title>
 <!-- Google Analytics loads only after explicit consent. -->
@@ -30,6 +39,7 @@
   <link rel="stylesheet" href="ios-hub-visual.css?v=20261008-mobile2">
 </head>
 <body>
+<a class="skip-link" href="#top" data-cs="Přeskočit na obsah" data-en="Skip to content" data-de="Zum Inhalt springen" data-es="Saltar al contenido" data-fr="Aller au contenu">Přeskočit na obsah</a>
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a class="brand" href="#top" aria-label="Scriptable Apps">
@@ -45,28 +55,28 @@
       <div class="nav-actions">
         <div class="settings-menu">
           <button id="settingsBtn" class="icon-btn settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings" title="Settings">⚙</button>
-          <div id="settingsPanel" class="settings-panel" role="dialog" aria-hidden="true">
-            <div class="settings-title"><span data-cs="Nastavení" data-en="Settings" data-de="Einstellungen" data-es="Ajustes" data-fr="Paramètres">Nastavení</span></div>
+          <div id="settingsPanel" class="settings-panel" role="dialog" aria-labelledby="settingsTitle" aria-hidden="true">
+            <div id="settingsTitle" class="settings-title"><span data-cs="Nastavení" data-en="Settings" data-de="Einstellungen" data-es="Ajustes" data-fr="Paramètres">Nastavení</span></div>
 
             <div class="settings-label"><span data-cs="VZHLED" data-en="APPEARANCE" data-de="DARSTELLUNG" data-es="APARIENCIA" data-fr="APPARENCE">VZHLED</span></div>
             <div class="settings-theme-seg">
-              <button id="themeDark" type="button">☾ <span data-cs="Tmavý" data-en="Dark" data-de="Dunkel" data-es="Oscuro" data-fr="Sombre">Tmavý</span></button>
-              <button id="themeLight" type="button">☀ <span data-cs="Světlý" data-en="Light" data-de="Hell" data-es="Claro" data-fr="Clair">Světlý</span></button>
+              <button id="themeDark" type="button" aria-pressed="false">☾ <span data-cs="Tmavý" data-en="Dark" data-de="Dunkel" data-es="Oscuro" data-fr="Sombre">Tmavý</span></button>
+              <button id="themeLight" type="button" aria-pressed="false">☀ <span data-cs="Světlý" data-en="Light" data-de="Hell" data-es="Claro" data-fr="Clair">Světlý</span></button>
             </div>
 
             <div class="settings-label"><span data-cs="JAZYK" data-en="LANGUAGE" data-de="SPRACHE" data-es="IDIOMA" data-fr="LANGUE">JAZYK</span></div>
             <div class="settings-language-list">
-              <button id="langCs" type="button" data-language="cs"><img src="assets/flags/cz.svg" alt=""><span>Čeština</span></button>
-              <button id="langEn" type="button" data-language="en"><img src="assets/flags/gb.svg" alt=""><span>English</span></button>
-              <button id="langDe" type="button" data-language="de"><img src="assets/flags/de.svg" alt=""><span>Deutsch</span></button>
-              <button id="langEs" type="button" data-language="es"><img src="assets/flags/es.svg" alt=""><span>Español</span></button>
-              <button id="langFr" type="button" data-language="fr"><img src="assets/flags/fr.svg" alt=""><span>Français</span></button>
+              <button id="langCs" type="button" data-language="cs" role="radio" aria-checked="false"><img src="assets/flags/cz.svg" alt=""><span>Čeština</span></button>
+              <button id="langEn" type="button" data-language="en" role="radio" aria-checked="false"><img src="assets/flags/gb.svg" alt=""><span>English</span></button>
+              <button id="langDe" type="button" data-language="de" role="radio" aria-checked="false"><img src="assets/flags/de.svg" alt=""><span>Deutsch</span></button>
+              <button id="langEs" type="button" data-language="es" role="radio" aria-checked="false"><img src="assets/flags/es.svg" alt=""><span>Español</span></button>
+              <button id="langFr" type="button" data-language="fr" role="radio" aria-checked="false"><img src="assets/flags/fr.svg" alt=""><span>Français</span></button>
             </div>
 
             <div class="settings-label"><span data-cs="ROZLOŽENÍ" data-en="LAYOUT" data-de="LAYOUT" data-es="DISEÑO" data-fr="MISE EN PAGE">ROZLOŽENÍ</span></div>
             <div class="settings-layout-seg">
-              <button id="layoutGrid" type="button" title="Grid">▦</button>
-              <button id="layoutList" type="button" title="List">☷</button>
+              <button id="layoutGrid" type="button" aria-pressed="false" title="Grid">▦</button>
+              <button id="layoutList" type="button" aria-pressed="false" title="List">☷</button>
             </div>
 
             <div class="settings-label"><span data-cs="NAHLÁSIT PROBLÉM" data-en="REPORT ISSUE" data-de="PROBLEM MELDEN" data-es="INFORMAR DE UN PROBLEMA" data-fr="SIGNALER UN PROBLÈME">NAHLÁSIT PROBLÉM</span></div>
@@ -145,7 +155,7 @@
           <a href="https://github.com/dersvenhesse/awesome-scriptable" target="_blank" rel="noopener">Awesome Scriptable</a>
           <a href="https://www.scriptables.net/" target="_blank" rel="noopener">Scriptables.net</a>
           <a href="https://www.reddit.com/r/Scriptable/" target="_blank" rel="noopener">r/Scriptable</a>
-          <button class="footer-link-button" type="button" data-cookie-settings>Cookie settings</button>
+          <a href="privacy.html">Privacy &amp; Cookies</a><button class="footer-link-button" type="button" data-cookie-settings>Cookie settings</button>
         </div>
       </div>
     </footer>
@@ -372,6 +382,22 @@
     const clear=()=>{drag=null};document.addEventListener('touchend',clear,{passive:true});document.addEventListener('touchcancel',clear,{passive:true});
   })();
   </script>
+<script id="settingsA11ySync">
+(()=>{
+  const sync=()=>{
+    const lang=(localStorage.getItem('siteLang')||document.documentElement.lang||'en').slice(0,2);
+    document.querySelectorAll('[data-language]').forEach(btn=>btn.setAttribute('aria-checked',String(btn.dataset.language===lang)));
+    const theme=document.documentElement.dataset.theme||localStorage.getItem('siteTheme')||'dark';
+    document.getElementById('themeDark')?.setAttribute('aria-pressed',String(theme==='dark'));
+    document.getElementById('themeLight')?.setAttribute('aria-pressed',String(theme==='light'));
+    const layout=localStorage.getItem('siteLayout')||'grid';
+    document.getElementById('layoutGrid')?.setAttribute('aria-pressed',String(layout==='grid'));
+    document.getElementById('layoutList')?.setAttribute('aria-pressed',String(layout==='list'));
+  };
+  sync();
+  document.addEventListener('click',e=>{if(e.target.closest('[data-language],#themeDark,#themeLight,#layoutGrid,#layoutList'))requestAnimationFrame(sync)});
+})();
+</script>
 <script src="mobile-menu.js?v=20261008-mobile2"></script>
 </body>
 </html>
