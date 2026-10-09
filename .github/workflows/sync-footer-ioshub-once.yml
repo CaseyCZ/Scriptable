@@ -1,0 +1,62 @@
+name: Sync footer with iOS Hub once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-footer-ioshub-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-footer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Match Scriptable footer to iOS Hub
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          files = [Path('index.html'), Path('guide.html'), Path('credits.html'), Path('privacy.html')]
+          footer = '''<footer class="footer">
+            <div class="wrap footer-inner">
+              <span>© <span id="year"></span> Scriptable Apps · v1.0.0</span>
+              <div class="footer-links">
+                <a href="https://caseycz.github.io/" target="_blank" rel="noopener">Website</a>
+                <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub · Scriptable</a>
+                <a href="credits.html">Credits</a>
+                <a href="privacy.html">Privacy &amp; Cookies</a>
+                <button class="footer-link-button" type="button" data-cookie-settings>Cookie settings</button>
+              </div>
+            </div>
+          </footer>'''
+
+          pattern = re.compile(r'<footer class="footer">.*?</footer>', re.S)
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              updated, count = pattern.subn(footer, text, count=1)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one footer, found {count}')
+              path.write_text(updated, encoding='utf-8')
+          PY
+
+          node --check assets/js/index-page.js
+          node --check assets/js/guide-page.js
+          node --check assets/js/credits-page.js
+          node --check assets/js/privacy-page.js
+          node tools/audit-web-csp.cjs
+          node tools/audit-community-catalog.cjs
+
+      - name: Commit footer sync
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add index.html guide.html credits.html privacy.html
+          git commit -m "Match site footer with iOS Hub"
+          git push origin HEAD:Master
