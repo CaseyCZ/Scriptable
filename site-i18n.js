@@ -18,6 +18,14 @@
     'Primary': {de:'Hauptnavigation', es:'Navegación principal', fr:'Navigation principale'},
     'Grid': {de:'Raster', es:'Cuadrícula', fr:'Grille'},
     'List': {de:'Liste', es:'Lista', fr:'Liste'},
+    'Getting started': {de:'Erste Schritte', es:'Primeros pasos', fr:'Bien démarrer'},
+    'Status': {de:'Status', es:'Estado', fr:'Statut'},
+    'Sort': {de:'Sortierung', es:'Ordenar', fr:'Tri'},
+    '● Status · 🏷 Category · ↕ Sort · 🔎 Search': {
+      de:'● Status · 🏷 Kategorie · ↕ Sortierung · 🔎 Suche',
+      es:'● Estado · 🏷 Categoría · ↕ Ordenar · 🔎 Buscar',
+      fr:'● Statut · 🏷 Catégorie · ↕ Tri · 🔎 Recherche'
+    },
 
     'Useful Scriptable apps in one place': {
       de:'Nützliche Scriptable-Apps an einem Ort',
@@ -43,6 +51,17 @@
     'Category': {de:'Kategorie', es:'Categoría', fr:'Catégorie'},
     'Search': {de:'Suchen', es:'Buscar', fr:'Rechercher'},
     'Search projects…': {de:'Projekte suchen…', es:'Buscar proyectos…', fr:'Rechercher des projets…'},
+    'Name A–Z': {de:'Name A–Z', es:'Nombre A–Z', fr:'Nom A–Z'},
+    'Author A–Z': {de:'Autor A–Z', es:'Autor A–Z', fr:'Auteur A–Z'},
+    'Variant': {de:'Variante', es:'Variante', fr:'Variante'},
+    'active': {de:'aktiv', es:'activos', fr:'actifs'},
+    'Clear filters': {de:'Filter löschen', es:'Borrar filtros', fr:'Effacer les filtres'},
+    'Previous page': {de:'Vorherige Seite', es:'Página anterior', fr:'Page précédente'},
+    'Next page': {de:'Nächste Seite', es:'Página siguiente', fr:'Page suivante'},
+    'Checking': {de:'Wird geprüft', es:'Comprobando', fr:'Vérification'},
+    'Last checked': {de:'Zuletzt geprüft', es:'Última comprobación', fr:'Dernière vérification'},
+    'Online': {de:'Online', es:'En línea', fr:'En ligne'},
+    'Offline': {de:'Offline', es:'Sin conexión', fr:'Hors ligne'},
     'ℹ️ These projects are not ours. During installation, the original code is fetched directly from the author and only wrapped in the .scriptable format; the script code itself is not modified. Review the original project and its setup/API requirements before running third-party code.': {
       de:'ℹ️ Diese Projekte stammen nicht von uns. Bei der Installation wird der Originalcode direkt vom Autor geladen und nur in das .scriptable-Format verpackt; der Skriptcode selbst wird nicht verändert. Prüfe vor dem Ausführen von Drittanbieter-Code das ursprüngliche Projekt sowie dessen Einrichtung und API-Anforderungen.',
       es:'ℹ️ Estos proyectos no son nuestros. Durante la instalación, el código original se obtiene directamente del autor y solo se empaqueta en formato .scriptable; el código del script no se modifica. Revisa el proyecto original y sus requisitos de configuración/API antes de ejecutar código de terceros.',
@@ -80,6 +99,7 @@
     'Health': {de:'Gesundheit', es:'Salud', fr:'Santé'},
     'Travel': {de:'Reisen', es:'Viajes', fr:'Voyages'},
     'Design': {de:'Design', es:'Diseño', fr:'Design'},
+    'Shopping': {de:'Einkaufen', es:'Compras', fr:'Shopping'},
 
     'Copying…': {de:'Wird kopiert…', es:'Copiando…', fr:'Copie…'},
     '✓ Code copied': {de:'✓ Code kopiert', es:'✓ Código copiado', fr:'✓ Code copié'},
@@ -100,11 +120,28 @@
       de:'Keine Projekte entsprechen diesem Filter oder der Suche.',
       es:'Ningún proyecto coincide con este filtro o búsqueda.',
       fr:'Aucun projet ne correspond à ce filtre ou à cette recherche.'
-    }
+    },
+
+    'Skip to content': {de:'Zum Inhalt springen', es:'Saltar al contenido', fr:'Aller au contenu'},
+    'Menu': {de:'Menü', es:'Menú', fr:'Menu'},
+    'Mobile navigation': {de:'Mobile Navigation', es:'Navegación móvil', fr:'Navigation mobile'}
   };
 
+  const SHARED = {
+    website: {cs:'Web', en:'Website', de:'Website', es:'Sitio web', fr:'Site web'},
+    credits: {cs:'Poděkování', en:'Credits', de:'Danksagungen', es:'Créditos', fr:'Crédits'},
+    privacy: {cs:'Soukromí a cookies', en:'Privacy & Cookies', de:'Datenschutz & Cookies', es:'Privacidad y cookies', fr:'Confidentialité et cookies'},
+    cookies: {cs:'Nastavení cookies', en:'Cookie settings', de:'Cookie-Einstellungen', es:'Configuración de cookies', fr:'Paramètres des cookies'},
+    creditsTitle: {cs:'Poděkování a zdroje', en:'Credits & Acknowledgements', de:'Danksagungen & Quellen', es:'Créditos y agradecimientos', fr:'Crédits et remerciements'}
+  };
+
+  function normalizeLang(lang) {
+    const code = String(lang || 'en').toLowerCase().slice(0,2);
+    return ['cs','en','de','es','fr'].includes(code) ? code : 'en';
+  }
+
   function translate(cs, en, lang) {
-    const code = ['cs','en','de','es','fr'].includes(lang) ? lang : 'en';
+    const code = normalizeLang(lang);
     if (code === 'cs') return cs ?? en ?? '';
     if (code === 'en') return en ?? cs ?? '';
 
@@ -123,5 +160,39 @@
     return base;
   }
 
-  window.ScriptableI18n = Object.freeze({ translate });
+  function applyShared(lang) {
+    const code = normalizeLang(lang || document.documentElement.lang);
+    const value = key => SHARED[key]?.[code] || SHARED[key]?.en || '';
+
+    document.querySelectorAll('a[href="https://caseycz.github.io/"]').forEach(el => { el.textContent = value('website'); });
+    document.querySelectorAll('a[href="credits.html"]').forEach(el => {
+      if (!el.querySelector('[data-cs]')) el.textContent = value('credits');
+    });
+    document.querySelectorAll('a[href="privacy.html"]').forEach(el => { el.textContent = value('privacy'); });
+    document.querySelectorAll('[data-cookie-settings]').forEach(el => {
+      el.textContent = value('cookies');
+      el.setAttribute('aria-label', value('cookies'));
+    });
+
+    const skip = document.querySelector('.skip-link');
+    if (skip) skip.textContent = translate('Přeskočit na obsah', 'Skip to content', code);
+
+    const creditsTitle = document.querySelector('.credits-content .hero h1');
+    if (creditsTitle) creditsTitle.textContent = value('creditsTitle');
+
+    const mobileButton = document.getElementById('mobileMenuButton');
+    if (mobileButton) mobileButton.setAttribute('aria-label', translate('Nabídka', 'Menu', code));
+    const mobileNav = document.querySelector('.mobile-nav-links');
+    if (mobileNav) mobileNav.setAttribute('aria-label', translate('Mobilní navigace', 'Mobile navigation', code));
+  }
+
+  window.ScriptableI18n = Object.freeze({ translate, applyShared });
+
+  const syncShared = () => applyShared(document.documentElement.lang);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncShared, {once:true});
+  else syncShared();
+
+  new MutationObserver(mutations => {
+    if (mutations.some(m => m.type === 'attributes' && m.attributeName === 'lang')) syncShared();
+  }).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
 })();
