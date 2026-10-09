@@ -1,0 +1,47 @@
+name: Center section headings once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/center-section-headings-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  center-headings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Center catalog section headings on desktop
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          marker = '    @media(max-width:900px)'
+          css = '''    @media(min-width:901px){.sectionHead{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px}.sectionHead>div{width:100%;text-align:center}.sectionHead .count{width:100%;text-align:center}}
+'''
+          if css.strip() not in text:
+              if marker not in text:
+                  raise SystemExit('Desktop media marker not found')
+              text = text.replace(marker, css + marker, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          node --check assets/js/index-page.js
+          node tools/audit-web-csp.cjs
+          node tools/audit-community-catalog.cjs
+
+      - name: Commit centered headings
+        run: |
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add index.html
+          git commit -m "Center catalog section headings on desktop"
+          git push origin HEAD:Master
