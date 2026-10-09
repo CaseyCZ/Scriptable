@@ -31,7 +31,8 @@ jobs:
         run: |
           git config user.name "Lukáš"
           git config user.email "kyselalukas@seznam.cz"
-          git add index.html assets/js/index-page.js tools/audit-web-csp.cjs .github/workflows/pages.yml
+          git restore .github/workflows/pages.yml
+          git add index.html assets/js/index-page.js tools/audit-web-csp.cjs
           git rm tools/fix-csp-once.py .github/workflows/fix-web-csp-once.yml
           git commit -m "Fix CSP-safe web interactions and add regression audit"
           git push origin HEAD:Master
