@@ -1,0 +1,50 @@
+name: Set catalog page size to 30 once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/set-page-size-30-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Set page size to 30
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/js/index-page.js')
+          s=p.read_text(encoding='utf-8')
+          old='const PAGE_SIZE=20;'
+          new='const PAGE_SIZE=30;'
+          if old not in s and new not in s:
+              raise SystemExit('PAGE_SIZE constant not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check assets/js/index-page.js
+          node tools/audit-web-csp.cjs
+          node tools/audit-community-catalog.cjs
+          grep -q '^const PAGE_SIZE=30;' assets/js/index-page.js
+
+      - name: Commit update
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add assets/js/index-page.js
+          if git diff --cached --quiet; then
+            echo "Page size already 30"
+            exit 0
+          fi
+          git commit -m "Show 30 catalog cards per page"
+          git push origin HEAD:Master
