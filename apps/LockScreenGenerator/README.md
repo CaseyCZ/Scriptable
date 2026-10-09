@@ -22,29 +22,50 @@
   <a href="./LockScreenGenerator.scriptable"><img src="https://img.shields.io/badge/Instalovat-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Instalovat LockScreen Generator" /></a>
 </p>
 
-## O aplikaci
+## Co aplikace umí
 
-**LockScreen Generator** umožňuje sestavit tapetu podle toho, co chceš na Lock Screenu opravdu vidět. Obsah, pořadí, vzhled i jednotlivé moduly lze upravit přímo v aplikaci.
+**LockScreen Generator** vytváří vlastní tapetu zamykací obrazovky iPhonu. Na fotografii může zobrazit kalendář, počasí, sportovní výsledky a další informace, které chceš mít po ruce.
+
+## Co můžeš na tapetě zobrazit
+
+- 📅 Kalendář, události a připomínky.
+- 🌤️ Počasí a předpověď.
+- 🏎️ Formuli 1 a další sportovní informace.
+- 📈 Akcie, kryptoměny a měnové kurzy.
+- 🌙 Světový čas, fáze Měsíce a další informační moduly.
+- 👁️ Náhled tapety ještě před jejím použitím.
+- 🎨 Vlastní vzhled, pořadí informací a automatické přizpůsobení velikosti iPhonu.
+
+<p align="center">
+  <img src="./LockScreenPreview.png" alt="Náhled tapety LockScreen Generator" width="250" />
+</p>
+
+## Jak začít
+
+1. Nainstaluj **LockScreen Generator** do Scriptable a otevři jeho nastavení.
+2. Vyber informace, které chceš na tapetě zobrazit.
+3. V části **Tapeta** zvol, odkud se má vzít podkladová fotografie.
+4. Zkontroluj výsledek v náhledu.
+5. Přidej odpovídající Apple Zkratku pro vytvoření a nastavení tapety.
+
+## Dva způsoby výběru fotografie
+
+**Fotka uložená v generátoru:** V nastavení vybereš jednu fotografii. Generátor ji používá jako podklad pro další vytvořené tapety.
+
+**Fotka ze Zkratek:** Zkratka vybere fotografii z alba a předá ji generátoru. Může tak použít například náhodný obrázek z vybraného alba.
+
+## Apple Zkratky pro nastavení tapety
+
+- [⚡ Přímé nastavení – fotka uložená v generátoru](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
+- [🖼️ Nastavení z alba – fotografii vybírá Zkratka](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
+
+## Dobré vědět
+
+Generátor vytváří obrázek tapety; k jejímu nastavení a případnému pravidelnému obnovování slouží Apple Zkratky. Některé informační moduly potřebují povolení přístupu k příslušným údajům.
 
 ## Původ a poděkování
 
-Při vzniku projektu jsme použili [**LSWeather**](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) od [**ajatkj (Ankit Jain)**](https://github.com/ajatkj) jako předlohu pro princip generování dynamické Lock Screen tapety pomocí Scriptable a Shortcuts. Současný **LockScreen Generator** byl následně výrazně přepracován a rozšířen o vlastní uživatelské rozhraní, moduly, lokalizace, automatický layout, diagnostiku a další funkce.
-
-## Hlavní funkce
-
-- 📅 kalendář a připomínky
-- 🌤️ počasí a předpověď
-- 🏎️ Formula 1 a sport
-- 📈 finance, krypto a kurzy
-- 🌙 další informační moduly včetně světového času a fází Měsíce
-- 👁️ živý náhled tapety
-- 📐 automatické přizpůsobení různým iPhonům
-- 🌍 čeština, angličtina, němčina a španělština
-- 🔄 aktualizace přímo z aplikace
-
-<p align="center">
-  <img src="./LockScreenPreview.png" alt="LockScreen Generator preview" width="250" />
-</p>
+Inspirací byl [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) od [ajatkj (Ankit Jain)](https://github.com/ajatkj). Současný generátor byl následně výrazně přepracován a rozšířen o vlastní nastavení, vzhled a další informační moduly.
 
 ## Odkazy
 
@@ -52,14 +73,6 @@ Při vzniku projektu jsme použili [**LSWeather**](https://github.com/ajatkj/scr
   <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable App Store" /></a>
   <a href="./LockScreenGenerator.js"><img src="https://img.shields.io/badge/JavaScript-St%C3%A1hnout-172033?style=for-the-badge&labelColor=111827" alt="Stáhnout JavaScript" /></a>
 </p>
-
-
-## Zkratky pro nastavení tapety
-
-Pro nastavení vygenerované tapety jsou dostupné dvě Apple Zkratky:
-
-- [Nastavit tapetu přímo (fotka uložená v generátoru)](https://www.icloud.com/shortcuts/869bc40bbd494f5481b6c5ba1caab016)
-- [Nastavit tapetu z alba (fotka vybraná Zkratkou)](https://www.icloud.com/shortcuts/05f7231904014644a75cedb18c943545)
 
 ## Podpora
 
