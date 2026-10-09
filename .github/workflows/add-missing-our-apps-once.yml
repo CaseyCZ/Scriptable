@@ -1,0 +1,58 @@
+name: Add missing first-party apps once
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - '.github/workflows/add-missing-our-apps-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: Master
+          fetch-depth: 0
+
+      - name: Add Homebridge Status and Sports Live to Our apps
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('assets/js/index-page.js')
+          text = path.read_text(encoding='utf-8')
+
+          if "name:'Sports Live'" not in text:
+              anchor = "      {name:'Sideload Watch',version:'0.2.25'"
+              card = "      {name:'Sports Live',version:'0.3.3',icon:'🔴',file:'./apps/Sports-Live/Sports-Live%2Cjs',install:'./apps/Sports-Live/Sports-Live%2Cjs',preview:'./readme-header.svg',tags:['Multi-sport','Live team','Schedule','CZ / EN'],description:{cs:'Rychlý sportovní widget pro jeden vybraný tým s live stavem, nejbližším zápasem a programem.',en:'Fast sports widget for one selected team with live status, nearest game and upcoming schedule.'},features:{cs:['Fotbal, hokej, basketbal, florbal a baseball','Výběr sportu, soutěže a jednoho týmu','Live stav + nejbližší zápas + další program','Small / Medium + diagnostika a cache'],en:['Football, hockey, basketball, floorball and baseball','Sport, competition and single-team selection','Live status + nearest game + upcoming schedule','Small / Medium + diagnostics and cache']}},\n"
+              if anchor not in text:
+                  raise SystemExit('Sports Live insertion anchor not found')
+              text = text.replace(anchor, card + anchor, 1)
+
+          if "name:'Homebridge Status'" not in text:
+              anchor = "      {name:'Home Dashboard',version:'0.3.13'"
+              card = "      {name:'Homebridge Status',version:'0.1.13',icon:'🌉',file:'./apps/Homebridge-Status/Homebridge%20Status.js',install:'./apps/Homebridge-Status/Homebridge%20Status.scriptable',preview:'./readme-header.svg',tags:['Homebridge','LAN / VPN','System status','CZ / EN'],description:{cs:'Widget pro monitoring Homebridge, aktualizací, výkonu a dostupnosti přes LAN s automatickým VPN fallbackem.',en:'Widget for monitoring Homebridge, updates, performance and availability over LAN with automatic VPN fallback.'},features:{cs:['LAN s automatickým VPN fallbackem','Homebridge, pluginy a Node.js aktualizace','CPU, RAM, teplota, uptime a grafy','Small / Medium / Large + Lock Screen widgety'],en:['LAN with automatic VPN fallback','Homebridge, plugins and Node.js update status','CPU, RAM, temperature, uptime and charts','Small / Medium / Large + Lock Screen widgets']}},\n"
+              if anchor not in text:
+                  raise SystemExit('Homebridge Status insertion anchor not found')
+              text = text.replace(anchor, card + anchor, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          node tools/audit-community-catalog.cjs
+          node tools/audit-web-csp.cjs
+
+          grep -q "name:'Sports Live'" assets/js/index-page.js
+          grep -q "name:'Homebridge Status'" assets/js/index-page.js
+
+          git config user.name "Lukáš"
+          git config user.email "kyselalukas@seznam.cz"
+          git add assets/js/index-page.js
+          git rm .github/workflows/add-missing-our-apps-once.yml
+          git commit -m "Add missing first-party widgets to website"
+          git push origin HEAD:Master
