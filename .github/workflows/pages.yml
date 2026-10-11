@@ -1,0 +1,58 @@
+name: Deploy Scriptable Apps website
+
+# Deploy the latest Master branch to GitHub Pages.
+on:
+  push:
+    branches: [Master]
+  workflow_run:
+    workflows: ["Build Sports Info package"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Audit community catalog duplicates
+        run: node tools/audit-community-catalog.cjs
+
+      - name: Audit CSP-safe website interactions
+        run: node tools/audit-web-csp.cjs
+
+      - name: Generate Credits from catalog
+        run: node tools/build-credits.cjs
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      # GitHub's artifact API can briefly lag immediately after upload finalization.
+      # A short delay avoids deploy-pages seeing zero artifacts in a fresh run.
+      - name: Wait for Pages artifact registration
+        run: sleep 8
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

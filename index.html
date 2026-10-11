@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="cs" data-theme="dark">
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta id="themeColor" name="theme-color" content="#070b14">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="canonical" href="https://caseycz.github.io/Scriptable/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Scriptable Apps">
+<meta property="og:title" content="Scriptable Apps">
+<meta property="og:description" content="Useful Scriptable apps and a curated catalog of community widgets for iPhone.">
+<meta property="og:url" content="https://caseycz.github.io/Scriptable/">
+<meta name="twitter:card" content="summary">
+<meta name="analytics-page-title" content="Scriptable Apps">
+  <meta name="description" content="Scriptable Apps – užitečné iPhone nástroje a vybrané komunitní projekty ke stažení.">
+  <title>Scriptable Apps</title>
+<!-- Google Analytics loads only after explicit consent. -->
+<script src="analytics-consent.js?v=20261009-i18n2"></script>
+  <style>
+    :root{color-scheme:dark;--page:#070b14;--bg:#0b1020;--panel:#111827;--panel2:#172033;--border:#2a3850;--text:#f8fafc;--muted:#94a3b8;--accent:#38bdf8;--accent2:#0284c7;--accent-soft:#0f2b45;--ok:#86efac;--warn:#fde68a;--shadow:0 18px 48px rgba(0,0,0,.34);--hero1:#172554;--hero2:#0b1020;--input:#0b1220}
+    html[data-theme="light"]{color-scheme:light;--page:#f1f5f9;--bg:#f8fafc;--panel:#fff;--panel2:#f1f5f9;--border:#d9e2ee;--text:#0f172a;--muted:#64748b;--accent:#0284c7;--accent2:#0369a1;--accent-soft:#e0f2fe;--ok:#15803d;--warn:#92400e;--shadow:0 14px 36px rgba(15,23,42,.09);--hero1:#dbeafe;--hero2:#f8fafc;--input:#f8fafc}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--page)}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(circle at top,var(--hero1) 0,var(--hero2) 42%,var(--page) 100%);transition:background .18s,color .18s}a{color:inherit;text-decoration:none}button{font:inherit}.wrap{width:min(1180px,calc(100% - 28px));margin:0 auto}
+    .topbar{position:relative;display:flex;align-items:center;justify-content:space-between;padding:18px 0;gap:16px}.brand{display:flex;align-items:center;gap:11px;font-weight:850;letter-spacing:-.02em}.brandIcon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#0ea5e9,#2563eb);box-shadow:0 10px 30px rgba(14,165,233,.22)}.brand small{display:block;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.03em;margin-top:2px}.topActions{display:flex;align-items:center;gap:7px}.topLink,.iconBtn{height:40px;border:1px solid var(--border);border-radius:11px;background:color-mix(in srgb,var(--panel) 90%,transparent);color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;font-weight:800;font-size:12px;cursor:pointer}.topLink:hover,.iconBtn:hover{border-color:var(--accent)}.iconBtn{width:40px;padding:0;font-size:16px}.lang{display:flex;gap:4px;padding:3px;border:1px solid var(--border);border-radius:11px;background:color-mix(in srgb,var(--panel) 88%,transparent)}.lang button{height:32px;border:0;border-radius:8px;background:transparent;color:var(--muted);padding:0 9px;cursor:pointer;font-weight:850;font-size:11px}.lang button.active{background:var(--accent-soft);color:var(--accent)}
+    .settingsPanel{position:absolute;right:0;top:64px;z-index:20;width:310px;padding:13px;border:1px solid var(--border);border-radius:16px;background:var(--panel);box-shadow:var(--shadow);display:none}.settingsPanel.open{display:block}.settingsTitle{font-size:13px;font-weight:900;margin-bottom:13px}.settingsLabel{margin:12px 0 7px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em}.seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}.seg button{min-height:38px;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--muted);font-size:12px;font-weight:850;cursor:pointer}.seg button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.layoutSeg{display:flex;gap:7px}.layoutSeg button{width:42px;height:38px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:var(--muted);font-size:17px;cursor:pointer}.layoutSeg button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+    .hero{padding:34px 0 22px;text-align:center}.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid color-mix(in srgb,var(--accent) 55%,var(--border));border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:850}h1{font-size:clamp(36px,6vw,66px);line-height:1;letter-spacing:-.055em;margin:20px auto 14px;max-width:880px}.lead{max-width:760px;margin:0 auto;color:var(--muted);font-size:clamp(15px,1.9vw,19px);line-height:1.55}.heroActions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:22px}
+    .btn{min-height:38px;border-radius:10px;border:1px solid var(--border);padding:0 11px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:850;cursor:pointer;transition:.15s ease}.btn:hover{transform:translateY(-1px)}.btn.primary{background:linear-gradient(135deg,var(--accent2),var(--accent));border-color:var(--accent);color:#fff}.btn.secondary{background:var(--panel2);color:var(--text)}
+    .sectionHead{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:25px 0 11px}.sectionHead h2{margin:0;font-size:24px;letter-spacing:-.03em}.sectionHead p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.45}.count{color:var(--muted);font-size:12px;white-space:nowrap}.notice{margin:0 0 12px;padding:11px 13px;border:1px solid var(--border);border-radius:12px;background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--muted);font-size:12px;line-height:1.45}
+    .catalogBar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px;margin:0 0 12px}.catalogFilters{display:flex;align-items:end;gap:10px;min-width:0}.filterWrap,.searchWrap{display:flex;align-items:center;gap:7px;min-width:0}.filterWrap{flex:0 0 auto}.searchWrap{flex:1;max-width:360px}.filterLabel{color:var(--muted);font-size:11px;font-weight:800;white-space:nowrap}.categorySelect,.searchInput{height:34px;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);font-size:11px;font-weight:800;outline:none}.categorySelect{min-width:150px;padding:0 30px 0 10px}.searchInput{width:100%;min-width:180px;padding:0 11px}.searchInput::placeholder{color:var(--muted);font-weight:700}.categorySelect:focus,.searchInput:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}.catalogRight{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0}.pagination{display:flex;align-items:center;justify-content:flex-end;gap:4px;flex-wrap:wrap;min-width:0}.pageBtn{height:34px;min-width:32px;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--muted);font-weight:850;font-size:11px;cursor:pointer;padding:0 7px}.pageBtn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}.pageBtn:disabled{opacity:.4;cursor:default}.pageInfo{color:var(--muted);font-size:11px;white-space:nowrap;flex:0 0 auto}.catalogBottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-16px 0 18px}.catalogBottom .pagination{justify-content:flex-start}.emptyState{grid-column:1/-1;padding:28px 16px;border:1px dashed var(--border);border-radius:14px;color:var(--muted);text-align:center;background:color-mix(in srgb,var(--panel) 75%,transparent)}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;padding-bottom:30px;align-items:stretch}.card{min-width:0;min-height:440px;height:auto;overflow:hidden;background:color-mix(in srgb,var(--panel) 96%,transparent);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column}.preview{position:relative;height:142px;flex:0 0 142px;background:linear-gradient(135deg,var(--input),var(--panel2));overflow:hidden;display:grid;place-items:center}.preview img{width:100%;height:100%;object-fit:cover;display:block}.ourPreview img{object-fit:contain;padding:8px;background:var(--input)}.preview:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(2,6,23,.35) 100%);pointer-events:none}.version,.externalBadge{position:absolute;top:9px;z-index:2;padding:5px 8px;border-radius:999px;background:rgba(2,6,23,.76);border:1px solid rgba(148,163,184,.25);font-size:10px;font-weight:850;color:#dbeafe}.version{right:9px}.externalBadge{left:9px;color:#fde68a;border-color:#854d0e;background:rgba(66,32,6,.8)}.body{padding:12px;display:flex;flex-direction:column;flex:1;min-height:0}.titleRow{display:flex;align-items:start;gap:9px}.appIcon{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 55%,var(--border));display:grid;place-items:center;font-size:17px;flex:0 0 34px}.appTitle{min-width:0;flex:1}.appTitle h3{margin:0 0 3px;font-size:16px;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.appTitle p{margin:0;color:var(--muted);font-size:11px;line-height:1.4;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:30px}.author{margin-top:4px;color:var(--accent);font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.communityAvailability{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 7px;border:1px solid var(--border);border-radius:999px;font-size:9px;font-weight:850;width:max-content;max-width:100%}.communityAvailability.online{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--border));background:color-mix(in srgb,var(--ok) 10%,transparent)}.communityAvailability.offline{color:#f87171;border-color:color-mix(in srgb,#ef4444 45%,var(--border));background:color-mix(in srgb,#ef4444 9%,transparent)}.communityAvailability.checking{color:var(--muted)}.communityHealth{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:-2px 0 12px}.communityHealth .communityAvailability{margin:0}.communityChecked{color:var(--muted);font-size:10px;margin-left:2px}.tags{display:flex;flex-wrap:wrap;gap:4px;margin:9px 0;max-height:42px;overflow:hidden;flex-shrink:0}.tag{padding:4px 6px;border-radius:7px;background:var(--input);border:1px solid var(--border);font-size:9px;color:var(--muted);font-weight:750}.features{margin:0 0 10px;padding:0;list-style:none;display:grid;gap:4px;color:var(--muted);font-size:10.5px;line-height:1.35;flex-shrink:0}.features li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.features li:before{content:"✓";color:var(--ok);font-weight:900;margin-right:6px}.actions{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:auto;flex-shrink:0}.ourActions{grid-template-columns:1fr}.actions.wallpaperActions{grid-template-columns:repeat(2,minmax(0,1fr))}.actions.wallpaperActions .shortcutSmall{font-size:10px;padding:7px 4px;min-width:0}.actions.wallpaperActions .btn.primary{grid-column:1/-1}.status{min-height:14px;color:var(--ok);font-size:9px;margin-top:5px}.mutedLink{color:var(--accent);text-decoration:underline;text-underline-offset:3px}.divider{height:1px;background:var(--border);margin:4px 0 7px}footer{border-top:1px solid var(--border);padding:22px 0 32px;color:var(--muted);font-size:11px;text-align:center}
+    body.layout-list .grid{grid-template-columns:1fr}body.layout-list .card{display:grid;grid-template-columns:210px 1fr;max-width:none;height:auto;min-height:210px}body.layout-list .preview{height:100%;min-height:182px;flex-basis:auto}body.layout-list .body{padding:14px}body.layout-list .features{grid-template-columns:repeat(2,minmax(0,1fr))}body.layout-list .features li{white-space:normal}
+    @media(min-width:901px){.sectionHead{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px}.sectionHead>div{width:100%;text-align:center}.sectionHead .count{width:100%;text-align:center}}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{height:auto;min-height:440px}.features li{white-space:normal;overflow:visible;text-overflow:clip}.catalogBar{grid-template-columns:1fr}.catalogFilters{width:100%}.searchWrap{max-width:none}.catalogRight{width:100%;justify-content:space-between;gap:8px}.pagination{justify-content:flex-start}.pageBtn{min-width:30px;padding:0 6px}}
+    @media(max-width:660px){.topbar{align-items:flex-start;flex-direction:column}.topActions{width:100%;flex-wrap:wrap}.topLink{flex:1}.settingsPanel{left:0;right:auto;top:112px;width:min(310px,100%)}.hero{padding-top:24px}.brand small{display:none}.grid{grid-template-columns:1fr}.card{max-width:none;height:auto;min-height:440px}.actions,.ourActions{grid-template-columns:1fr}.heroActions .btn{width:auto}.sectionHead{align-items:start;flex-direction:column}.catalogBar{display:block}.catalogFilters{width:100%;flex-direction:column;align-items:stretch;gap:8px}.filterWrap,.searchWrap{width:100%;max-width:none}.categorySelect,.searchInput{flex:1;min-width:0;width:100%}.catalogRight{width:100%;align-items:stretch;flex-direction:column;margin-top:8px}.pagination{width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.pageBtn{flex:0 0 32px}.pageInfo{white-space:normal}.catalogBottom{align-items:stretch;flex-direction:column}.catalogBottom .pagination{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.preview{height:155px;flex-basis:155px}body.layout-list .card{display:block;height:auto}body.layout-list .preview{height:145px;min-height:0}body.layout-list .features{grid-template-columns:1fr}}
+  
+    /* community-variant-actions */
+    .actions.variantActions{grid-template-columns:repeat(2,minmax(0,1fr))}.actions.variantActions .variantProject{grid-column:1/-1}
+    @media(max-width:660px){.actions.variantActions{grid-template-columns:1fr}.actions.variantActions .variantProject{grid-column:auto}}
+  </style>
+  <link rel="stylesheet" href="ios-hub-visual.css?v=20261008-mobile2">
+</head>
+<body>
+<a class="skip-link" href="#top" data-cs="Přeskočit na obsah" data-en="Skip to content" data-de="Zum Inhalt springen" data-es="Saltar al contenido" data-fr="Aller au contenu">Přeskočit na obsah</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#top" aria-label="Scriptable Apps">
+        <span class="brand-mark">JS</span>
+        <span>Scriptable Apps<small>Scriptable · Widgets</small></span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#ourApps"><span data-cs="Naše aplikace" data-en="Our apps" data-de="Unsere Apps" data-es="Nuestras apps" data-fr="Nos apps">Naše aplikace</span></a>
+        <a href="guide.html"><span data-cs="Průvodce" data-en="Guide" data-de="Anleitung" data-es="Guía" data-fr="Guide">Průvodce</span></a>
+        <a href="#community"><span data-cs="Komunita" data-en="Community" data-de="Community" data-es="Comunidad" data-fr="Communauté">Komunita</span></a>
+        <a href="credits.html">Credits</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="settings-menu">
+          <button id="settingsBtn" class="icon-btn settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings" title="Settings">⚙</button>
+          <div id="settingsPanel" class="settings-panel" role="dialog" aria-labelledby="settingsTitle" aria-hidden="true">
+            <div id="settingsTitle" class="settings-title"><span data-cs="Nastavení" data-en="Settings" data-de="Einstellungen" data-es="Ajustes" data-fr="Paramètres">Nastavení</span></div>
+
+            <div class="settings-label"><span data-cs="VZHLED" data-en="APPEARANCE" data-de="DARSTELLUNG" data-es="APARIENCIA" data-fr="APPARENCE">VZHLED</span></div>
+            <div class="settings-theme-seg">
+              <button id="themeDark" type="button" aria-pressed="false">☾ <span data-cs="Tmavý" data-en="Dark" data-de="Dunkel" data-es="Oscuro" data-fr="Sombre">Tmavý</span></button>
+              <button id="themeLight" type="button" aria-pressed="false">☀ <span data-cs="Světlý" data-en="Light" data-de="Hell" data-es="Claro" data-fr="Clair">Světlý</span></button>
+            </div>
+
+            <div class="settings-label"><span data-cs="JAZYK" data-en="LANGUAGE" data-de="SPRACHE" data-es="IDIOMA" data-fr="LANGUE">JAZYK</span></div>
+            <div class="settings-language-list">
+              <button id="langCs" type="button" data-language="cs" role="radio" aria-checked="false"><img src="assets/flags/cz.svg" alt=""><span>Čeština</span></button>
+              <button id="langEn" type="button" data-language="en" role="radio" aria-checked="false"><img src="assets/flags/gb.svg" alt=""><span>English</span></button>
+              <button id="langDe" type="button" data-language="de" role="radio" aria-checked="false"><img src="assets/flags/de.svg" alt=""><span>Deutsch</span></button>
+              <button id="langEs" type="button" data-language="es" role="radio" aria-checked="false"><img src="assets/flags/es.svg" alt=""><span>Español</span></button>
+              <button id="langFr" type="button" data-language="fr" role="radio" aria-checked="false"><img src="assets/flags/fr.svg" alt=""><span>Français</span></button>
+            </div>
+
+            <div class="settings-label"><span data-cs="ROZLOŽENÍ" data-en="LAYOUT" data-de="LAYOUT" data-es="DISEÑO" data-fr="MISE EN PAGE">ROZLOŽENÍ</span></div>
+            <div class="settings-layout-seg">
+              <button id="layoutGrid" type="button" aria-pressed="false" title="Grid">▦</button>
+              <button id="layoutList" type="button" aria-pressed="false" title="List">☷</button>
+            </div>
+
+            <div class="settings-label"><span data-cs="NAHLÁSIT PROBLÉM" data-en="REPORT ISSUE" data-de="PROBLEM MELDEN" data-es="INFORMAR DE UN PROBLEMA" data-fr="SIGNALER UN PROBLÈME">NAHLÁSIT PROBLÉM</span></div>
+            <a class="settings-report-link" href="https://github.com/CaseyCZ/Scriptable/issues/new/choose" target="_blank" rel="noopener"><span aria-hidden="true">🐞</span><span data-cs="Nahlásit problém" data-en="Report issue" data-de="Problem melden" data-es="Informar de un problema" data-fr="Signaler un problème">Nahlásit problém</span></a>
+          </div>
+        </div>
+        <button class="compact-btn nav-support-primary" type="button" data-support-open><img class="compact-brand-icon" src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="" referrerpolicy="no-referrer"><span class="support-label" data-cs="Podpořit" data-en="Support" data-de="Unterstützen" data-es="Apoyar" data-fr="Soutenir">Podpořit</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main id="top">
+      <section class="hero">
+        <div class="badge">📱 iPhone · Scriptable · Shortcuts</div>
+        <h1 data-cs="Užitečné Scriptable aplikace na jednom místě" data-en="Useful Scriptable apps in one place">Užitečné Scriptable aplikace na jednom místě</h1>
+        <p class="lead" data-cs="Naše aplikace instaluj přímo přes .scriptable balíček. Na iPhonu soubor otevři v Scriptable a potvrď import; existující skript vyřeší Scriptable při importu." data-en="Install our apps through the native .scriptable package. On iPhone, open the file in Scriptable and confirm the import; Scriptable handles an existing script during import.">Naše aplikace stáhneš přímo z webu. Navíc tu najdeš vybrané projekty dalších Scriptable vývojářů s jasně uvedeným autorem a původním zdrojem.</p>
+        <div class="heroActions"><a class="btn primary" href="#ourApps">⬇️ <span data-cs="Naše aplikace" data-en="Our apps">Naše aplikace</span></a><a class="btn secondary" href="#community">🌍 <span data-cs="Ostatní vývojáři" data-en="Other developers">Ostatní vývojáři</span></a><a class="btn secondary" href="guide.html">📘 <span data-cs="Jak začít" data-en="Getting started">Jak začít</span></a></div>
+      </section>
+
+      <section id="ourApps">
+        <div class="sectionHead"><div><h2 data-cs="Naše aplikace" data-en="Our apps">Naše aplikace</h2><p data-cs="Stahování probíhá přímo z našeho webu." data-en="Downloads are served directly from our site.">Stahování probíhá přímo z našeho webu.</p></div><div id="ourCount" class="count"></div></div>
+        <div id="ourGrid" class="grid"></div>
+      </section>
+
+      <section id="community">
+        <div class="divider"></div>
+        <div class="sectionHead"><div><h2 data-cs="Ostatní vývojáři" data-en="Other developers">Ostatní vývojáři</h2><p data-cs="Vybrané komunitní projekty. Instalace načte originální kód přímo z repozitáře autora a připraví ho pro Scriptable." data-en="Selected community projects. Installation fetches the original code directly from the author's repository and prepares it for Scriptable.">Vybrané komunitní projekty. Instalace načte originální kód přímo z repozitáře autora a připraví ho pro Scriptable.</p></div><div id="communityCount" class="count"></div></div>
+        <div id="communityHealth" class="communityHealth" aria-live="polite"></div>
+        <details class="content-disclosure filter-disclosure">
+          <summary>
+            <span class="disclosure-title" data-cs="● Stav · 🏷 Kategorie · ↕ Řazení · 🔎 Hledání" data-en="● Status · 🏷 Category · ↕ Sort · 🔎 Search">● Stav · 🏷 Kategorie · ↕ Řazení · 🔎 Hledání</span>
+            <span id="communityFilterSummaryActions" class="filter-summary-actions" hidden>
+              <span id="communityFilterSummaryCount" class="filter-summary-count"></span>
+              <button class="filter-summary-clear" type="button" data-community-clear></button>
+            </span>
+          </summary>
+          <div class="disclosure-body">
+            <div class="catalog-filters filter-disclosure-grid">
+              <div class="filter-group">
+                <div class="filter-label">● <span data-cs="Stav" data-en="Status">Stav</span></div>
+                <div id="availabilityFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">🏷 <span data-cs="Kategorie" data-en="Category">Kategorie</span></div>
+                <div id="categoryFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">↕ <span data-cs="Řazení" data-en="Sort">Řazení</span></div>
+                <div id="sortFilters" class="filter-tabs"></div>
+              </div>
+              <div class="filter-group">
+                <div class="filter-label">🔎 <span data-cs="Hledat" data-en="Search">Hledat</span></div>
+                <input id="sourceSearch" class="search" type="search" autocomplete="off" placeholder="Hledat projekty…">
+              </div>
+            </div>
+          </div>
+        </details>
+        <div class="catalogRight catalogPager"><div id="pagination" class="pagination"></div><div id="pageInfo" class="pageInfo"></div></div>
+        <div id="communityGrid" class="grid"></div>
+        <div class="catalogBottom"><div id="paginationBottom" class="pagination"></div><div id="pageInfoBottom" class="pageInfo"></div></div>
+        <div class="notice" data-cs="ℹ️ Tyto projekty nejsou naše. Při instalaci se originální kód stáhne přímo od autora a pouze se vloží do formátu .scriptable; samotný kód neměníme. Před spuštěním doporučujeme otevřít původní projekt a přečíst jeho nastavení a požadavky na API." data-en="ℹ️ These projects are not ours. During installation, the original code is fetched directly from the author and only wrapped in the .scriptable format; the script code itself is not modified. Review the original project and its setup/API requirements before running third-party code.">ℹ️ Tyto projekty nejsou naše. Při instalaci se originální kód stáhne přímo od autora a pouze se vloží do formátu .scriptable; samotný kód neměníme. Před spuštěním doporučujeme otevřít původní projekt a přečíst jeho nastavení a požadavky na API.</div>
+      </section>
+    </main>
+
+    <footer class="footer">
+  <div class="wrap footer-inner">
+    <span>© <span id="year"></span> Scriptable Apps · v1.0.0</span>
+    <div class="footer-links">
+      <a href="https://caseycz.github.io/" target="_blank" rel="noopener">Website</a>
+      <a href="https://github.com/CaseyCZ/Scriptable" target="_blank" rel="noopener">GitHub · Scriptable</a>
+      <a href="credits.html">Credits</a>
+      <a href="privacy.html">Privacy &amp; Cookies</a>
+      <button class="footer-link-button" type="button" data-cookie-settings>Cookie settings</button>
+    </div>
+  </div>
+</footer>
+  </div>
+
+
+  <div id="supportModal" class="support-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="supportTitle">
+    <div class="support-dialog">
+      <button class="support-close" type="button" data-support-close aria-label="Close">×</button>
+      <div class="badge" data-cs="PODPOŘIT PROJEKT" data-en="SUPPORT THE PROJECT" data-de="PROJEKT UNTERSTÜTZEN" data-es="APOYAR EL PROYECTO" data-fr="SOUTENIR LE PROJET">PODPOŘIT PROJEKT</div>
+      <h2 id="supportTitle" data-cs="Podpoř další vývoj." data-en="Support further development." data-de="Unterstütze die weitere Entwicklung." data-es="Apoya el desarrollo futuro." data-fr="Soutenez le développement futur.">Podpoř další vývoj.</h2>
+      <p data-cs="Pokud ti Scriptable Apps šetří čas, můžeš podpořit další vývoj přes Buy Me a Coffee." data-en="If Scriptable Apps saves you time, you can support further development through Buy Me a Coffee." data-de="Wenn dir Scriptable Apps Zeit spart, kannst du die weitere Entwicklung über Buy Me a Coffee unterstützen." data-es="Si Scriptable Apps te ahorra tiempo, puedes apoyar el desarrollo futuro mediante Buy Me a Coffee." data-fr="Si Scriptable Apps vous fait gagner du temps, vous pouvez soutenir son développement via Buy Me a Coffee.">Pokud ti Scriptable Apps šetří čas, můžeš podpořit další vývoj přes Buy Me a Coffee.</p>
+      <a href="https://www.buymeacoffee.com/caseycz" target="_blank" rel="noopener"><img class="support-qr" src="https://caseycz.github.io/support-qr.svg" alt="Buy Me a Coffee QR code"></a>
+      <a class="btn primary" style="width:100%" href="https://www.buymeacoffee.com/caseycz" target="_blank" rel="noopener"><span data-cs="Otevřít Buy Me a Coffee" data-en="Open Buy Me a Coffee" data-de="Buy Me a Coffee öffnen" data-es="Abrir Buy Me a Coffee" data-fr="Ouvrir Buy Me a Coffee">Otevřít Buy Me a Coffee</span></a>
+    </div>
+  </div>
+  <script src="./site-i18n.js?v=20261009-full2"></script>
+  <script src="./community-extra.js?v=20261008-library4"></script>
+  <script src="./assets/js/index-page.js?v=20261009-i18n3"></script>
+
+  
+
+<script src="mobile-menu.js?v=20261008-mobile2"></script>
+</body>
+</html>

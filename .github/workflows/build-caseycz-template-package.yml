@@ -1,0 +1,105 @@
+name: Build CaseyCZ Template package
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/_Template/CaseyCZ Template.js'
+      - '.github/workflows/build-caseycz-template-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Validate JavaScript syntax
+        run: |
+          cp 'apps/_Template/CaseyCZ Template.js' /tmp/CaseyCZTemplate.mjs
+          node --check /tmp/CaseyCZTemplate.mjs
+
+      - name: Build template package
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          app = Path('apps/_Template')
+          src_path = app / 'CaseyCZ Template.js'
+          src = src_path.read_text(encoding='utf-8')
+
+          name_match = re.search(r'const APP_NAME\s*=\s*"([^"]+)"', src)
+          version_match = re.search(r'const APP_VERSION\s*=\s*"([^"]+)"', src)
+          assert name_match, 'APP_NAME missing'
+          assert version_match, 'APP_VERSION missing'
+
+          name = name_match.group(1)
+          version = version_match.group(1)
+          assert name == 'CaseyCZ Template', f'Unexpected template name: {name}'
+
+          package = {
+              'always_run_in_app': False,
+              'icon': {'color': 'deep-blue', 'glyph': 'magic'},
+              'name': name,
+              'script': src,
+              'share_sheet_inputs': [],
+          }
+
+          (app / 'CaseyCZ Template.scriptable').write_text(
+              json.dumps(package, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          (app / 'version.json').write_text(
+              json.dumps({'version': version}, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          print(f'Built {name} v{version}')
+          PY
+
+      - name: Validate package parity
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          app = Path('apps/_Template')
+          src = (app / 'CaseyCZ Template.js').read_text(encoding='utf-8')
+          pkg = json.loads((app / 'CaseyCZ Template.scriptable').read_text(encoding='utf-8'))
+          version = json.loads((app / 'version.json').read_text(encoding='utf-8'))['version']
+
+          vm = re.search(r'const APP_VERSION\s*=\s*"([^"]+)"', src)
+          sm = re.search(r'const SETTINGS_VERSION\s*=\s*(\d+)', src)
+          assert vm, 'APP_VERSION missing'
+          assert sm, 'SETTINGS_VERSION missing'
+          assert version == vm.group(1), 'version.json does not match APP_VERSION'
+          assert pkg['name'] == 'CaseyCZ Template'
+          assert pkg['script'] == src, '.scriptable does not contain exact template JS'
+          assert pkg['always_run_in_app'] is False
+          assert pkg['share_sheet_inputs'] == []
+          assert 'CaseyCZ.Scriptable.Backup' in src
+          assert 'SECRET_KEYS' in src
+          assert 'Cache-Control' in src and 'no-cache' in src
+          assert 'SETTINGS_VERSION' in src
+          print(f'CaseyCZ Template v{version}: syntax, package, backup and updater validated')
+          PY
+
+      - name: Commit generated template files
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add 'apps/_Template/CaseyCZ Template.scriptable' 'apps/_Template/version.json'
+          if git diff --cached --quiet; then
+            echo "Template package already synchronized"
+            exit 0
+          fi
+          git commit -m "Build CaseyCZ Template package"
+          git push origin HEAD:Master

@@ -1,0 +1,74 @@
+name: 🐞 Bug report
+description: Nahlásit reprodukovatelnou chybu / Report a reproducible bug
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: Aplikace / App
+      options:
+        - LockScreen Generator
+        - Sports Info
+        - Sports Live
+        - Web / community catalog
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: Verze aplikace / App version
+      placeholder: např. 2.9.1
+
+  - type: input
+    id: device
+    attributes:
+      label: iPhone, iOS a Scriptable
+      placeholder: např. iPhone 15 Pro Max · iOS 20.x · Scriptable ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Postup reprodukce / Steps to reproduce
+      description: Popiš přesné kroky od spuštění až k chybě.
+      placeholder: |
+        1. Otevřu ...
+        2. Zvolím ...
+        3. Zobrazí se ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Očekávané chování / Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Skutečné chování / Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logy / Screenshots
+      description: Přidej bezpečné logy nebo screenshot. Odstraň API klíče, tokeny a osobní údaje.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Kontrola / Checklist
+      options:
+        - label: Ověřil(a) jsem, že používám aktuální verzi aplikace.
+          required: true
+        - label: Issue neobsahuje API klíče, tokeny ani jiné citlivé údaje.
+          required: true
