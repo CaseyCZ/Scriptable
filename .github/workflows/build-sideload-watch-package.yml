@@ -54,8 +54,6 @@ jobs:
           replacements = [
               (r'(img\.shields\.io/badge/VERZE-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
               (r'(img\.shields\.io/badge/VERSION-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
-              (r'(Aktuální testovací verze:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
-              (r'(Current testing version:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
               (r'(alt="[^"]*\bverze )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
               (r'(alt="[^"]*\bversion )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
           ]
@@ -75,16 +73,6 @@ jobs:
               assert count == 1, f'Sideload Watch row missing: {root}'
               root.write_text(text, encoding='utf-8')
 
-          site_path = Path('index.html')
-          site = site_path.read_text(encoding='utf-8')
-          site, count = re.subn(
-              r"(\{name:'Sideload Watch',version:')[^']+(')",
-              rf'\g<1>{version}\g<2>',
-              site,
-              count=1,
-          )
-          assert count == 1, 'Sideload Watch website card missing'
-          site_path.write_text(site, encoding='utf-8')
           print(f'Sideload Watch v{version}: release metadata synchronized')
           PY
 
@@ -107,8 +95,7 @@ jobs:
           marker=f'<strong>Sideload Watch</strong></td><td><code>v{version}</code>'
           assert marker in Path('README.md').read_text(encoding='utf-8')
           assert marker in Path('README_EN.md').read_text(encoding='utf-8')
-          assert f"{{name:'Sideload Watch',version:'{version}'" in Path('index.html').read_text(encoding='utf-8')
-          print(f'Sideload Watch v{version}: package, website and CZ/EN READMEs synchronized')
+          print(f'Sideload Watch v{version}: package and CZ/EN READMEs synchronized')
           PY
 
       - name: Commit synchronized release files
@@ -118,7 +105,7 @@ jobs:
           git add \
             'apps/Sideload-Watch/Sideload Watch.js' \
             'apps/Sideload-Watch/Sideload Watch.scriptable' \
-            README.md README_EN.md index.html \
+            README.md README_EN.md \
             apps/Sideload-Watch/README.md apps/Sideload-Watch/README_EN.md \
             apps/Sideload-Watch/version.json
           if git diff --cached --quiet; then
