@@ -6,7 +6,6 @@ on:
     paths:
       - 'apps/Sideload-Watch/Sideload Watch.js'
       - '.github/scripts/build_sideload_watch_package.py'
-      - '.github/scripts/patch_sideload_watch_offline.py'
       - '.github/workflows/build-sideload-watch-package.yml'
   workflow_dispatch:
 
@@ -22,9 +21,6 @@ jobs:
         with:
           ref: Master
 
-      - name: Apply one-time offline source fix
-        run: python .github/scripts/patch_sideload_watch_offline.py
-
       - name: Validate JavaScript syntax
         run: |
           cp 'apps/Sideload-Watch/Sideload Watch.js' /tmp/SideloadWatch.mjs
@@ -33,48 +29,8 @@ jobs:
       - name: Build package
         run: python .github/scripts/build_sideload_watch_package.py
 
-      - name: Sync Sideload Watch release metadata
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import json
-          import re
-
-          app = Path('apps/Sideload-Watch')
-          src = (app / 'Sideload Watch.js').read_text(encoding='utf-8')
-          match = re.search(r'const APP_VERSION\s*=\s*"([^"]+)"', src)
-          assert match, 'APP_VERSION missing'
-          version = match.group(1)
-
-          (app / 'version.json').write_text(
-              json.dumps({'version': version}, ensure_ascii=False, indent=2) + '\n',
-              encoding='utf-8'
-          )
-
-          replacements = [
-              (r'(img\.shields\.io/badge/VERZE-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
-              (r'(img\.shields\.io/badge/VERSION-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
-              (r'(alt="[^"]*\bverze )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
-              (r'(alt="[^"]*\bversion )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
-          ]
-          for readme in [app / 'README.md', app / 'README_EN.md']:
-              text = readme.read_text(encoding='utf-8')
-              hits = 0
-              for pattern, replacement in replacements:
-                  text, count = re.subn(pattern, replacement, text, count=1)
-                  hits += count
-              assert hits > 0, f'No version marker found: {readme}'
-              readme.write_text(text, encoding='utf-8')
-
-          for root in [Path('README.md'), Path('README_EN.md')]:
-              text = root.read_text(encoding='utf-8')
-              pattern = r'(<tr><td><strong>Sideload Watch</strong></td><td><code>)([^<]+)(</code></td>)'
-              text, count = re.subn(pattern, rf'\g<1>v{version}\g<3>', text, count=1)
-              assert count == 1, f'Sideload Watch row missing: {root}'
-              root.write_text(text, encoding='utf-8')
-
-          print(f'Sideload Watch v{version}: release metadata synchronized')
-          PY
+      - name: Sync README, website and version metadata
+        run: python .github/scripts/sync_release_metadata.py
 
       - name: Validate release parity
         run: |
@@ -95,7 +51,8 @@ jobs:
           marker=f'<strong>Sideload Watch</strong></td><td><code>v{version}</code>'
           assert marker in Path('README.md').read_text(encoding='utf-8')
           assert marker in Path('README_EN.md').read_text(encoding='utf-8')
-          print(f'Sideload Watch v{version}: package and CZ/EN READMEs synchronized')
+          assert f"{{name:'Sideload Watch',version:'{version}'" in Path('index.html').read_text(encoding='utf-8')
+          print(f'Sideload Watch v{version}: package, website and CZ/EN READMEs synchronized')
           PY
 
       - name: Commit synchronized release files
@@ -103,14 +60,12 @@ jobs:
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
-            'apps/Sideload-Watch/Sideload Watch.js' \
             'apps/Sideload-Watch/Sideload Watch.scriptable' \
-            README.md README_EN.md \
-            apps/Sideload-Watch/README.md apps/Sideload-Watch/README_EN.md \
-            apps/Sideload-Watch/version.json
+            README.md README_EN.md index.html \
+            apps/*/README.md apps/*/README_EN.md apps/*/version.json
           if git diff --cached --quiet; then
             echo "Sideload Watch release surfaces already synchronized"
             exit 0
           fi
-          git commit -m "Fix offline sources in Sideload Watch"
+          git commit -m "Sync Sideload Watch release surfaces"
           git push origin HEAD:Master
