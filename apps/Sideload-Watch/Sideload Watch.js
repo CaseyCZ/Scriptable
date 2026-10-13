@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.25
+// Sideload Watch v0.2.26
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.25";
+const APP_VERSION = "0.2.26";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -407,6 +407,38 @@ function loadState(){
 }
 function saveState(s){fm.writeString(statePath,JSON.stringify(s,null,2))}
 function resetState(){try{if(fm.fileExists(statePath))fm.remove(statePath)}catch(_){}}
+function catalogWithWatchedFallback(catalog,settings){
+  const base=normalizeCatalog(catalog||{}),sources=base.sources.slice(),knownIds=new Set(sources.map(src=>String(src.id||""))),state=loadState(),groups=new Map();
+  for(const item of settings.watched||[]){
+    const id=String(item.sourceId||"").trim();
+    if(!id||knownIds.has(id))continue;
+    if(!groups.has(id))groups.set(id,[]);
+    groups.get(id).push(item)
+  }
+  for(const [id,items] of groups){
+    const known=items.map(item=>state.lastCurrent?.[watchKey(item)]).find(Boolean)||{};
+    const withURL=items.find(item=>String(item.sourceURL||"").trim());
+    const sourceURL=String(withURL?.sourceURL||known.sourceURL||"");
+    const apps=items.map(item=>{
+      const prev=state.lastCurrent?.[watchKey(item)]||{};
+      return{
+        name:item.name,
+        bundleIdentifier:item.bundleIdentifier||"",
+        version:String(prev.version||"—"),
+        iconURL:String(prev.iconURL||"")
+      }
+    });
+    sources.push({
+      id,
+      name:String(known.sourceName||id),
+      iconURL:String(known.iconURL||""),
+      sourceURL,
+      apps,
+      missing:true
+    })
+  }
+  return{...base,sources}
+}
 
 function cachedStatus(settings,error=null){
   const state=loadState(),updates=[],current=[];
@@ -1079,8 +1111,9 @@ function key(x){return [x.sourceId||'',x.bundleIdentifier||'',x.name||''].join('
 function selectedSet(){return new Set((state.watched||[]).map(key))}
 function watchedForSource(id){return(state.watched||[]).filter(x=>x.sourceId===id)}
 function sourceObj(id){return(catalog.sources||[]).find(x=>x.id===id)}
-function sourceFailed(src){return failedSourceIds.has(String(src?.id||""))}
-function updateSourceHealthUI(){const p=document.getElementById('sourceHealthPill');if(!p)return;if(sourceCacheOnly){p.hidden=false;p.textContent='⚠︎ '+${JSON.stringify('Cache')};return}const n=failedSourceIds.size;p.hidden=n===0;p.textContent=n?'⚠︎ '+n:''}
+function missingWatchedSourceIds(){return new Set((catalog.sources||[]).filter(src=>src?.missing&&watchedForSource(src.id).length>0).map(src=>String(src.id||"")).filter(Boolean))}
+function sourceFailed(src){return !!src?.missing||failedSourceIds.has(String(src?.id||""))}
+function updateSourceHealthUI(){const p=document.getElementById('sourceHealthPill');if(!p)return;if(sourceCacheOnly){p.hidden=false;p.textContent='⚠︎ '+${JSON.stringify('Cache')};return}const ids=new Set([...failedSourceIds,...missingWatchedSourceIds()]);const n=ids.size;p.hidden=n===0;p.textContent=n?'⚠︎ '+n:''}
 function refreshCounts(){
   const n=(state.watched||[]).length;
   const p=document.getElementById('watchedPill');if(p)p.textContent=n+' '+${JSON.stringify(L.selected)};
@@ -1089,7 +1122,11 @@ function appKey(src,app){return key({sourceId:src.id,bundleIdentifier:app.bundle
 function saveState(){post({action:'save',settings:state});document.getElementById('jsonBox').value=JSON.stringify(state,null,2);refreshCounts()}
 function renderSources(){
   const root=document.getElementById('sourceList'),q=norm(document.getElementById('sourceSearch').value);root.innerHTML='';
-  const rows=(catalog.sources||[]).filter(s=>!q||norm(s.name+' '+s.id).includes(q)).slice().sort((a,b)=>String(a.name||a.id||'').localeCompare(String(b.name||b.id||''),state.language||'en',{sensitivity:'base'}));
+  const rows=(catalog.sources||[]).filter(s=>{
+    const n=watchedForSource(s.id).length;
+    if(s?.missing&&!n)return false;
+    return !q||norm(s.name+' '+s.id).includes(q)
+  }).slice().sort((a,b)=>String(a.name||a.id||'').localeCompare(String(b.name||b.id||''),state.language||'en',{sensitivity:'base'}));
   if(!rows.length){root.innerHTML='<div class="empty">'+${JSON.stringify(L.none)}+'</div>';return}
   for(const src of rows){
     const n=watchedForSource(src.id).length,row=document.createElement('div');row.className='sourceRow';row.onclick=()=>openSource(src.id);
@@ -1097,7 +1134,7 @@ function renderSources(){
     const icon=document.createElement('div');icon.className='sourceIcon';icon.textContent='📦';
     const txt=document.createElement('div');txt.className='rowText';
     const title=document.createElement('div');title.className='rowTitle';title.textContent=src.name;
-    const detail=document.createElement('div');detail.className='rowDetail';detail.textContent=(src.apps||[]).length+' '+${JSON.stringify(L.apps)}+' · '+n+' '+${JSON.stringify(L.selected)};
+    const detail=document.createElement('div');detail.className='rowDetail';detail.textContent=(src.missing?${JSON.stringify(L.offline)}+' · ':'')+(src.apps||[]).length+' '+${JSON.stringify(L.apps)}+' · '+n+' '+${JSON.stringify(L.selected)};
     txt.append(title,detail);left.append(icon,txt);
     const right=document.createElement('div');right.className='navRight';
     if(sourceFailed(src)){const warn=document.createElement('span');warn.className='sourceErrorIcon';warn.textContent='⚠︎';warn.title=src.name;right.appendChild(warn)}
@@ -1236,6 +1273,7 @@ async function settings(s){
   let catalogResult;
   try{catalogResult=await fetchCatalog()}catch(e){catalogResult={data:{sources:[]},online:false,cached:false,error:String(e)}}
   s=enrichWatchedSources(s,catalogResult.data);
+  catalogResult={...catalogResult,data:catalogWithWatchedFallback(catalogResult.data,s)};
   saveSettings(s);
   const web=new WebView();await web.loadHTML(settingsHTML(s,catalogResult));
   let dismissed=false,cur=merge(s);
@@ -1259,9 +1297,10 @@ async function settings(s){
         try{await presentWidget(w,family)}finally{await send(web,{action:"previewDone"})}
       }else if(m.action==="refreshCatalog"){
         try{
-          const r=await fetchCatalog(true);catalogResult=r;
+          const r=await fetchCatalog(true);
           cur=enrichWatchedSources(cur,r.data);saveSettings(cur);
-          await send(web,{action:"catalog",catalog:r.data,online:r.online,text:tx(cur,"catalogUpdated")});
+          const mergedCatalog=catalogWithWatchedFallback(r.data,cur);catalogResult={...r,data:mergedCatalog};
+          await send(web,{action:"catalog",catalog:mergedCatalog,online:r.online,text:tx(cur,"catalogUpdated")});
           const h=await getLiveStatus(cur);await send(web,{action:"sourceHealth",failedSourceIds:h.failedSourceIds||[],cacheOnly:!!h.cacheOnly})
         }catch(e){await send(web,{action:"status",text:tx(cur,"catalogFail")})}
       }else if(m.action==="markSeen"){
