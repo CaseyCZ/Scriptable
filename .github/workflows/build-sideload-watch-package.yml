@@ -33,21 +33,60 @@ jobs:
       - name: Build package
         run: python .github/scripts/build_sideload_watch_package.py
 
-      - name: Sync README, website and version metadata
+      - name: Sync Sideload Watch release metadata
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('.github/scripts/sync_release_metadata.py')
-          s=p.read_text(encoding='utf-8')
-          old='''        if count != 1:
-            raise SystemExit(f"Website card missing: {app['name']}")'''
-          new='''        if count != 1:
-            print(f"Website card missing, skipped: {app['name']}")'''
-          if old not in s:
-              raise SystemExit('sync_release_metadata website-card guard not found')
-          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          import json
+          import re
+
+          app = Path('apps/Sideload-Watch')
+          src = (app / 'Sideload Watch.js').read_text(encoding='utf-8')
+          match = re.search(r'const APP_VERSION\s*=\s*"([^"]+)"', src)
+          assert match, 'APP_VERSION missing'
+          version = match.group(1)
+
+          (app / 'version.json').write_text(
+              json.dumps({'version': version}, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+
+          replacements = [
+              (r'(img\.shields\.io/badge/VERZE-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
+              (r'(img\.shields\.io/badge/VERSION-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
+              (r'(Aktuální testovací verze:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
+              (r'(Current testing version:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
+              (r'(alt="[^"]*\bverze )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
+              (r'(alt="[^"]*\bversion )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
+          ]
+          for readme in [app / 'README.md', app / 'README_EN.md']:
+              text = readme.read_text(encoding='utf-8')
+              hits = 0
+              for pattern, replacement in replacements:
+                  text, count = re.subn(pattern, replacement, text, count=1)
+                  hits += count
+              assert hits > 0, f'No version marker found: {readme}'
+              readme.write_text(text, encoding='utf-8')
+
+          for root in [Path('README.md'), Path('README_EN.md')]:
+              text = root.read_text(encoding='utf-8')
+              pattern = r'(<tr><td><strong>Sideload Watch</strong></td><td><code>)([^<]+)(</code></td>)'
+              text, count = re.subn(pattern, rf'\g<1>v{version}\g<3>', text, count=1)
+              assert count == 1, f'Sideload Watch row missing: {root}'
+              root.write_text(text, encoding='utf-8')
+
+          site_path = Path('index.html')
+          site = site_path.read_text(encoding='utf-8')
+          site, count = re.subn(
+              r"(\{name:'Sideload Watch',version:')[^']+(')",
+              rf'\g<1>{version}\g<2>',
+              site,
+              count=1,
+          )
+          assert count == 1, 'Sideload Watch website card missing'
+          site_path.write_text(site, encoding='utf-8')
+          print(f'Sideload Watch v{version}: release metadata synchronized')
           PY
-          python .github/scripts/sync_release_metadata.py
 
       - name: Validate release parity
         run: |
@@ -80,7 +119,8 @@ jobs:
             'apps/Sideload-Watch/Sideload Watch.js' \
             'apps/Sideload-Watch/Sideload Watch.scriptable' \
             README.md README_EN.md index.html \
-            apps/*/README.md apps/*/README_EN.md apps/*/version.json
+            apps/Sideload-Watch/README.md apps/Sideload-Watch/README_EN.md \
+            apps/Sideload-Watch/version.json
           if git diff --cached --quiet; then
             echo "Sideload Watch release surfaces already synchronized"
             exit 0
