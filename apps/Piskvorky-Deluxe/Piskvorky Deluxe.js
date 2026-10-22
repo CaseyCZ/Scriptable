@@ -2,8 +2,96 @@
 // Původní Piškvorky_Scriptable.js zůstávají beze změny.
 // Offline hra, AI, zvuk, animace, nastavení a ukládání do Keychain.
 
-const APP_VERSION = "1.0.0"
+const APP_NAME = "Piškvorky Deluxe"
+const APP_VERSION = "1.1.0"
+const UPDATE_VERSION_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Piskvorky-Deluxe/version.json"
+const UPDATE_SOURCE_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Piskvorky-Deluxe/Piskvorky%20Deluxe.js"
 const SAVE_KEY = "piskvorky_deluxe_v1"
+
+function compareVersions(a, b) {
+  const aa = a.split(".").map(Number), bb = b.split(".").map(Number)
+  for (let i = 0; i < 3; i++) {
+    if (aa[i] > bb[i]) return 1
+    if (aa[i] < bb[i]) return -1
+  }
+  return 0
+}
+
+async function checkUpdatesAtLaunch() {
+  const fallback = { updated: false, text: "Kontrola aktualizací není dostupná (offline)" }
+  try {
+    const req = new Request(UPDATE_VERSION_URL + "?t=" + Date.now())
+    req.timeoutInterval = 5
+    const info = await req.loadJSON()
+    const latest = info && info.version
+    if (typeof latest !== "string" || !/^\d+\.\d+\.\d+$/.test(latest)) throw new Error("Neplatná verze")
+    if (compareVersions(latest, APP_VERSION) <= 0) return { updated: false, text: "Používáš aktuální verzi" }
+
+    const ask = new Alert()
+    ask.title = "🎮 " + APP_NAME
+    ask.message = "Je dostupná nová verze v" + latest + " (máš v" + APP_VERSION + "). Chceš ji nainstalovat?"
+    ask.addAction("Aktualizovat")
+    ask.addCancelAction("Později")
+    if (await ask.presentAlert() !== 0) return { updated: false, text: "Nová verze v" + latest + " je dostupná" }
+
+    try {
+      const download = new Request(UPDATE_SOURCE_URL + "?t=" + Date.now())
+      download.timeoutInterval = 15
+      const source = await download.loadString()
+      const found = typeof source === "string" && source.match(/const APP_VERSION\s*=\s*"(\d+\.\d+\.\d+)"/)
+      if (!source || source.length < 27000 || !found || found[1] !== latest ||
+          !source.includes('const SAVE_KEY = "piskvorky_deluxe_v1"') || !source.includes("new WebView()")) {
+        throw new Error("Stažený soubor není platná verze Piškvorek Deluxe")
+      }
+
+      const target = typeof module !== "undefined" ? module.filename : null
+      if (!target || !/\.js$/i.test(target)) throw new Error("Nelze určit cestu ke skriptu")
+      let cloud = null
+      try { cloud = FileManager.iCloud() } catch (_) {}
+      const local = FileManager.local()
+      let fm = null
+      if (cloud && cloud.fileExists(target)) {
+        fm = cloud
+        if (!cloud.isFileDownloaded(target)) await cloud.downloadFileFromiCloud(target)
+      } else if (local.fileExists(target)) fm = local
+      if (!fm) throw new Error("Současný skript nebyl nalezen")
+
+      const original = fm.readString(target)
+      if (!original || original.length < 20000) throw new Error("Současný skript nelze zálohovat")
+      const backup = target.replace(/\.js$/i, "_backup_v" + APP_VERSION + "_" + Date.now() + ".js")
+      fm.writeString(backup, original)
+      if (!fm.fileExists(backup) || fm.readString(backup) !== original) throw new Error("Záloha se nezdařila")
+      try {
+        fm.writeString(target, source)
+        if (fm.readString(target) !== source) throw new Error("Nová verze se nezapsala správně")
+      } catch (writeError) {
+        try { fm.writeString(target, original) } catch (_) {}
+        throw writeError
+      }
+      return { updated: true, text: "Aktualizováno na v" + latest }
+    } catch (error) {
+      console.warn("Aktualizace: " + error)
+      const warning = new Alert()
+      warning.title = "Aktualizace se nezdařila"
+      warning.message = String(error)
+      warning.addAction("OK")
+      await warning.presentAlert()
+      return { updated: false, text: "Aktualizace se nezdařila" }
+    }
+  } catch (error) {
+    console.warn("Kontrola verze: " + error)
+    return fallback
+  }
+}
+
+const updateResult = await checkUpdatesAtLaunch()
+if (updateResult.updated) {
+  const done = new Alert()
+  done.title = "✅ Aktualizace dokončena"
+  done.message = updateResult.text + ". Zavři toto okno a spusť Piškvorky znovu. Původní skript máš zálohovaný."
+  done.addAction("OK")
+  await done.presentAlert()
+} else {
 const defaults = {
   mode: "ai", difficulty: "medium", size: "medium", theme: "violet",
   icons: ["🦁", "🐶"], emptyIcon: "", sound: true, starts: 1,
@@ -115,6 +203,14 @@ const html = String.raw`<!doctype html>
     padding:24px 22px calc(env(safe-area-inset-bottom) + 25px); }
   .panelhead {display:flex;align-items:center;justify-content:space-between;}
   .panelhead h2 {margin:0;font-size:23px;}
+  .app-about {display:flex;align-items:center;gap:13px;padding:14px;margin-top:18px;
+    border:1px solid #ffffff24;border-radius:17px;background:linear-gradient(125deg,#39345b,#1c2138);}
+  .app-logo {width:57px;height:57px;flex-shrink:0;display:grid;place-items:center;
+    font-size:31px;border-radius:17px;background:linear-gradient(135deg,#a78bfa,#5b5dc9);
+    box-shadow:0 8px 18px #0006;}
+  .app-about strong {display:block;font-size:16px;margin-bottom:4px;}
+  .app-about .version {font-size:12px;color:#ded4ff;font-weight:800;}
+  .app-about .update-note {font-size:11px;color:#aeb4ce;margin-top:3px;line-height:1.4;}
   .close {width:35px;height:35px;border:0;border-radius:50%;background:#ffffff16;color:white;font-size:20px;}
   .setting {margin-top:21px;}
   .setting label {display:block;color:#bcc0d6;font-size:12px;font-weight:800;margin-bottom:10px;}
@@ -179,6 +275,7 @@ const html = String.raw`<!doctype html>
 <div id="overlay" class="overlay" hidden>
  <section class="panel" role="dialog" aria-modal="true" aria-label="Nastavení hry">
   <div class="panelhead"><h2>⚙️ Nastavení</h2><button class="close" id="closeSettings" aria-label="Zavřít">×</button></div>
+  <div class="app-about"><div class="app-logo" aria-hidden="true">🎮</div><div><strong>Piškvorky Deluxe</strong><div id="appVersion" class="version"></div><div id="updateStatus" class="update-note"></div></div></div>
   <div class="setting"><label>PROFILY HRÁČŮ</label>
    <div class="profile"><div class="profilehead"><button type="button" class="avatar outline" id="icon1" aria-label="Změnit ikonu hráče 1">🦁</button><input id="name1" maxlength="18" placeholder="Jméno hráče 1" aria-label="Jméno hráče 1"></div><div class="colors" id="colors1" aria-label="Barva hráče 1"></div><div class="stats" id="stats1"></div></div>
    <div class="profile"><div class="profilehead"><button type="button" class="avatar outline" id="icon2" aria-label="Změnit ikonu hráče 2">🐶</button><input id="name2" maxlength="18" placeholder="Jméno hráče 2" aria-label="Jméno hráče 2"></div><div class="colors" id="colors2" aria-label="Barva hráče 2"></div><div class="stats" id="stats2"></div></div>
@@ -198,6 +295,8 @@ const html = String.raw`<!doctype html>
 
 <script>
 const ICONS = ["🦁","🐶","🐱","🐼","🦊","🐸","🐵","🐯","🦄","🐲","🐙","🦋","❌","⭕","⭐️","🔥","❤️","💙"];
+const APP_VERSION_LABEL = __APP_VERSION__;
+const UPDATE_STATUS_LABEL = __UPDATE_STATUS__;
 const COLORS = {purple:"#a78bfa",cyan:"#67e8f9",pink:"#f9a8d4",orange:"#fdba74",lime:"#bef264"};
 const COLOR_NAMES = {purple:"Fialová",cyan:"Tyrkysová",pink:"Růžová",orange:"Oranžová",lime:"Zelená"};
 const defaults = {
@@ -382,6 +481,8 @@ function profileStats(player) {
 }
 function render() {
   const r=outcome(state.board), s=state.scores[state.mode];
+  el("appVersion").textContent="Verze v"+APP_VERSION_LABEL;
+  el("updateStatus").textContent=UPDATE_STATUS_LABEL;
   document.body.dataset.theme=state.theme;
   el("board").dataset.size=state.size;
   el("humanMode").classList.toggle("active",state.mode === "human");
@@ -482,7 +583,10 @@ render();scheduleAI();
 
 const view = new WebView()
 const initialJSON = JSON.stringify(initial).replace(/</g, "\\u003c")
-await view.loadHTML(html.replace("__INITIAL_STATE__", initialJSON))
+const versionJSON = JSON.stringify(APP_VERSION)
+const updateJSON = JSON.stringify(updateResult.text).replace(/</g, "\\u003c")
+await view.loadHTML(html.replace("__INITIAL_STATE__", initialJSON)
+  .replace("__APP_VERSION__", versionJSON).replace("__UPDATE_STATUS__", updateJSON))
 
 // Zobrazení ponecháme na Scriptable, bez souběžného volání JavaScript bridge.
 await view.present(true)
@@ -491,4 +595,5 @@ try {
   const finalState = await view.evaluateJavaScript("JSON.stringify(state)")
   if (typeof finalState === "string") Keychain.set(SAVE_KEY, finalState)
 } catch (_) {}
+}
 Script.complete()

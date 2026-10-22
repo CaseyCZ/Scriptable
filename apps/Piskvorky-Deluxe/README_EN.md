@@ -2,7 +2,7 @@
 
 An offline 3 × 3 tic-tac-toe game for iPhone, designed for **Scriptable**.
 
-![Version](https://img.shields.io/badge/version-1.0.0-38BDF8)
+![Version](https://img.shields.io/badge/version-1.1.0-38BDF8)
 
 **[Čeština](README.md)**
 
@@ -23,9 +23,17 @@ A [.scriptable package](./Piskvorky%20Deluxe.scriptable) is also available. If i
 - 🏆 Separate results per game mode and an option to reset scores.
 - 🎉 Winning-line highlight, victory banner and confetti.
 - 🔊 Optional game sounds.
-- 🔒 Fully offline, without accounts or external APIs. Scriptable stores settings and results locally.
+- 🔒 Offline gameplay, without accounts or game APIs. Internet is used only for optional update checks; results remain local.
 
 Open **⚙️ Settings** to find the difficulty, sound, appearance and player profiles. When iOS Reduce Motion is enabled, moving celebrations are suppressed but the win banner remains visible.
+
+## Updates
+
+Since **v1.1.0**, the game checks GitHub `version.json` on launch. When a newer version is available, it asks before installing. It downloads and validates the script, creates a backup of the existing `.js` file, then replaces it. Relaunch the game after updating.
+
+The **⚙️ Settings** page shows the app icon, installed version and latest update-check result. Offline gameplay remains available when the version check cannot connect.
+
+Users on v1.0.0 must install v1.1.0 manually once to enable future update checks.
 
 ## Notes
 

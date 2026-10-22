@@ -2,7 +2,7 @@
 
 Offline piškvorky 3 × 3 pro iPhone, vytvořené pro aplikaci **Scriptable**.
 
-![Verze](https://img.shields.io/badge/verze-1.0.0-38BDF8)
+![Verze](https://img.shields.io/badge/verze-1.1.0-38BDF8)
 
 **[English](README_EN.md)**
 
@@ -23,9 +23,17 @@ K dispozici je také [balíček .scriptable](./Piskvorky%20Deluxe.scriptable). P
 - 🏆 Počítání výher, proher a remíz v obou režimech; možnost výsledky vynulovat.
 - 🎉 Zvýraznění vítězné trojice, vítězný banner a konfety.
 - 🔊 Volitelné herní zvuky.
-- 🔒 Offline provoz bez účtů a externích API. Nastavení a výsledky ukládá Scriptable lokálně.
+- 🔒 Hraní offline bez účtů a herních API. Internet se používá jen pro volitelnou kontrolu aktualizací; výsledky zůstávají lokálně.
 
 Všechna herní nastavení včetně obtížnosti a zvuků najdeš pod ikonou **⚙️**. Pokud je v iOS zapnuto „Omezit pohyb“, pohyblivé oslavy se nespustí, ale vítězný banner se zobrazí.
+
+## Aktualizace
+
+Od verze **1.1.0** aplikace při každém spuštění ověří `version.json` na GitHubu. Pokud je dostupná novější verze, nabídne její instalaci; bez potvrzení nic nepřepisuje. Před nahrazením souboru `.js` vytvoří zálohu původní verze. Po aktualizaci je nutné aplikaci spustit znovu.
+
+V **⚙️ Nastavení** se zobrazuje ikona aplikace, aktuální číslo verze a výsledek poslední kontroly. Hra funguje i bez internetu; v takovém případě se pouze přeskočí kontrola aktualizací.
+
+Uživatelé verze 1.0.0 musí verzi 1.1.0 jednou nainstalovat ručně. Teprve od ní se aktualizace nabízejí při spuštění.
 
 ## Poznámky
 

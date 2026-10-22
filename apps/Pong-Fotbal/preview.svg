@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-label="Pong Fotbal">
+  <defs><linearGradient id="grass" x2="1" y2="1"><stop stop-color="#126f4c"/><stop offset="1" stop-color="#0c4935"/></linearGradient></defs>
+  <rect width="760" height="420" rx="28" fill="#081b24"/><rect x="70" y="65" width="620" height="320" rx="16" fill="url(#grass)" stroke="#9fe3ba" stroke-width="3"/>
+  <g fill="#ffffff0c"><rect x="70" y="65" width="124" height="320"/><rect x="318" y="65" width="124" height="320"/><rect x="566" y="65" width="124" height="320"/></g>
+  <g stroke="#d8fff2a0" fill="none" stroke-width="4"><rect x="92" y="85" width="576" height="280"/><path d="M380 85 V365"/><circle cx="380" cy="225" r="77"/><path d="M92 160 H162 V290 H92 M668 160 H598 V290 H668"/></g>
+  <rect x="109" y="160" width="20" height="91" rx="10" fill="#56caff"/><rect x="631" y="206" width="20" height="91" rx="10" fill="#ff897c"/>
+  <circle cx="444" cy="255" r="14" fill="#fff"/><circle cx="444" cy="255" r="5" fill="#1b3444"/>
+  <rect x="275" y="10" width="210" height="53" rx="16" fill="#123748" stroke="#4c8e86"/><text x="380" y="46" font-family="-apple-system,Arial,sans-serif" fill="#fff" text-anchor="middle" font-size="24" font-weight="850">⚽ PONG FOTBAL</text>
+</svg>
