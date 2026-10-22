@@ -11,10 +11,10 @@ An offline football-style Pong game for **Scriptable** on iPhone and iPad.
 - Three pitch themes: Stadium / Night / Classic.
 - Offline play and optional startup version check, with backup before updating.
 
-## Installation
+Settings now includes the app version and manual update check.\n\n## Installation
 
 Import [Pong Fotbal.scriptable](./Pong%20Fotbal.scriptable) into Scriptable or copy [Pong Fotbal.js](./Pong%20Fotbal.js) to the iCloud Drive Scriptable folder.
 
-Left player: touch/drag on the left half. Right player: touch/drag on the right half. Keyboard: W/S and arrow keys; Space to serve.
+Portrait gameplay: blue paddle at the bottom, red at the top. Each player controls their half with horizontal drags. Keyboard: A/D (blue), Left/Right (red); Space to serve.
 
-Version **1.0.0**.
+Version **1.1.0**.

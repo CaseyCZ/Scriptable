@@ -5,7 +5,7 @@
 // 1 hráč vs. počítač nebo 2 hráči na jednom displeji (multitouch).
 
 const APP_NAME = "Pong Fotbal"
-const APP_VERSION = "1.0.0"
+const APP_VERSION = "1.1.0"
 const SAVE_KEY = "pong_fotbal_v1"
 const VERSION_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Pong-Fotbal/version.json"
 const SCRIPT_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Pong-Fotbal/Pong%20Fotbal.js"
@@ -110,7 +110,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .choice.active{background:#185f72;border-color:#6fe5cf;box-shadow:inset 0 0 0 1px #6fe5cf66}
 .settingrow{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:16px}.toggle{border:1px solid #507584;background:#2b4a57;padding:8px 12px;border-radius:10px;font-weight:800;min-width:70px}.toggle.on{color:#a0ffdb;border-color:#4b9c82;background:#205b52}
 .statline{margin-top:15px;padding-top:14px;border-top:1px solid #36576a;display:flex;justify-content:space-between;font-size:13px;color:#bcd3df}.danger{width:100%;margin-top:13px;border:1px solid #a5686b;background:#51333d;color:#ffd1d8;padding:11px;border-radius:11px;font-weight:800}
-.version{text-align:center;font-size:11px;color:#90acbb;margin:14px 0 0}
+.version{text-align:center;font-size:11px;color:#90acbb;margin:14px 0 0}.updatestatus{margin:11px 0;color:#9ce0c9;font-size:11px;line-height:1.45;text-align:center}.updatecheck{width:100%;margin-top:9px}
 @media(max-height:680px){.app{gap:6px}.scoreboard{padding:5px}.score{font-size:23px}.hint{display:none}}
 </style></head><body>
 <main class="app">
@@ -118,10 +118,10 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
   <section class="scoreboard"><div class="team"><span class="teamname">🔵 MODŘÍ</span><span id="scoreL" class="score leftscore">0</span></div><div class="dash">:</div><div class="team"><span id="rightName" class="teamname">🔴 POČÍTAČ</span><span id="scoreR" class="score rightscore">0</span></div></section>
   <div class="minor" id="matchInfo">Hraje se do 5 gólů</div>
   <div class="gamearea"><div class="pitch"><canvas id="field" width="360" height="530" aria-label="Fotbalový Pong"></canvas>
-    <div id="overlay" class="overlay"><div class="card"><div id="overlayIcon" class="big">⚽</div><h2 id="overlayTitle">Připraven?</h2><p id="overlayText">Levá strana ovládá modrou pálku. Vpravo hraje počítač.</p><button id="overlayButton" class="primary">Výkop!</button></div></div>
+    <div id="overlay" class="overlay"><div class="card"><div id="overlayIcon" class="big">⚽</div><h2 id="overlayTitle">Připraven?</h2><p id="overlayText">Modří jsou dole, červení nahoře. Pálku posouváš vodorovně.</p><button id="overlayButton" class="primary">Výkop!</button></div></div>
   </div></div>
   <div class="buttons"><button id="pauseBtn" class="secondary">⏸ Pauza</button><button id="newBtn" class="primary">↻ Nový zápas</button></div>
-  <p id="hint" class="hint">👆 Tažením po levé části hřiště ovládáš modré</p>
+  <p id="hint" class="hint">👆 Tažením po spodní části hřiště ovládáš modré</p>
 </main>
 <div id="settingsModal" class="modalback" hidden><section class="settings" role="dialog" aria-label="Nastavení" aria-modal="true">
   <div class="modalhead"><h2>⚙️ Nastavení</h2><button class="smallx" id="closeSettings" aria-label="Zavřít">✕</button></div>
@@ -140,21 +140,21 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
   <div class="settingrow"><span class="settinglabel">Zvuky</span><button class="toggle" id="soundBtn">Zapnuto</button></div>
   <div class="statline"><span>Vítězství 🔵 / 🔴</span><b id="winStats">0 / 0</b></div>
   <button class="danger" id="resetStats">Vynulovat výsledky</button>
-  <p class="version">⚽ Pong Fotbal · verze __APP_VERSION__ · offline hra</p>
+  <p class="version">⚽ Pong Fotbal · verze __APP_VERSION__</p><p class="updatestatus" id="updateStatus">Kontrola verze probíhá při spuštění.</p><button id="checkUpdatesBtn" class="choice updatecheck">🔄 Zkontrolovat aktualizace</button>
 </section></div>
 <script>
 "use strict";
 const saveKey="pong_fotbal_v1", previous=__INITIAL_STATE__;
 const config={mode:previous.mode==="human"?"human":"ai",difficulty:["easy","normal","hard"].includes(previous.difficulty)?previous.difficulty:"normal",target:[3,5,10].includes(Number(previous.target))?Number(previous.target):5,theme:["stadium","night","classic"].includes(previous.theme)?previous.theme:"stadium",sound:previous.sound!==false,wins:Array.isArray(previous.wins)&&previous.wins.length===2?previous.wins.map(x=>Math.max(0,Number(x)||0)):[0,0],games:Math.max(0,Number(previous.games)||0)};
 const state=config;
-const el=id=>document.getElementById(id),cv=el("field"),g=cv.getContext("2d"),W=360,H=530;
+const el=id=>document.getElementById(id),cv=el("field"),g=cv.getContext("2d"),W=530,H=360;
 const palettes={
  stadium:{grass:["#126b42","#0b5837"],lines:"#c6ffdb91",left:"#48cfff",right:"#ff8576",ball:"#fff"},
  night:{grass:["#0b2940","#10253c"],lines:"#7bb4ce80",left:"#6ccfff",right:"#ff8aab",ball:"#fff"},
  classic:{grass:["#eeeeee","#e1e6e5"],lines:"#4b565b72",left:"#1d9da7",right:"#e24d4b",ball:"#fff"}
 };
 const AI={easy:{speed:155,delay:.3,error:32},normal:{speed:247,delay:.14,error:15},hard:{speed:355,delay:.055,error:5}};
-const PAD_H=82,PAD_W=12,PAD_OFFSET=19,R=8;
+const PAD_H=85,PAD_W=12,PAD_OFFSET=19,R=8;
 let left={y:H/2},right={y:H/2},ball={x:W/2,y:H/2,vx:0,vy:0},scoreL=0,scoreR=0;
 let phase="ready",serveToward=1,lastFrame=0,particles=[],trail=[],audio=null,aiTime=0,aiAim=H/2;
 let confirmReset=false,controls=new Map(),keyUp=false,keyDown=false,keyW=false,keyS=false;
@@ -163,13 +163,13 @@ function save(){try{localStorage.setItem(saveKey,JSON.stringify(config))}catch(_
 try{const p=JSON.parse(localStorage.getItem(saveKey)||"null");if(p&&Array.isArray(p.wins)) config.wins=config.wins.map((w,i)=>Math.max(w,Number(p.wins[i])||0))}catch(_){}
 function chirp(f,d=85,type="sine",gain=.036){if(!config.sound)return;try{if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume().catch(()=>{});const a=audio.createOscillator(),v=audio.createGain(),t=audio.currentTime;a.frequency.value=f;a.type=type;v.gain.setValueAtTime(gain,t);v.gain.exponentialRampToValueAtTime(.001,t+d/1000);a.connect(v);v.connect(audio.destination);a.start();a.stop(t+d/1000)}catch(_){}}
 function confetti(x,y,color,count=20){for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,sp=40+Math.random()*150;particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.5+Math.random()*.7,color,size:2+Math.random()*3})}if(particles.length>260)particles.splice(0,particles.length-260)}
-function updateHUD(){el("scoreL").textContent=scoreL;el("scoreR").textContent=scoreR;el("rightName").textContent=config.mode==="ai"?"🔴 POČÍTAČ":"🔴 HRÁČ 2";el("matchInfo").textContent="Hraje se do "+config.target+" gólů";el("hint").textContent=config.mode==="ai"?"👆 Tažením po levé části hřiště ovládáš modré":"👥 Každý hráč ovládá dotykem svou polovinu hřiště";el("pauseBtn").textContent=phase==="playing"?"⏸ Pauza":"▶ Pokračovat";el("winStats").textContent=config.wins[0]+" / "+config.wins[1]}
+function updateHUD(){el("scoreL").textContent=scoreL;el("scoreR").textContent=scoreR;el("rightName").textContent=config.mode==="ai"?"🔴 POČÍTAČ":"🔴 HRÁČ 2";el("matchInfo").textContent="Hraje se do "+config.target+" gólů";el("hint").textContent=config.mode==="ai"?"👆 Tažením po levé části hřiště ovládáš modré":"👥 Modří dole, červení nahoře – každý svou polovinu";el("pauseBtn").textContent=phase==="playing"?"⏸ Pauza":"▶ Pokračovat";el("winStats").textContent=config.wins[0]+" / "+config.wins[1]}
 function show(icon,title,message,btn){el("overlayIcon").textContent=icon;el("overlayTitle").textContent=title;el("overlayText").textContent=message;el("overlayButton").textContent=btn;el("overlay").hidden=false}
 function hide(){el("overlay").hidden=true}
 function phaseTo(p){phase=p;updateHUD()}
 function park(){ball.x=W/2;ball.y=H/2;ball.vx=0;ball.vy=0;trail=[]}
-function match(){scoreL=0;scoreR=0;left.y=H/2;right.y=H/2;particles=[];controls.clear();serveToward=Math.random()<.5?-1:1;park();phaseTo("ready");show("⚽","Připraveni?",config.mode==="ai"?"Hraješ za modré proti počítači. První na "+config.target+" gólů vyhrává.":"Hrajete na jednom displeji. Každý posouvá svoji pálku prstem. První na "+config.target+" gólů vyhrává.","Výkop!");config.games++;save()}
-function kick(){if(phase!=="ready")return;const speed=245,spread=(Math.random()-.5)*.8;ball.vx=serveToward*speed*Math.cos(spread);ball.vy=speed*Math.sin(spread);if(Math.abs(ball.vy)<45)ball.vy=45*(Math.random()<.5?-1:1);hide();phaseTo("playing");chirp(620,100)}
+function match(){scoreL=0;scoreR=0;left.y=H/2;right.y=H/2;particles=[];controls.clear();serveToward=Math.random()<.5?-1:1;park();phaseTo("ready");show("⚽","Připraveni?",config.mode==="ai"?"Hraješ dole za modré, počítač je nahoře. První na "+config.target+" gólů vyhrává.":"Modří jsou dole, červení nahoře. Pálky posouváte vodorovně. První na "+config.target+" gólů vyhrává.","Výkop!");config.games++;save()}
+function kick(){if(phase!=="ready")return;const speed=295,spread=(Math.random()-.5)*.8;ball.vx=serveToward*speed*Math.cos(spread);ball.vy=speed*Math.sin(spread);if(Math.abs(ball.vy)<45)ball.vy=45*(Math.random()<.5?-1:1);hide();phaseTo("playing");chirp(620,100)}
 function togglePause(){if(phase==="playing"){phaseTo("paused");show("⏸","Pauza","Zápas je pozastavený.","Pokračovat")}else if(phase==="paused"){phaseTo("playing");hide();lastFrame=performance.now()}else if(phase==="ready")kick()}
 function mainButton(){if(phase==="ready")kick();else if(phase==="paused")togglePause();else if(phase==="finished")match()}
 function goal(scorer){if(phase!=="playing")return;if(scorer===0)scoreL++;else scoreR++;serveToward=scorer===0?1:-1;chirp(scorer===0?780:320,230,"triangle",.055);confetti(scorer===0?W-15:15,H/2,scorer===0?"#4ad6ff":"#ff9a7a",36);park();if(scoreL>=config.target||scoreR>=config.target){phaseTo("finished");config.wins[scoreL>scoreR?0:1]++;save();show("🏆",scoreL>scoreR?"Vyhráli modří!":"Vyhráli červení!","Konečný výsledek "+scoreL+" : "+scoreR+". Zahraješ si odvetu?","Odveta")}else{phaseTo("ready");show("⚽",scorer===0?"Gól modrých!":"Gól červených!","Stav zápasu: "+scoreL+" : "+scoreR,"Další výkop")}}
@@ -184,7 +184,7 @@ function physics(dt){if(phase!=="playing")return;aiStep(dt);if(keyW)left.y-=290*
 }
 function bounce(dir,mid,correctX){const power=clamp((ball.y-mid)/(PAD_H/2),-1,1),speed=clamp(Math.hypot(ball.vx,ball.vy)*1.05,245,535);ball.x=correctX;ball.vx=dir*Math.max(speed*.50,Math.cos(power*.95)*speed);ball.vy=Math.sin(power*.95)*speed;if(Math.abs(ball.vy)<30)ball.vy=30*(Math.random()<.5?-1:1);chirp(dir===1?420:520,75,"triangle")}
 function roundRect(x,y,w,h,r,color){g.fillStyle=color;g.beginPath();g.roundRect(x,y,w,h,r);g.fill()}
-function render(t){const p=palettes[config.theme];g.fillStyle=p.grass[0];g.fillRect(0,0,W,H);for(let i=0;i<10;i++){g.fillStyle=p.grass[i%2];g.fillRect(i*W/10,0,W/10,H)}
+function render(t){g.setTransform(0,-1,1,0,0,W);const p=palettes[config.theme];g.fillStyle=p.grass[0];g.fillRect(0,0,W,H);for(let i=0;i<10;i++){g.fillStyle=p.grass[i%2];g.fillRect(i*W/10,0,W/10,H)}
  g.strokeStyle=p.lines;g.lineWidth=2.2;g.strokeRect(9,8,W-18,H-16);g.beginPath();g.moveTo(W/2,9);g.lineTo(W/2,H-9);g.stroke();g.beginPath();g.arc(W/2,H/2,52,0,Math.PI*2);g.stroke();
  g.strokeRect(9,H/2-92,44,184);g.strokeRect(W-53,H/2-92,44,184);g.strokeRect(9,H/2-45,15,90);g.strokeRect(W-24,H/2-45,15,90);
  g.beginPath();g.arc(W/2,H/2,3.3,0,Math.PI*2);g.fillStyle=p.lines;g.fill();
@@ -194,17 +194,17 @@ function render(t){const p=palettes[config.theme];g.fillStyle=p.grass[0];g.fillR
  g.shadowColor="#0009";g.shadowBlur=7;g.fillStyle="#fff";g.beginPath();g.arc(ball.x,ball.y,R,0,Math.PI*2);g.fill();g.shadowBlur=0;g.fillStyle="#172a35";g.beginPath();g.arc(ball.x,ball.y,R*.35,0,Math.PI*2);g.fill();for(let i=0;i<5;i++){const a=i*Math.PI*2/5;g.beginPath();g.arc(ball.x+Math.cos(a)*R*.7,ball.y+Math.sin(a)*R*.7,1.15,0,Math.PI*2);g.fill()}
 }
 function frame(ts){let dt=lastFrame?Math.min((ts-lastFrame)/1000,.035):0;lastFrame=ts;if(phase==="playing"){const count=Math.max(1,Math.ceil(dt/.005));for(let i=0;i<count;i++)physics(dt/count);trail.unshift({x:ball.x,y:ball.y,life:1});if(trail.length>9)trail.pop()}for(const q of particles){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=100*dt;q.life-=dt*1.5}particles=particles.filter(x=>x.life>0);for(const dot of trail)dot.life-=dt*3;trail=trail.filter(x=>x.life>0);render(ts);requestAnimationFrame(frame)}
-function touchY(t){const r=cv.getBoundingClientRect();return clamp((t.clientY-r.top)/r.height*H,PAD_H/2+7,H-PAD_H/2-7)}
-function touchSide(t){const r=cv.getBoundingClientRect();return (t.clientX-r.left)<r.width/2?0:1}
+function touchY(t){const r=cv.getBoundingClientRect();return clamp((t.clientX-r.left)/r.width*H,PAD_H/2+7,H-PAD_H/2-7)}
+function touchSide(t){const r=cv.getBoundingClientRect();return (t.clientY-r.top)>r.height/2?0:1}
 function updateTouch(t,side){if(side===0)left.y=touchY(t);else if(config.mode==="human")right.y=touchY(t)}
 cv.addEventListener("touchstart",e=>{e.preventDefault();for(const t of e.changedTouches){const side=touchSide(t);if(config.mode==="ai"&&side===1)continue;controls.set(t.identifier,side);updateTouch(t,side)}if(phase==="ready"&&el("overlay").hidden)kick()},{passive:false});
 cv.addEventListener("touchmove",e=>{e.preventDefault();for(const t of e.changedTouches){if(controls.has(t.identifier))updateTouch(t,controls.get(t.identifier))}},{passive:false});
 const endTouches=e=>{for(const t of e.changedTouches)controls.delete(t.identifier)};
 cv.addEventListener("touchend",endTouches);cv.addEventListener("touchcancel",endTouches);
 // Myš a stylus pro iPad / počítač; na dotykovém iPhonu se používá touch výše.
-cv.addEventListener("pointermove",e=>{if(e.pointerType==="touch")return;const r=cv.getBoundingClientRect(),side=e.clientX-r.left<r.width/2?0:1;updateTouch(e,side)});
-document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k==="w")keyW=true;if(k==="s")keyS=true;if(k==="arrowup")keyUp=true;if(k==="arrowdown")keyDown=true;if(k===" "||k==="enter"){e.preventDefault();mainButton()}if(k==="p"||k==="escape"){e.preventDefault();togglePause()}});
-document.addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(k==="w")keyW=false;if(k==="s")keyS=false;if(k==="arrowup")keyUp=false;if(k==="arrowdown")keyDown=false});
+cv.addEventListener("pointermove",e=>{if(e.pointerType==="touch")return;const r=cv.getBoundingClientRect(),side=e.clientY-r.top>r.height/2?0:1;updateTouch(e,side)});
+document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k==="a")keyW=true;if(k==="d")keyS=true;if(k==="arrowleft")keyUp=true;if(k==="arrowright")keyDown=true;if(k===" "||k==="enter"){e.preventDefault();mainButton()}if(k==="p"||k==="escape"){e.preventDefault();togglePause()}});
+document.addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(k==="a")keyW=false;if(k==="d")keyS=false;if(k==="arrowleft")keyUp=false;if(k==="arrowright")keyDown=false});
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&phase==="playing")togglePause()});
 el("pauseBtn").addEventListener("click",togglePause);el("newBtn").addEventListener("click",match);el("overlayButton").addEventListener("click",mainButton);
 function settingsUI(){for(const b of document.querySelectorAll("[data-mode]"))b.classList.toggle("active",b.dataset.mode===config.mode);for(const b of document.querySelectorAll("[data-difficulty]"))b.classList.toggle("active",b.dataset.difficulty===config.difficulty);for(const b of document.querySelectorAll("[data-target]"))b.classList.toggle("active",Number(b.dataset.target)===config.target);for(const b of document.querySelectorAll("[data-theme]"))b.classList.toggle("active",b.dataset.theme===config.theme);el("soundBtn").classList.toggle("on",config.sound);el("soundBtn").textContent=config.sound?"Zapnuto":"Vypnuto";updateHUD()}
@@ -217,11 +217,33 @@ for(const b of document.querySelectorAll("[data-target]"))b.addEventListener("cl
 for(const b of document.querySelectorAll("[data-theme]"))b.addEventListener("click",()=>{config.theme=b.dataset.theme;settingsUI();save()});
 el("soundBtn").addEventListener("click",()=>{config.sound=!config.sound;settingsUI();save();chirp(670,90)});
 el("resetStats").addEventListener("click",()=>{if(!confirmReset){confirmReset=true;el("resetStats").textContent="Opravdu vynulovat? Klepni znovu";return}config.wins=[0,0];confirmReset=false;save();settingsUI();el("resetStats").textContent="✓ Výsledky vynulovány"});
-updateHUD();settingsUI();show("⚽","Připraveni?",config.mode==="ai"?"Hraješ za modré proti počítači. K vítězství potřebuješ "+config.target+" gólů.":"Dva hráči ovládají každý svou polovinu hřiště. První na "+config.target+" gólů vyhrává.","Výkop!");requestAnimationFrame(frame);
+updateHUD();settingsUI();show("⚽","Připraveni?",config.mode==="ai"?"Hraješ dole za modré, počítač je nahoře. K vítězství potřebuješ "+config.target+" gólů.":"Hráč 1 je dole, hráč 2 nahoře. Pálky posouvejte vodorovně. První na "+config.target+" gólů vyhrává.","Výkop!");requestAnimationFrame(frame);
+
+const CURRENT_APP_VERSION=__CURRENT_VERSION__;
+const SETTINGS_VERSION_URL=__VERSION_URL__;
+const updateStatus=document.getElementById("updateStatus");
+updateStatus.textContent="✅ Automatická kontrola při spuštění je zapnutá";
+document.getElementById("checkUpdatesBtn").addEventListener("click",async()=>{
+  const button=document.getElementById("checkUpdatesBtn");
+  button.disabled=true;button.textContent="⏳ Kontroluji…";
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),6500);
+  try{
+    const response=await fetch(SETTINGS_VERSION_URL+"?t="+Date.now(),{cache:"no-store",signal:ctrl.signal});
+    if(!response.ok)throw Error("HTTP "+response.status);
+    const info=await response.json();
+    if(!info||typeof info.version!=="string"||!/^\d+\.\d+\.\d+$/.test(info.version))throw Error("Neplatná verze");
+    const a=info.version.split(".").map(Number),b=CURRENT_APP_VERSION.split(".").map(Number);
+    let newer=false;
+    for(let i=0;i<3;i++){if(a[i]!==b[i]){newer=a[i]>b[i];break}}
+    updateStatus.textContent=newer?"🔔 Nová verze v"+info.version+". Zavři a znovu spusť hru pro instalaci.":"✅ Používáš aktuální verzi v"+CURRENT_APP_VERSION;
+  }catch(_){updateStatus.textContent="🌐 Nelze ověřit online. Při příštím spuštění se kontrola opakuje."}
+  finally{clearTimeout(timer);button.disabled=false;button.textContent="🔄 Zkontrolovat aktualizace"}
+});
+
 </script></body></html>`
 
 const view = new WebView()
-await view.loadHTML(html.replace("__INITIAL_STATE__", JSON.stringify(initial).replace(/</g, "\\u003c")).replace("__APP_VERSION__", APP_VERSION))
+await view.loadHTML(html.replace("__INITIAL_STATE__", JSON.stringify(initial).replace(/</g, "\\u003c")).replace("__APP_VERSION__", APP_VERSION).replace("__CURRENT_VERSION__",JSON.stringify(APP_VERSION)).replace("__VERSION_URL__",JSON.stringify(VERSION_URL)))
 await view.present(true)
 try {
   const result = await view.evaluateJavaScript("JSON.stringify(state)")

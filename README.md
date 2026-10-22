@@ -32,8 +32,8 @@
   <thead><tr><th>Aplikace</th><th>Verze</th><th>Info</th><th>Odkaz</th></tr></thead>
   <tbody>
     <tr><td><strong>Piškvorky Deluxe</strong></td><td><code>v1.1.0</code></td><td>Piškvorky proti AI i pro dva hráče, profily, statistiky, aktualizace.</td><td><a href="./apps/Piskvorky-Deluxe/">Otevřít projekt</a></td></tr>
-    <tr><td><strong>Breakout Deluxe</strong></td><td><code>v1.1.0</code></td><td>Arkádové rozbíjení kostek, dotykové ovládání, úrovně.</td><td><a href="./apps/Breakout-Deluxe/">Otevřít projekt</a></td></tr>
-    <tr><td><strong>Pong Fotbal</strong></td><td><code>v1.0.0</code></td><td>Fotbalový Pong proti AI nebo pro dva na jednom iPhonu.</td><td><a href="./apps/Pong-Fotbal/">Otevřít projekt</a></td></tr>
+    <tr><td><strong>Breakout Deluxe</strong></td><td><code>v1.2.0</code></td><td>Arkádové rozbíjení kostek, dotykové ovládání, úrovně.</td><td><a href="./apps/Breakout-Deluxe/">Otevřít projekt</a></td></tr>
+    <tr><td><strong>Pong Fotbal</strong></td><td><code>v1.1.0</code></td><td>Fotbalový Pong proti AI nebo pro dva na jednom iPhonu.</td><td><a href="./apps/Pong-Fotbal/">Otevřít projekt</a></td></tr>
     <tr><td><strong>LockScreen Generator</strong></td><td><code>v2.10.2</code></td><td>Nástroj pro tvorbu vlastního vzhledu zamykací obrazovky.</td><td><a href="./apps/LockScreenGenerator/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="LockScreen Generator" /></a></td></tr>
     <tr><td><strong>Sports Info</strong></td><td><code>v2.5.41</code></td><td>Univerzální sportovní widget pro více sportů a soutěží.</td><td><a href="./apps/Sports-Info/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sports Info" /></a></td></tr>
     <tr><td><strong>Sideload Watch</strong></td><td><code>v0.2.26</code></td><td>Sleduje nové verze vybraných sideload aplikací z katalogu iOS-Hub.</td><td><a href="./apps/Sideload-Watch/"><img src="https://img.shields.io/badge/Otev%C5%99%C3%ADt-Projekt-38BDF8?style=flat-square&labelColor=0284C7" alt="Sideload Watch" /></a></td></tr>

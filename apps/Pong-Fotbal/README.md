@@ -15,11 +15,11 @@ Fotbalová varianta klasického Pongu pro **Scriptable** na iPhonu a iPadu.
 
 Otevři [Pong Fotbal.scriptable](./Pong%20Fotbal.scriptable) v Scriptable, případně zkopíruj [Pong Fotbal.js](./Pong%20Fotbal.js) do složky Scriptable na iCloud Drive.
 
-## Ovládání
+Pálky jsou dole a nahoře, míček se odráží ve svislém směru. V nastavení nyní najdeš kontrolu aktualizací a verzi aplikace.\n\n## Ovládání
 
-- Modří: dotykem/táhnutím na **levé** polovině hřiště.
-- Červení (režim 2 hráčů): dotykem/táhnutím na **pravé** polovině hřiště.
-- Na klávesnici: **W/S** (modří), **↑/↓** (červení), mezerník (výkop).
+- Modří: dotykem/táhnutím na **spodní** polovině hřiště.
+- Červení (režim 2 hráčů): dotykem/táhnutím na **horní** polovině hřiště.
+- Na klávesnici: **A/D** (modří), **←/→** (červení), mezerník (výkop).
 - Tlačítko **Pauza** zastaví zápas; ikona ozubeného kola otevře nastavení.
 
-Verze **1.0.0**.
+Verze **1.1.0**.

@@ -6,7 +6,7 @@
 // Samostatná implementace inspirovaná klasickým Breakoutem.
 
 const APP_NAME = "Breakout Deluxe"
-const APP_VERSION = "1.1.0"
+const APP_VERSION = "1.2.0"
 const SAVE_KEY = "breakout_deluxe_v1"
 const VERSION_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Breakout-Deluxe/version.json"
 const SCRIPT_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/Master/apps/Breakout-Deluxe/Breakout%20Deluxe.js"
@@ -170,7 +170,7 @@ const html = String.raw`<!DOCTYPE html>
     .record b { color: #fff; }
     .danger { margin-top: 14px; width: 100%; background: #3b2235;
       border: 1px solid #8c4d65; border-radius: 11px; padding: 11px; color: #ffb7c9; font-weight: 750; }
-    .version { text-align: center; color: #8298bd; font-size: 12px; margin: 15px 0 0; }
+    .version { text-align: center; color: #8298bd; font-size: 12px; margin: 15px 0 0; } .updatecheck { width:100%; margin-top:10px; } .updatestatus { color:#94d9cc; font-size:11px; line-height:1.45; text-align:center; margin-top:10px; }
     @media (max-height: 650px) { .app { gap: 6px; } .stat { padding: 5px; }
       .statvalue { font-size: 17px; } h1 { font-size: 17px; } .hint { display: none; } }
   </style>
@@ -220,7 +220,7 @@ const html = String.raw`<!DOCTYPE html>
       <div class="settingrow"><span class="settinglabel">Zvukové efekty</span><button id="soundBtn" class="toggle">Zapnuto</button></div>
       <div class="record"><span>🏆 Nejlepší skóre</span><b id="best">0</b></div>
       <button class="danger" id="resetBest">Vynulovat rekord</button>
-      <div class="version">🧱 Breakout Deluxe · verze __APP_VERSION__ · offline</div>
+      <div class="version">🧱 Breakout Deluxe · verze __APP_VERSION__</div><div class="updatestatus" id="updateStatus">Kontrola verze probíhá při spuštění.</div><button class="choice updatecheck" id="checkUpdatesBtn">🔄 Zkontrolovat aktualizace</button>
     </section>
   </div>
   <script>
@@ -524,13 +524,35 @@ const html = String.raw`<!DOCTYPE html>
   buildBricks();parkBall();updateHUD();refreshSettings();
   showOverlay("🚀","Připraven?","Táhni prstem po herní ploše a ovládej pálku. Rozbij všechny barevné kostky!","Spustit hru");
   requestAnimationFrame(tick);
-  </script>
+  
+const CURRENT_APP_VERSION=__CURRENT_VERSION__;
+const SETTINGS_VERSION_URL=__VERSION_URL__;
+const updateStatus=document.getElementById("updateStatus");
+updateStatus.textContent="✅ Automatická kontrola při spuštění je zapnutá";
+document.getElementById("checkUpdatesBtn").addEventListener("click",async()=>{
+  const button=document.getElementById("checkUpdatesBtn");
+  button.disabled=true;button.textContent="⏳ Kontroluji…";
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),6500);
+  try{
+    const response=await fetch(SETTINGS_VERSION_URL+"?t="+Date.now(),{cache:"no-store",signal:ctrl.signal});
+    if(!response.ok)throw Error("HTTP "+response.status);
+    const info=await response.json();
+    if(!info||typeof info.version!=="string"||!/^\d+\.\d+\.\d+$/.test(info.version))throw Error("Neplatná verze");
+    const a=info.version.split(".").map(Number),b=CURRENT_APP_VERSION.split(".").map(Number);
+    let newer=false;
+    for(let i=0;i<3;i++){if(a[i]!==b[i]){newer=a[i]>b[i];break}}
+    updateStatus.textContent=newer?"🔔 Nová verze v"+info.version+". Zavři a znovu spusť hru pro instalaci.":"✅ Používáš aktuální verzi v"+CURRENT_APP_VERSION;
+  }catch(_){updateStatus.textContent="🌐 Nelze ověřit online. Při příštím spuštění se kontrola opakuje."}
+  finally{clearTimeout(timer);button.disabled=false;button.textContent="🔄 Zkontrolovat aktualizace"}
+});
+
+</script>
 </body>
 </html>`
 
 const view = new WebView()
 const initialJSON = JSON.stringify(initial).replace(/</g, "\\u003c")
-await view.loadHTML(html.replace("__INITIAL_STATE__", initialJSON).replace("__APP_VERSION__", APP_VERSION))
+await view.loadHTML(html.replace("__INITIAL_STATE__", initialJSON).replace("__APP_VERSION__", APP_VERSION).replace("__CURRENT_VERSION__",JSON.stringify(APP_VERSION)).replace("__VERSION_URL__",JSON.stringify(VERSION_URL)))
 await view.present(true)
 
 // Uloží rekord a nastavení po zavření WebView.
