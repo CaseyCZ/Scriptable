@@ -1,3 +1,6 @@
+// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: blue; icon-glyph: gamepad;
 // BREAKOUT DELUXE — offline hra pro aplikaci Scriptable na iPhonu.
 // Ovládání: táhni prstem po herní ploše, klepnutím odpálíš míček.
 // Samostatná implementace inspirovaná klasickým Breakoutem.

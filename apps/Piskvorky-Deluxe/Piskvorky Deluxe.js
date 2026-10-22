@@ -1,3 +1,6 @@
+// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: purple; icon-glyph: gamepad;
 // PIŠKVORKY DELUXE — samostatná verze pro Scriptable na iPhonu.
 // Původní Piškvorky_Scriptable.js zůstávají beze změny.
 // Offline hra, AI, zvuk, animace, nastavení a ukládání do Keychain.

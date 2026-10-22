@@ -1,3 +1,6 @@
+// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: teal; icon-glyph: futbol;
 // PONG FOTBAL — offline fotbalový Pong pro Scriptable na iPhonu.
 // 1 hráč vs. počítač nebo 2 hráči na jednom displeji (multitouch).
 
