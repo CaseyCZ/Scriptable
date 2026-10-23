@@ -1,0 +1,103 @@
+name: Sync Scriptable game releases
+
+on:
+  push:
+    branches: [Master]
+    paths:
+      - 'apps/Piskvorky-Deluxe/Piskvorky Deluxe.js'
+      - 'apps/Breakout-Deluxe/Breakout Deluxe.js'
+      - 'apps/Pong-Fotbal/Pong Fotbal.js'
+      - '.github/scripts/sync_release_metadata.py'
+      - '.github/workflows/sync-game-releases.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scriptable-game-release-metadata
+  cancel-in-progress: true
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest Master
+        uses: actions/checkout@v4
+        with:
+          ref: Master
+
+      - name: Synchronize game install packages
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          for directory, basename in (
+              ("Piskvorky-Deluxe", "Piskvorky Deluxe"),
+              ("Breakout-Deluxe", "Breakout Deluxe"),
+              ("Pong-Fotbal", "Pong Fotbal"),
+          ):
+              folder = Path("apps") / directory
+              source = (folder / (basename + ".js")).read_text(encoding="utf-8")
+              package_file = folder / (basename + ".scriptable")
+              package = json.loads(package_file.read_text(encoding="utf-8"))
+              if package.get("name") != basename or not package.get("icon"):
+                  raise SystemExit(f"Unexpected package metadata: {basename}")
+              package["script"] = source
+              generated = json.dumps(package, ensure_ascii=False, indent=2) + "\n"
+              if generated != package_file.read_text(encoding="utf-8"):
+                  package_file.write_text(generated, encoding="utf-8")
+              assert json.loads(package_file.read_text(encoding="utf-8"))["script"] == source
+              print(f"{basename}: installation package synchronized")
+          PY
+
+      - name: Synchronize versions across README and catalog
+        run: python .github/scripts/sync_release_metadata.py
+
+      - name: Verify game versions across release files
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          root = [Path("README.md").read_text(encoding="utf-8"),
+                  Path("README_EN.md").read_text(encoding="utf-8")]
+          site = Path("assets/js/index-page.js").read_text(encoding="utf-8")
+          for directory, name in (
+              ("Piskvorky-Deluxe", "Piškvorky Deluxe"),
+              ("Breakout-Deluxe", "Breakout Deluxe"),
+              ("Pong-Fotbal", "Pong Fotbal"),
+          ):
+              folder = Path("apps") / directory
+              base = "Piskvorky Deluxe" if directory == "Piskvorky-Deluxe" else name
+              src = (folder / (base + ".js")).read_text(encoding="utf-8")
+              match = re.search(r'const APP_VERSION\s*=\s*"([^"]+)"', src)
+              assert match, f"APP_VERSION missing: {name}"
+              version = match.group(1)
+              assert json.loads((folder / "version.json").read_text(encoding="utf-8"))["version"] == version
+              assert json.loads((folder / (base + ".scriptable")).read_text(encoding="utf-8"))["script"] == src
+              assert all(f"<strong>{name}</strong></td><td><code>v{version}</code>" in text for text in root)
+              assert f"{{name:'{name}',version:'{version}'" in site
+              assert f"VERZE-v{version}-38BDF8" in (folder / "README.md").read_text(encoding="utf-8")
+              assert f"VERSION-v{version}-38BDF8" in (folder / "README_EN.md").read_text(encoding="utf-8")
+              print(f"{name}: v{version} verified")
+          PY
+
+      - name: Commit synchronized metadata
+        run: |
+          git config user.name "CaseyCZ"
+          git config user.email "25530709+CaseyCZ@users.noreply.github.com"
+          git add \
+            'apps/Piskvorky-Deluxe/Piskvorky Deluxe.scriptable' \
+            'apps/Breakout-Deluxe/Breakout Deluxe.scriptable' \
+            'apps/Pong-Fotbal/Pong Fotbal.scriptable' \
+            README.md README_EN.md assets/js/index-page.js \
+            apps/*/README.md apps/*/README_EN.md apps/*/version.json
+          if git diff --cached --quiet; then
+            echo "Game release metadata is already current"
+            exit 0
+          fi
+          git commit -m "Sync Scriptable game release metadata"
+          git push origin HEAD:Master

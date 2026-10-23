@@ -49,14 +49,15 @@ Scriptable Apps jsou praktické nástroje pro každodenní použití na iPhonu. 
 
 ## Původ a poděkování
 
-U projektů, které vznikly na základě existujícího veřejného skriptu, uvádíme původní předlohu a autory přímo v jejich README:
+U projektů vycházejících z veřejných skriptů nebo inspirovaných jinými projekty uvádíme původní předlohy a autory:
 
 - **LockScreen Generator** — předloha [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) od [ajatkj / Ankit Jain](https://github.com/ajatkj).
 - **Homebridge Status** — předloha [homebridgeStatusWidget](https://github.com/lwitzani/homebridgeStatusWidget) od [lwitzani](https://github.com/lwitzani).
 - **Sports Live** — vychází z [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) od **Nicolas-kings**, které navazuje na [NBA MyTeam widget](https://github.com/thisisevanfox/nba-my-team-ios-widget) od [thisisevanfox](https://github.com/thisisevanfox); hlavička ONE-NBA uvádí oba autory **thisisevanfox & Nicolas-kings**.
 - **Sports Info** — vlastní multi-sport implementace, při jejímž návrhu byla jako předloha použita architektura našeho LockScreen Generatoru.
+- **Breakout Deluxe** — vlastní implementace inspirovaná ukázkami her na [CodeGuppy](https://codeguppy.com/games/).
 
-Tyto projekty byly od původních předloh dále výrazně přepracovány a rozšířeny; konkrétní informace jsou uvedené v README jednotlivých aplikací.
+U projektů navazujících na cizí kód jsou původní předlohy uvedené v README jednotlivých aplikací. Inspirace ukázkami her neznamená převzetí jejich zdrojového kódu.
 
 <p>
   <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable pro iPhone" /></a>

@@ -41,7 +41,7 @@ jobs:
           app=Path('apps/Home-Dashboard')
           src=(app/'Home Dashboard.js').read_text(encoding='utf-8')
           pkg=json.loads((app/'Home Dashboard.scriptable').read_text(encoding='utf-8'))
-          site=Path('index.html').read_text(encoding='utf-8')
+          site=Path('assets/js/index-page.js').read_text(encoding='utf-8')
           root_cz=Path('README.md').read_text(encoding='utf-8')
           root_en=Path('README_EN.md').read_text(encoding='utf-8')
           vm=re.search(r'const APP_VERSION\s*=\s*"([^"]+)"',src)
@@ -68,7 +68,7 @@ jobs:
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
           git add \
             'apps/Home-Dashboard/Home Dashboard.scriptable' \
-            README.md README_EN.md index.html \
+            README.md README_EN.md assets/js/index-page.js \
             apps/*/README.md apps/*/README_EN.md apps/*/version.json
           if git diff --cached --quiet; then
             echo "Home Dashboard release surfaces already synchronized"

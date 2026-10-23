@@ -2,6 +2,23 @@
 
 All notable public changes to Scriptable Apps are documented here.
 
+## October 2026 updates — 2026-10-23
+
+### New games for Scriptable
+
+- Added **Piškvorky Deluxe v1.1.0**: local two-player tic-tac-toe, AI difficulty levels, player profiles, statistics and in-app update checks.
+- Added **Breakout Deluxe v1.2.0**: touch-controlled brick breaker with scores, levels, lives, themes and update checks.
+- Added **Pong Fotbal v1.1.0**: portrait football Pong, AI and local two-player modes, match settings and updates.
+- Standardized the three games' Scriptable install packages and Czech/English READMEs.
+
+### Catalog and release documentation
+
+- Added the new games to the Scriptable Apps catalog and root README tables.
+- Matched the project-link badges and game preview style across the catalog.
+- Repaired release metadata synchronization to use the actual `assets/js/index-page.js` catalog data, including the three games and existing apps.
+- Updated the Sideload Watch catalog version to **v0.2.26**.
+- Added an attribution to [CodeGuppy](https://codeguppy.com/games/) for inspiration behind Breakout Deluxe.
+
 ## 1.0.0 — 2026-10-08
 
 ### Public catalog

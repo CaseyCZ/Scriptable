@@ -4,9 +4,30 @@ import re
 
 ROOT_CZ = Path("README.md")
 ROOT_EN = Path("README_EN.md")
-SITE = Path("index.html")
+SITE = Path("assets/js/index-page.js")
 
 APPS = [
+    {
+        "name": "Piškvorky Deluxe",
+        "source": Path("apps/Piskvorky-Deluxe/Piskvorky Deluxe.js"),
+        "version_json": Path("apps/Piskvorky-Deluxe/version.json"),
+        "readmes": [Path("apps/Piskvorky-Deluxe/README.md"), Path("apps/Piskvorky-Deluxe/README_EN.md")],
+        "site": True,
+    },
+    {
+        "name": "Breakout Deluxe",
+        "source": Path("apps/Breakout-Deluxe/Breakout Deluxe.js"),
+        "version_json": Path("apps/Breakout-Deluxe/version.json"),
+        "readmes": [Path("apps/Breakout-Deluxe/README.md"), Path("apps/Breakout-Deluxe/README_EN.md")],
+        "site": True,
+    },
+    {
+        "name": "Pong Fotbal",
+        "source": Path("apps/Pong-Fotbal/Pong Fotbal.js"),
+        "version_json": Path("apps/Pong-Fotbal/version.json"),
+        "readmes": [Path("apps/Pong-Fotbal/README.md"), Path("apps/Pong-Fotbal/README_EN.md")],
+        "site": True,
+    },
     {
         "name": "LockScreen Generator",
         "source": Path("apps/LockScreenGenerator/LockScreenGenerator.js"),
@@ -40,7 +61,14 @@ APPS = [
         "source": Path("apps/Homebridge-Status/Homebridge Status.js"),
         "version_json": Path("apps/Homebridge-Status/version.json"),
         "readmes": [Path("apps/Homebridge-Status/README.md"), Path("apps/Homebridge-Status/README_EN.md")],
-        "site": False,
+        "site": True,
+    },
+    {
+        "name": "Sports Live",
+        "source": Path("apps/Sports-Live/Sports Live.js"),
+        "version_json": Path("apps/Sports-Live/version.json"),
+        "readmes": [Path("apps/Sports-Live/README.md"), Path("apps/Sports-Live/README_EN.md")],
+        "site": True,
     },
 ]
 
@@ -74,6 +102,8 @@ def sync_app_readme(content: str, version: str) -> str:
         (r'(img\.shields\.io/badge/VERSION-v)[0-9A-Za-z._-]+(-38BDF8)', rf'\g<1>{version}\g<2>'),
         (r'(Aktuální testovací verze:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
         (r'(Current testing version:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
+        (r'(Aktuální verze:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
+        (r'(Current version:\s*\*\*v)[0-9A-Za-z._-]+(\*\*)', rf'\g<1>{version}\g<2>'),
         (r'(alt="[^"]*\bverze )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
         (r'(alt="[^"]*\bversion )[0-9A-Za-z._-]+(")', rf'\g<1>{version}\g<2>'),
     ]
@@ -108,25 +138,13 @@ for app in APPS:
         pattern = rf"(\{{name:'{re.escape(app['name'])}',version:')[^']+(')"
         site, count = re.subn(pattern, rf'\g<1>{version}\g<2>', site, count=1)
         if count != 1:
-            raise SystemExit(f"Website card missing: {app['name']}")
+            raise SystemExit(f"Website card missing: {app['name']} in {SITE}")
 
 marker = "<!-- App versions are synchronized automatically from APP_VERSION in each production script. -->"
 if marker not in root_cz:
     root_cz = root_cz.replace("## Aplikace\n", "## Aplikace\n\n" + marker + "\n", 1)
 if marker not in root_en:
     root_en = root_en.replace("## Apps\n", "## Apps\n\n" + marker + "\n", 1)
-
-# Keep the testing label stable across repeated workflow runs.
-root_cz = re.sub(
-    r'(?:Testovací\s+)*Homebridge monitoring s LAN → VPN fallbackem',
-    'Testovací Homebridge monitoring s LAN → VPN fallbackem',
-    root_cz,
-)
-root_en = re.sub(
-    r'(?:Testing\s+)*(?:Homebridge monitoring|Homebridge monitor) with automatic LAN → VPN fallback',
-    'Testing Homebridge monitor with automatic LAN → VPN fallback',
-    root_en,
-)
 
 write_if_changed(ROOT_CZ, root_cz)
 write_if_changed(ROOT_EN, root_en)

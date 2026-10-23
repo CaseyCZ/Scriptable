@@ -61,11 +61,16 @@ jobs:
           print(f'Sports Live v{version}: source, package, website and README references synchronized')
           PY
 
+      - name: Sync release versions and documentation
+        run: python .github/scripts/sync_release_metadata.py
+
       - name: Commit synchronized package
         run: |
           git config user.name "CaseyCZ"
           git config user.email "25530709+CaseyCZ@users.noreply.github.com"
-          git add 'apps/Sports-Live/Sports Live.scriptable' 'apps/Sports-Live/version.json'
+          git add 'apps/Sports-Live/Sports Live.scriptable' 'apps/Sports-Live/version.json' \
+            README.md README_EN.md assets/js/index-page.js \
+            apps/*/README.md apps/*/README_EN.md apps/*/version.json
           if git diff --cached --quiet; then
             echo "Sports Live package already synchronized"
             exit 0

@@ -49,14 +49,15 @@ Scriptable Apps are practical tools for everyday iPhone use. Each app has its ow
 
 ## Origin and credits
 
-For projects that started from an existing public script, we credit the original reference and authors directly in the app README:
+For projects based on public scripts or inspired by other work, we credit the relevant references and authors:
 
 - **LockScreen Generator** — based on [LSWeather](https://github.com/ajatkj/scriptable/blob/master/LSWeather.js) by [ajatkj / Ankit Jain](https://github.com/ajatkj).
 - **Homebridge Status** — based on [homebridgeStatusWidget](https://github.com/lwitzani/homebridgeStatusWidget) by [lwitzani](https://github.com/lwitzani).
 - **Sports Live** — based on [ONE-NBA](https://github.com/Nicolasking007/Scriptable/tree/main/ONE-NBA) by **Nicolas-kings**, which builds on the [NBA MyTeam widget](https://github.com/thisisevanfox/nba-my-team-ios-widget) by [thisisevanfox](https://github.com/thisisevanfox); the ONE-NBA source header credits both **thisisevanfox & Nicolas-kings**.
 - **Sports Info** — our own multi-sport implementation, designed using the architecture of our LockScreen Generator as a reference.
+- **Breakout Deluxe** — an original implementation inspired by game examples on [CodeGuppy](https://codeguppy.com/games/).
 
-These projects were subsequently substantially redesigned and expanded beyond their original references; details are documented in each app README.
+Projects building on existing source code cite their references in their individual READMEs. Inspiration from game examples does not imply that the source code was copied.
 
 <p>
   <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable for iPhone" /></a>
