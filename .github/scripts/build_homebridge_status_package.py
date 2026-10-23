@@ -5,7 +5,7 @@ import re
 APP_DIR = Path("apps/Homebridge-Status")
 SRC = APP_DIR / "Homebridge Status.js"
 PACKAGE = APP_DIR / "Homebridge Status.scriptable"
-SITE = Path("index.html")
+SITE = Path("assets/js/index-page.js")
 
 script = SRC.read_text(encoding="utf-8")
 assert 'const APP_NAME = "Homebridge Status";' in script
@@ -22,23 +22,25 @@ package = {
 }
 PACKAGE.write_text(json.dumps(package, ensure_ascii=False, indent=2), encoding="utf-8")
 
-# Keep the app in the repository while it is being tested, but do not expose it
-# in the public website catalog yet.
+# Keep the already-public Homebridge Status card in the catalog.
 site = SITE.read_text(encoding="utf-8")
-block_match = re.search(r"(const ourApps=\[\n)(.*?)(\n    \];)", site, re.S)
-assert block_match, "ourApps block missing in index.html"
-body = block_match.group(2)
-body, _ = re.subn(
-    r"\n?\s*\{name:'Homebridge Status'[^\n]*\},?",
-    "",
-    body,
+site, count = re.subn(
+    r"(\{name:'Homebridge Status',version:')[^']+(')",
+    lambda m: f"{m.group(1)}{version}{m.group(2)}",
+    site,
     count=1,
 )
-body = re.sub(r",\s*$", "", body.rstrip())
-site = site[:block_match.start()] + block_match.group(1) + body + block_match.group(3) + site[block_match.end():]
+assert count == 1, "Homebridge Status card missing in assets/js/index-page.js"
+site, count = re.subn(
+    r"(\{name:'Homebridge Status'[^\n]*?install:')[^']+(')",
+    lambda m: f"{m.group(1)}./apps/Homebridge-Status/Homebridge%20Status.scriptable{m.group(2)}",
+    site,
+    count=1,
+)
+assert count == 1, "Homebridge Status install path missing in catalog"
 SITE.write_text(site, encoding="utf-8")
 
-print(f"Homebridge Status v{version} synchronized (private testing):")
+print(f"Homebridge Status v{version} synchronized:")
 print(f"- {SRC}")
 print(f"- {PACKAGE}")
-print("- public website card hidden")
+print(f"- {SITE}")

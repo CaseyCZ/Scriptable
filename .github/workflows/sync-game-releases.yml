@@ -42,7 +42,8 @@ jobs:
               source = (folder / (basename + ".js")).read_text(encoding="utf-8")
               package_file = folder / (basename + ".scriptable")
               package = json.loads(package_file.read_text(encoding="utf-8"))
-              if package.get("name") != basename or not package.get("icon"):
+              display_name = "Piškvorky Deluxe" if directory == "Piskvorky-Deluxe" else basename
+              if package.get("name") != display_name or not package.get("icon"):
                   raise SystemExit(f"Unexpected package metadata: {basename}")
               package["script"] = source
               generated = json.dumps(package, ensure_ascii=False, indent=2) + "\n"

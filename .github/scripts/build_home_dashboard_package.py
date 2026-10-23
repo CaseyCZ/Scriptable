@@ -5,7 +5,7 @@ import re
 APP_DIR = Path("apps/Home-Dashboard")
 SRC = APP_DIR / "Home Dashboard.js"
 PACKAGE = APP_DIR / "Home Dashboard.scriptable"
-SITE = Path("index.html")
+SITE = Path("assets/js/index-page.js")
 
 script = SRC.read_text(encoding="utf-8")
 assert 'const APP_NAME = "Home Dashboard";' in script
@@ -29,14 +29,14 @@ site, count = re.subn(
     site,
     count=1,
 )
-assert count == 1, "Home Dashboard card missing in index.html"
+assert count == 1, "Home Dashboard card missing in assets/js/index-page.js"
 site, count = re.subn(
     r"(\{name:'Home Dashboard'[^\n]*?install:')[^']+(')",
     lambda m: f"{m.group(1)}./apps/Home-Dashboard/Home%20Dashboard.scriptable{m.group(2)}",
     site,
     count=1,
 )
-assert count == 1, "Home Dashboard install path missing in index.html"
+assert count == 1, "Home Dashboard install path missing in assets/js/index-page.js"
 SITE.write_text(site, encoding="utf-8")
 
 print(f"Home Dashboard v{version} synchronized:")

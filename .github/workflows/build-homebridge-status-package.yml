@@ -26,7 +26,7 @@ jobs:
           cp 'apps/Homebridge-Status/Homebridge Status.js' /tmp/HomebridgeStatus.mjs
           node --check /tmp/HomebridgeStatus.mjs
 
-      - name: Build package and keep website card hidden
+      - name: Build package and synchronize catalog card
         run: python .github/scripts/build_homebridge_status_package.py
 
       - name: Sync README and version metadata
@@ -51,7 +51,8 @@ jobs:
           marker=f'<strong>Homebridge Status</strong></td><td><code>v{version}</code>'
           assert marker in Path('README.md').read_text(encoding='utf-8')
           assert marker in Path('README_EN.md').read_text(encoding='utf-8')
-          assert "{name:'Homebridge Status'" not in site
+          assert f"{{name:'Homebridge Status',version:'{version}'" in site
+          assert "install:'./apps/Homebridge-Status/Homebridge%20Status.scriptable'" in site
           assert 'w.setPadding(14,10,11,10)' in src, 'Small changed unexpectedly'
           assert 'w.setPadding(11,10,9,10)' in src, 'Medium changed unexpectedly'
           assert 'w.setPadding(18,30,15,30)' in src, 'Large center padding missing'
