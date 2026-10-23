@@ -1,42 +1,86 @@
-# 🎮 Tic-Tac-Toe Deluxe
+<p align="center">
+  <img src="../../readme-header.svg" alt="Scriptable Apps by CaseyCZ" width="100%" />
+</p>
 
-An offline 3 × 3 tic-tac-toe game for iPhone, designed for **Scriptable**.
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/CZ-%C4%8Ce%C5%A1tina-172033?style=for-the-badge&labelColor=111827" alt="Czech" /></a>
+  <img src="https://img.shields.io/badge/EN-English-38BDF8?style=for-the-badge&labelColor=0284C7" alt="English" />
+</p>
 
-![Version](https://img.shields.io/badge/version-1.1.0-38BDF8)
+<h1 align="center">🎮 Tic-Tac-Toe Deluxe</h1>
 
-**[Čeština](README.md)**
+<p align="center">
+  Touch-friendly tic-tac-toe for <strong>Scriptable</strong> on iPhone — against the computer or a friend.
+</p>
 
-## Installation
+<p align="center">
+  <img src="https://img.shields.io/badge/VERSION-v1.1.0-38BDF8?style=for-the-badge&labelColor=0284C7" alt="Tic-Tac-Toe Deluxe version 1.1.0" />
+</p>
 
-1. Download **[Piskvorky Deluxe.js](./Piskvorky%20Deluxe.js)**.
-2. Save it to **iCloud Drive → Scriptable**, or paste its contents into a new Scriptable script.
-3. Run **Piškvorky Deluxe**.
+<p align="center">
+  <a href="https://caseycz.github.io/Scriptable/"><img src="https://img.shields.io/badge/Website-Catalog-38BDF8?style=for-the-badge&labelColor=0284C7&logo=googlechrome&logoColor=white" alt="Scriptable catalog" /></a>
+  <a href="./Piskvorky%20Deluxe.scriptable"><img src="https://img.shields.io/badge/Install-Scriptable-38BDF8?style=for-the-badge&labelColor=0284C7&logo=apple&logoColor=white" alt="Install Piškvorky Deluxe" /></a>
+</p>
 
-A [.scriptable package](./Piskvorky%20Deluxe.scriptable) is also available. If it opens as JSON code instead of importing as a script, use the **.js** file.
+## What it does
 
-## Features
+**Tic-Tac-Toe Deluxe** is an offline 3 × 3 game with touch controls, customizable player symbols and saved results.
 
-- 👥 Two-player mode and computer opponent (easy, medium, hard).
-- 🦁 Custom player names, emoji and colors.
-- 🎨 Three color themes and adjustable board size.
-- 🔁 Alternating first player or a fixed starting player.
-- 🏆 Separate results per game mode and an option to reset scores.
-- 🎉 Winning-line highlight, victory banner and confetti.
-- 🔊 Optional game sounds.
-- 🔒 Offline gameplay, without accounts or game APIs. Internet is used only for optional update checks; results remain local.
+## Key features
 
-Open **⚙️ Settings** to find the difficulty, sound, appearance and player profiles. When iOS Reduce Motion is enabled, moving celebrations are suppressed but the win banner remains visible.
+- 👥 Play against a friend or a computer with three difficulty settings.
+- 🦁 Custom names, emoji and colors for both players.
+- 🎨 Three themes and adjustable board size.
+- 🔁 Alternate the starting player or choose a fixed starter.
+- 🏆 Separate scores for AI and two-player modes, with a reset option.
+- 🎉 Winning-line highlight, winner banner and confetti.
+- 🔊 Optional sounds and saved settings.
+
+<p align="center">
+  <img src="./preview.svg" alt="Tic-Tac-Toe Deluxe – game preview" width="430" />
+</p>
+
+## Getting started
+
+1. Install **Piškvorky Deluxe** in Scriptable and open it.
+2. Choose the computer opponent or local two-player mode.
+3. Tap an empty square to make a move.
+4. Open ⚙️ Settings to customize profiles, appearance, difficulty, sound and the starting player.
+
+**Example:** Challenge the computer on Hard, or take turns with a friend on the same iPhone.
+
+## Profiles and results
+
+Change each player's name, emoji and color in Settings. Results are tracked separately for computer games and local two-player matches.
 
 ## Updates
 
-Since **v1.1.0**, the game checks GitHub `version.json` on launch. When a newer version is available, it asks before installing. It downloads and validates the script, creates a backup of the existing `.js` file, then replaces it. Relaunch the game after updating.
+The game checks for updates when it launches. You can see the installed version and last check status under ⚙️ Settings. An update is installed only with your approval, with a backup of the existing script created first. Offline gameplay is unaffected.
 
-The **⚙️ Settings** page shows the app icon, installed version and latest update-check result. Offline gameplay remains available when the version check cannot connect.
+## Good to know
 
-Users on v1.0.0 must install v1.1.0 manually once to enable future update checks.
+This is a full-screen Scriptable game, not a Home Screen widget. Game state and settings are stored locally. When iOS Reduce Motion is enabled, moving celebrations may be suppressed, but match results remain visible.
 
-## Notes
+**Installation:** Open [Piskvorky Deluxe.scriptable](./Piskvorky%20Deluxe.scriptable) with Scriptable. If iOS shows it as plain text, download the [JavaScript file](./Piskvorky%20Deluxe.js) and save it under **iCloud Drive → Scriptable**.
 
-- This is an app-like Scriptable script, not a Home Screen widget.
-- No dependencies or internet connection required.
-- Game logic passed automated tests; behavior should still be checked on a real iPhone.
+## Origin and credits
+
+The Deluxe edition expands a simple Scriptable tic-tac-toe example into a custom game with its own interface, AI, profiles and additional features.
+
+## Links
+
+<p>
+  <a href="https://apps.apple.com/app/scriptable/id1405459188"><img src="https://img.shields.io/badge/Scriptable-App%20Store-172033?style=for-the-badge&labelColor=111827&logo=apple&logoColor=white" alt="Scriptable App Store" /></a>
+  <a href="./Piskvorky%20Deluxe.js"><img src="https://img.shields.io/badge/JavaScript-Download-172033?style=for-the-badge&labelColor=111827" alt="Download JavaScript" /></a>
+</p>
+
+## Support
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://img.shields.io/badge/Support%20CaseyCZ-Buy%20Me%20a%20Coffee-38BDF8?style=for-the-badge&labelColor=0284C7&logo=buymeacoffee&logoColor=white" alt="Support CaseyCZ" /></a>
+</p>
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/caseycz"><img src="https://caseycz.github.io/support-qr.svg" width="150" alt="Buy Me a Coffee QR code Buy Me a Coffee CaseyCZ" /></a><br>
+  <sub>Scan the QR code or click the button.</sub>
+</p>
