@@ -8,7 +8,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-blue; icon-glyph: download;
 // ============================================================
-// Sideload Watch v0.2.26
+// Sideload Watch v0.2.27
 // CaseyCZ Scriptable Apps
 // iOS-Hub update watcher.
 // Settings and updater follow the same UI pattern as Sports Info
@@ -16,7 +16,7 @@
 // ============================================================
 
 const APP_NAME = "Sideload Watch";
-const APP_VERSION = "0.2.26";
+const APP_VERSION = "0.2.27";
 const SETTINGS_FILE = "SideloadWatch_settings.json";
 const STATE_FILE = "SideloadWatch_state.json";
 const CATALOG_CACHE_FILE = "SideloadWatch_catalog.json";
@@ -994,6 +994,10 @@ input[type=text],input[type=search],input[type=number],select,textarea{width:100
     <p>${esc(L.subtitle)}</p>
     <div id="updateStatus" class="updateStatus">${esc(L.current)} · v${esc(APP_VERSION)}</div>
   </div>
+  <div class="card">
+    <div class="navRow" onclick="post({action:'markSeen'})"><div class="navLeft"><span class="navIcon">✓</span><div class="rowText"><div class="rowTitle">${esc(L.markSeen)}</div><div class="rowDetail">${esc(L.markSeenDetail)}</div></div></div><span class="chevron">›</span></div>
+    <div id="homeStatus" class="status" aria-live="polite" hidden></div>
+  </div>
   <div class="sectionTitle">${esc(L.settings)}</div>
   <div class="card">
     ${nav("sources","📦",L.watched,`${watchedCount} ${L.selected}`)}
@@ -1259,7 +1263,7 @@ window.__native=function(m){
   if(!m)return;
   if(m.action==='catalog'){catalog=m.catalog||{sources:[]};document.getElementById('catalogMode').textContent=m.online?${JSON.stringify(L.online)}:${JSON.stringify(L.cached)};document.getElementById('catalogCount').textContent=(catalog.sources||[]).length;renderSources();if(currentSourceId&&sourceObj(currentSourceId))renderApps();finishCatalogRefresh();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
   if(m.action==='sourceHealth'){failedSourceIds=new Set((m.failedSourceIds||[]).map(String));sourceCacheOnly=!!m.cacheOnly;updateSourceHealthUI();renderSources()}
-  if(m.action==='status'){finishCatalogRefresh();const e=document.getElementById('toolStatus');if(e)e.textContent=m.text||''}
+  if(m.action==='status'){finishCatalogRefresh();for(const id of ['toolStatus','homeStatus']){const e=document.getElementById(id);if(e){e.textContent=m.text||'';if(id==='homeStatus')e.hidden=!m.text}}}
   if(m.action==='previewDone'){document.getElementById('previewStatus').textContent=''}
   if(m.action==='update'){const e=document.getElementById('updateStatus');e.textContent=m.text||'';e.className='updateStatus '+(m.ok?'ok':'error')}
   if(m.action==='replace'){state=m.settings||state;document.getElementById('jsonBox').value=JSON.stringify(state,null,2);location.reload()}
