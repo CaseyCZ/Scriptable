@@ -5,8 +5,78 @@
 // Pravidla inspirovaná tradičním českým Prší a popisem na prsigame.cz.
 
 const APP_NAME = "Prší Deluxe"
-const APP_VERSION = "0.1.0"
+const APP_VERSION = "0.1.1"
 const SAVE_KEY = "prsi_deluxe_v1"
+const UPDATE_VERSION_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/refs/heads/feature/prsi-deluxe-scriptable/apps/Prsi-Deluxe/version.json"
+const UPDATE_SCRIPT_URL = "https://raw.githubusercontent.com/CaseyCZ/Scriptable/refs/heads/feature/prsi-deluxe-scriptable/apps/Prsi-Deluxe/Prsi%20Deluxe.js"
+
+function compareVersions(current, latest) {
+  const left = current.split(".").map(Number), right = latest.split(".").map(Number)
+  for (let i = 0; i < 3; i++) if (left[i] !== right[i]) return left[i] < right[i] ? -1 : 1
+  return 0
+}
+
+async function checkForUpdates() {
+  try {
+    const request = new Request(UPDATE_VERSION_URL + "?t=" + Date.now())
+    request.timeoutInterval = 5
+    const info = await request.loadJSON()
+    if (!info || typeof info.version !== "string" || !/^\d+\.\d+\.\d+$/.test(info.version)) return false
+    if (compareVersions(APP_VERSION, info.version) >= 0) return false
+
+    const question = new Alert()
+    question.title = "🃏 Aktualizace Prší Deluxe"
+    question.message = "Je dostupná verze " + info.version + ". Chceš ji nainstalovat?"
+    question.addAction("Aktualizovat")
+    question.addCancelAction("Později")
+    if (await question.presentAlert() !== 0) return false
+
+    try {
+      const download = new Request(UPDATE_SCRIPT_URL + "?t=" + Date.now())
+      download.timeoutInterval = 15
+      const source = await download.loadString()
+      const match = source.match(/const APP_VERSION\s*=\s*"(\d+\.\d+\.\d+)"/)
+      if (source.length < 30000 || !match || match[1] !== info.version ||
+          !source.includes('const SAVE_KEY = "prsi_deluxe_v1"') ||
+          !source.includes('new WebView()') || !source.includes('const engine = (() => {')) {
+        throw new Error("Stažený soubor není platná verze Prší Deluxe")
+      }
+      const target = typeof module !== "undefined" ? module.filename : ""
+      if (!/\.js$/i.test(target)) throw new Error("Nelze určit cestu k nainstalovanému skriptu")
+      const cloud = FileManager.iCloud(), local = FileManager.local()
+      const manager = cloud.fileExists(target) ? cloud : local.fileExists(target) ? local : null
+      if (!manager) throw new Error("Nainstalovaný skript nebyl nalezen")
+      if (manager === cloud && !cloud.isFileDownloaded(target)) await cloud.downloadFileFromiCloud(target)
+      const original = manager.readString(target)
+      if (original.length < 30000) throw new Error("Původní skript nelze bezpečně zálohovat")
+      const backup = target.replace(/\.js$/i, "_backup_" + Date.now() + ".js")
+      manager.writeString(backup, original)
+      if (!manager.fileExists(backup) || manager.readString(backup) !== original) throw new Error("Záloha se nezdařila")
+      try {
+        manager.writeString(target, source)
+        if (manager.readString(target) !== source) throw new Error("Novou verzi nelze ověřit")
+      } catch (error) {
+        try { manager.writeString(target, original) } catch (_) {}
+        throw error
+      }
+      const done = new Alert()
+      done.title = "✅ Prší Deluxe aktualizováno"
+      done.message = "Verze " + info.version + " je nainstalovaná. Spusť hru znovu. Původní verze je zálohovaná."
+      done.addAction("OK")
+      await done.presentAlert()
+      return true
+    } catch (error) {
+      const failed = new Alert()
+      failed.title = "Aktualizace se nezdařila"
+      failed.message = String(error)
+      failed.addAction("OK")
+      await failed.presentAlert()
+    }
+  } catch (_) { /* Hra funguje i offline. */ }
+  return false
+}
+
+if (!await checkForUpdates()) {
 
 const defaults = { difficulty: "normal", theme: "green", sound: true, wins: [0, 0], rounds: 0, game: null }
 let initial = { ...defaults }
@@ -59,12 +129,12 @@ body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var
 .active-suit{border:1px solid #e8d4a1a6;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:850;color:#fce6b9;background:#143c34d9;min-height:26px}
 .player-zone{flex-direction:column;gap:4px;padding:0 0 15px;min-height:165px}
 .hand-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:850;color:#f7efd6}.hand-scroller{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:14px 9px 10px;scrollbar-width:thin;scrollbar-color:#d3aa7199 transparent}
-.hand{display:flex;align-items:flex-end;justify-content:center;width:max-content;min-width:100%;padding:0 20px 5px;min-height:calc(var(--card-w) * 1.5 + 15px)}
-.hand .playing-card{flex:0 0 var(--card-w);margin-left:-20px;transform:translateY(var(--lift,0px)) rotate(var(--tilt,0deg));transition:transform .16s,border-color .16s,box-shadow .16s;position:relative}
+.hand{display:flex;align-items:flex-end;justify-content:center;width:max-content;min-width:100%;padding:0 12px 5px;min-height:calc(var(--card-w) * 1.5 + 15px)}
+.hand .playing-card{flex:0 0 var(--card-w);margin-left:-8px;transition:transform .16s,border-color .16s,box-shadow .16s;position:relative}
 .hand .playing-card:first-child{margin-left:0}
 .hand .playing-card.allowed{box-shadow:0 0 0 2px #ffe3a3,0 7px 17px #0023187d}
 .hand .playing-card.allowed:active{transform:translateY(-15px) scale(1.06)}
-.hand .playing-card:disabled{opacity:.78;cursor:default}
+.hand .playing-card:disabled{opacity:1;cursor:default}
 .playing-card{width:var(--card-w);aspect-ratio:.7;position:relative;flex-shrink:0;display:block;padding:0;border-radius:10px;border:3px solid #f8e8c6;color:var(--ink);background:linear-gradient(125deg,#fffdf5,#f2e9d3);box-shadow:0 5px 14px #00231888;overflow:hidden;text-align:center}
 .playing-card.suit-hearts{--ink:#c6303c}.playing-card.suit-bells{--ink:#d19122}.playing-card.suit-leaves{--ink:#398054}.playing-card.suit-acorns{--ink:#664a2e}
 .playing-card .corner{position:absolute;display:flex;flex-direction:column;align-items:center;gap:0;left:5px;top:4px;font-weight:950;font-size:16px;line-height:1;z-index:1}.playing-card .corner.bottom{left:auto;top:auto;right:5px;bottom:4px;transform:rotate(180deg)}
@@ -83,8 +153,9 @@ body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var
 .choices{display:flex;gap:7px}.choice{flex:1;min-height:42px;border:1px solid #638877;border-radius:11px;background:#23493f;color:#d6e5d9;font-size:12px;font-weight:800;padding:8px 5px}.choice.selected{background:#dec18b;border-color:#ffe1a2;color:#26372d}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:13px;font-weight:800;color:#d9dfd1}
 .version{font-size:11px;color:#91b2a6;margin-top:18px}.rules{text-align:left;font-size:12px;line-height:1.55;color:#d7e5d9}.rules li{margin:7px 0}.log-list{margin:0;padding-left:18px;text-align:left;color:#d7e5d9;font-size:12px;line-height:1.75}
+.update-status{font-size:12px;line-height:1.5;color:#c7dfd0;text-align:left;margin:7px 0 10px}.update-check{width:100%;min-height:44px}
 :root{--card-w:clamp(82px,19vw,115px)}
-@media(max-width:400px){:root{--card-w:82px}.table{min-height:355px}.app{gap:8px;padding-left:9px;padding-right:9px}.center-zone{min-height:138px}.opponent-zone{padding-top:12px}.player-zone{padding-bottom:11px}.hand .playing-card{margin-left:-26px}.playing-card .corner{font-size:14px}}
+@media(max-width:400px){:root{--card-w:clamp(55px,19vw,76px)}.table{min-height:355px}.app{gap:8px;padding-left:9px;padding-right:9px}.center-zone{min-height:138px}.opponent-zone{padding-top:12px}.player-zone{padding-bottom:11px}.hand{padding-left:3px;padding-right:3px}.hand .playing-card{margin-left:-6px}.playing-card .corner{font-size:14px}}
 @media(max-height:690px){:root{--card-w:75px}.table{min-height:335px}.app{gap:6px;padding-top:calc(env(safe-area-inset-top) + 6px)}.opponent-zone{padding-top:8px}.player-zone{padding-bottom:7px;min-height:130px}.hand{min-height:120px}.hand-scroller{padding:7px 5px}.scores{padding:5px}.playing-card .corner{font-size:13px}.playing-card .rank-name{font-size:8px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style></head><body>
@@ -101,7 +172,7 @@ body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var
 </main>
 <div id="suitOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="suitTitle"><div class="emoji">🃏</div><h2 id="suitTitle">Zvol barvu</h2><p>Svršek můžeš položit na libovolnou kartu. Jakou barvu má hrát počítač?</p><div id="suitChoices" class="choices"></div><button id="cancelSuit" class="button secondary">Zrušit</button></section></div>
 <div id="resultOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div id="resultEmoji" class="emoji">🏆</div><h2 id="resultTitle">Vyhrál jsi!</h2><p id="resultText"></p><button id="playAgain" class="button">Hrát znovu</button></section></div>
-<div id="settingsOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-header"><h2 id="settingsTitle">⚙️ Nastavení</h2><button id="closeSettings" class="close" aria-label="Zavřít">×</button></div><div class="setting"><label>Obtížnost počítače</label><div class="choices"><button class="choice" data-difficulty="easy">Lehká</button><button class="choice" data-difficulty="normal">Střední</button><button class="choice" data-difficulty="hard">Těžká</button></div></div><div class="setting"><label>Vzhled stolu</label><div class="choices"><button class="choice" data-theme="green">🟢 Zelený</button><button class="choice" data-theme="blue">🔵 Modrý</button></div></div><div class="setting toggle-row"><span>Zvuky</span><button id="soundButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div><p class="version">Prší Deluxe v__APP_VERSION__ • Hra offline bez registrace</p></section></div>
+<div id="settingsOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-header"><h2 id="settingsTitle">⚙️ Nastavení</h2><button id="closeSettings" class="close" aria-label="Zavřít">×</button></div><div class="setting"><label>Obtížnost počítače</label><div class="choices"><button class="choice" data-difficulty="easy">Lehká</button><button class="choice" data-difficulty="normal">Střední</button><button class="choice" data-difficulty="hard">Těžká</button></div></div><div class="setting"><label>Vzhled stolu</label><div class="choices"><button class="choice" data-theme="green">🟢 Zelený</button><button class="choice" data-theme="blue">🔵 Modrý</button></div></div><div class="setting toggle-row"><span>Zvuky</span><button id="soundButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div><div class="setting"><label>Aktualizace</label><p id="updateStatus" class="update-status" role="status">Používáš verzi __APP_VERSION__. Aktualizace se při spuštění hry kontrolují automaticky.</p><button id="checkUpdatesButton" class="button secondary update-check">🔄 Zkontrolovat aktualizace</button></div><p class="version">Prší Deluxe v__APP_VERSION__ • Hra offline bez registrace</p></section></div>
 <div id="rulesOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="modal-header"><h2 id="rulesTitle">📖 Jak hrát</h2><button class="close" data-close="rulesOverlay" aria-label="Zavřít">×</button></div><ol class="rules"><li>Hraje se s <strong>32 mariášovými kartami</strong>, každý dostane čtyři. Vyhrává ten, kdo se první zbaví všech karet.</li><li>Pokládej kartu stejné <strong>barvy nebo hodnoty</strong> jako poslední vyložená karta.</li><li><strong>Sedmička</strong> znamená +2 karty. Další sedmičkou lze trest přenést a navýšit.</li><li><strong>Eso</strong> znamená „stojíš“. Můžeš ho přebít svým esem.</li><li><strong>Svršek</strong> můžeš položit na libovolnou kartu kromě rozehrané sedmičky nebo esa a zvolíš další barvu.</li><li>Když nemáš co zahrát, <strong>lízneš jednu kartu</strong> a tah končí. Po vyčerpání balíčku se odložené karty promíchají.</li></ol></section></div>
 <div id="logOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="logTitle"><div class="modal-header"><h2 id="logTitle">☷ Záznam hry</h2><button class="close" data-close="logOverlay" aria-label="Zavřít">×</button></div><ol id="logList" class="log-list"></ol></section></div>
 <script>
@@ -374,16 +445,32 @@ for(const button of document.querySelectorAll('[data-close]'))button.addEventLis
 for(const button of document.querySelectorAll('[data-difficulty]'))button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;render();});
 for(const button of document.querySelectorAll('[data-theme]'))button.addEventListener('click',()=>{state.theme=button.dataset.theme;render();});
 el('soundButton').addEventListener('click',()=>{state.sound=!state.sound;render();});
+el('checkUpdatesButton').addEventListener('click',async()=>{
+  const button=el('checkUpdatesButton'),status=el('updateStatus');
+  button.disabled=true;button.textContent='⏳ Kontroluji…';
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),7000);
+  try{
+    const response=await fetch(__VERSION_URL__+'?t='+Date.now(),{cache:'no-store',signal:controller.signal});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    const info=await response.json();
+    if(!info||typeof info.version!=='string'||!/^\d+\.\d+\.\d+$/.test(info.version))throw Error('Neplatná verze');
+    const current='__APP_VERSION__'.split('.').map(Number),latest=info.version.split('.').map(Number);
+    const newer=latest.some((number,i)=>number!==current[i]&&latest.slice(0,i).every((value,j)=>value===current[j])&&number>current[i]);
+    status.textContent=newer?'🔔 Nová verze '+info.version+' je dostupná. Zavři Prší a spusť ho znovu pro instalaci.':'✅ Používáš aktuální verzi '+current.join('.')+'.';
+  }catch(_){status.textContent='🌐 Aktualizace nyní nelze ověřit. Hru můžeš dál používat offline.';}
+  finally{clearTimeout(timer);button.disabled=false;button.textContent='🔄 Zkontrolovat aktualizace';}
+});
 for(const id of ['settingsOverlay','rulesOverlay','logOverlay'])el(id).addEventListener('click',event=>{if(event.target===el(id))el(id).hidden=true;});
 render();scheduleAI();
 </script></body></html>`
 
 const view = new WebView()
 await view.loadHTML(html.replace("__INITIAL_STATE__", JSON.stringify(initial).replace(/</g, "\\u003c"))
-  .replace("__APP_VERSION__", APP_VERSION))
+  .replace(/__APP_VERSION__/g, APP_VERSION).replace("__VERSION_URL__", JSON.stringify(UPDATE_VERSION_URL)))
 await view.present(true)
 try {
   const finalState = await view.evaluateJavaScript("JSON.stringify(state)")
   if (typeof finalState === "string") Keychain.set(SAVE_KEY, finalState)
 } catch (_) {}
+}
 Script.complete()

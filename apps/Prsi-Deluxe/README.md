@@ -24,9 +24,11 @@ První samostatná verze klasického českého **Prší** na iPhone v aplikaci [
 
 - Tři obtížnosti počítače: lehká, střední, těžká.
 - Zelený nebo modrý karetní stůl, jednoduché zvukové efekty.
+- Karty v ruce se jen mírně překrývají a zůstávají plně neprůhledné. Pokud se jich nahromadí více, lze řadou vodorovně posouvat.
 - Záznam tahů, přehled stavu výher a nová partie.
+- Kontrola aktualizací v Nastavení a automatická kontrola při spuštění; nová verze se instaluje s potvrzením a zálohou původního skriptu.
 - Samostatná implementace v JavaScriptu a HTML zobrazeném uvnitř Scriptable (`WebView`).
 
-**Stav:** verze 0.1.0 připravená pro první test na iPhonu. Online hráči a integrace do Číselné arény zatím nejsou součástí hry.
+**Stav:** verze 0.1.1 pro test na iPhonu. Z verze 0.1.0 je potřeba tuto aktualizaci nainstalovat ručně; od verze 0.1.1 funguje kontrola dalších aktualizací přímo v aplikaci. Online hráči a integrace do Číselné arény zatím nejsou součástí hry.
 
 Vzhled stolu a pravidla byly konzultovány podle veřejné hry [PršíGame.cz](https://www.prsigame.cz/play/) a [jejího návodu](https://www.prsigame.cz/blog/rules-of-prsi-how-to-play/). Kód a grafika jsou vlastní, nejedná se o kopii původní aplikace.

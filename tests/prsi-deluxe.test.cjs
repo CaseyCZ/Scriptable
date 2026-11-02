@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '../apps/Prsi-Deluxe/Prsi Deluxe.js'), 'utf8');
-const opening = source.indexOf('const engine = (() => {');
+const opening = source.lastIndexOf('const engine = (() => {');
 const closing = source.indexOf('// ENGINE END', opening);
 if (opening < 0 || closing < 0) throw new Error('Nelze najít samostatná pravidla Prší');
 const engineSource = source.slice(opening, closing);
@@ -28,6 +28,26 @@ test('Scriptable obsahuje syntakticky platný HTML herní skript', () => {
   assert.doesNotThrow(() => new vm.Script(browserScript));
   assert.ok(source.includes('new WebView()'));
   assert.ok(source.includes('await view.present(true)'));
+});
+
+test('karty v ruce jsou neprůhledné a Settings mají kontrolu aktualizací', () => {
+  assert.match(source, /\.hand \.playing-card:disabled\{opacity:1;cursor:default\}/);
+  assert.match(source, /\.hand \.playing-card\{[^}]*margin-left:-8px/);
+  assert.match(source, /id="checkUpdatesButton"/);
+  assert.match(source, /const UPDATE_VERSION_URL = "https:\/\//);
+  assert.match(source, /if \(!await checkForUpdates\(\)\)/);
+  assert.match(source, /_backup_/);
+});
+
+test('porovnávání verzí nepovažuje starší vydání za aktualizaci', () => {
+  const start = source.indexOf('function compareVersions(');
+  const end = source.indexOf('async function checkForUpdates()', start);
+  assert.ok(start > 0 && end > start);
+  const compare = vm.runInNewContext(source.slice(start, end) + '\ncompareVersions;', {});
+  assert.equal(compare('0.1.1', '0.1.2'), -1);
+  assert.equal(compare('0.1.1', '0.2.0'), -1);
+  assert.equal(compare('0.1.1', '0.1.1'), 0);
+  assert.equal(compare('0.1.1', '0.0.9'), 1);
 });
 
 function fixture({ hand0 = ['hearts-7'], hand1 = ['bells-7'], top = 'hearts-8', current = 0, pending = null } = {}) {
